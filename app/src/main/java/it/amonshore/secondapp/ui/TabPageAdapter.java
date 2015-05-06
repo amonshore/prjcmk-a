@@ -24,7 +24,7 @@ public class TabPageAdapter extends FragmentStatePagerAdapter {
 
         //preparo le pagine
         mPages = new ArrayList<>();
-        mPages.add(ComicsFragment.newInstance("P1", "P2"));
+        mPages.add(ComicsListFragment.newInstance("P1", "P2"));
         mPages.add(FakeBlankFragment.newInstance("Fake page A"));
         mPages.add(FakeBlankFragment.newInstance("Fake page B"));
     }
@@ -33,11 +33,6 @@ public class TabPageAdapter extends FragmentStatePagerAdapter {
     public Fragment getItem(int position) {
         Log.d("XXX", "getItem " + position);
         return mPages.get(position);
-//        if (position == PAGE_COMICS) {
-//            return ComicsFragment.newInstance("P1", "P2");
-//        } else {
-//            return FakeBlankFragment.newInstance("Fake page " + position);
-//        }
     }
 
     @Override
