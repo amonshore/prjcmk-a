@@ -1,6 +1,8 @@
 package it.amonshore.secondapp.ui;
 
+import android.support.v4.app.FragmentTransaction;
 import android.support.v4.view.ViewPager;
+import android.support.v7.app.ActionBar;
 import android.support.v7.app.ActionBarActivity;
 import android.os.Bundle;
 import android.view.Menu;
@@ -8,14 +10,46 @@ import android.view.MenuItem;
 
 import it.amonshore.secondapp.R;
 
-public class MainActivity extends ActionBarActivity {
+/**
+ * http://developer.android.com/training/implementing-navigation/lateral.html#tabs
+ */
+public class MainActivity extends ActionBarActivity
+        implements ComicsFragment.OnFragmentInteractionListener {
 
+    TabPageAdapter mTabPageAdapter;
     ViewPager mViewPager;
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
         setContentView(R.layout.activity_main);
+
+        final ActionBar actionBar = getSupportActionBar();
+        actionBar.setNavigationMode(ActionBar.NAVIGATION_MODE_TABS);
+
+        mTabPageAdapter = new TabPageAdapter(getSupportFragmentManager());
+        mViewPager = (ViewPager)findViewById(R.id.pager);
+        mViewPager.setAdapter(mTabPageAdapter);
+        mViewPager.setOnPageChangeListener(new ViewPager.SimpleOnPageChangeListener() {
+            @Override
+            public void onPageSelected(int position) {
+                actionBar.setSelectedNavigationItem(position);
+            }
+        });
+
+        final SimpleActionBarTabListener tabListener = new SimpleActionBarTabListener() {
+            @Override
+            public void onTabSelected(ActionBar.Tab tab, FragmentTransaction fragmentTransaction) {
+                mViewPager.setCurrentItem(tab.getPosition());
+            }
+        };
+
+        for (int ii=0; ii<mTabPageAdapter.getCount(); ii++) {
+            actionBar.addTab(
+                actionBar.newTab()
+                    .setText(mTabPageAdapter.getPageTitle(ii))
+                    .setTabListener(tabListener));
+        }
     }
 
     @Override
@@ -38,5 +72,10 @@ public class MainActivity extends ActionBarActivity {
         }
 
         return super.onOptionsItemSelected(item);
+    }
+
+    @Override
+    public void onFragmentInteraction(String id) {
+        //TODO
     }
 }
