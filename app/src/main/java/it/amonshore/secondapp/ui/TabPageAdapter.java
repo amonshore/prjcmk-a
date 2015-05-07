@@ -12,6 +12,8 @@ import java.util.ArrayList;
  */
 public class TabPageAdapter extends FragmentStatePagerAdapter {
 
+    private final static String LOG_TAG = "TPA";
+
     public final static int TOT_PAGES = 3;
     public final static int PAGE_COMICS = 0;
     public final static int PAGE_RELEASES = 1;
@@ -24,14 +26,14 @@ public class TabPageAdapter extends FragmentStatePagerAdapter {
 
         //preparo le pagine
         mPages = new ArrayList<>();
-        mPages.add(ComicsListFragment.newInstance("P1", "P2"));
+        mPages.add(new ComicsListFragment());
         mPages.add(FakeBlankFragment.newInstance("Fake page A"));
         mPages.add(FakeBlankFragment.newInstance("Fake page B"));
     }
 
     @Override
     public Fragment getItem(int position) {
-        Log.d("XXX", "getItem " + position);
+        //Log.d(LOG_TAG, "getItem " + position);
         return mPages.get(position);
     }
 
@@ -42,7 +44,7 @@ public class TabPageAdapter extends FragmentStatePagerAdapter {
 
     @Override
     public CharSequence getPageTitle(int position) {
-        Log.d("XXX", "getPageTitle " + position);
+        //Log.d(LOG_TAG, "getPageTitle " + position);
         if (position == PAGE_COMICS) {
             return "Comics";
         } else {

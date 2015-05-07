@@ -18,7 +18,7 @@ import it.amonshore.secondapp.R;
  * Use the {@link FakeBlankFragment#newInstance} factory method to
  * create an instance of this fragment.
  */
-public class FakeBlankFragment extends Fragment {
+public class FakeBlankFragment extends Fragment implements OnChangePageListener {
 
     private static final String ARG_MESSAGE = "message";
 
@@ -58,6 +58,11 @@ public class FakeBlankFragment extends Fragment {
         View rootView = inflater.inflate(R.layout.fragment_fake_blank, container, false);
         ((TextView)rootView.findViewById(R.id.txt_message)).setText(mMessage);
         return rootView;
+    }
+
+    @Override
+    public void finishActionMode() {
+        //
     }
 
 }

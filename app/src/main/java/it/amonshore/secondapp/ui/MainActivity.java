@@ -7,6 +7,7 @@ import android.support.v4.view.ViewPager;
 import android.support.v7.app.ActionBar;
 import android.support.v7.app.ActionBarActivity;
 import android.os.Bundle;
+import android.util.Log;
 import android.view.Menu;
 import android.view.MenuItem;
 
@@ -18,8 +19,12 @@ import it.amonshore.secondapp.R;
 public class MainActivity extends ActionBarActivity
         implements ComicsListFragment.OnFragmentInteractionListener {
 
+    private final static String LOG_TAG = "MAC";
+
     TabPageAdapter mTabPageAdapter;
     ViewPager mViewPager;
+    //salvo la page/fragment precedente
+    int mPreviousPage;
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
@@ -41,18 +46,23 @@ public class MainActivity extends ActionBarActivity
         mTabPageAdapter = new TabPageAdapter(getSupportFragmentManager());
         mViewPager = (ViewPager)findViewById(R.id.pager);
         mViewPager.setAdapter(mTabPageAdapter);
+        mPreviousPage = 0;
         //gestisco la selezione delle tab allo swipe dei fragment
         mViewPager.setOnPageChangeListener(new ViewPager.SimpleOnPageChangeListener() {
             @Override
             public void onPageSelected(int position) {
-                actionBar.setSelectedNavigationItem(position);
+                //chiudo l'ActionBar contestuale del fragment precedente
+                ((OnChangePageListener)mTabPageAdapter.getItem(mPreviousPage)).finishActionMode();
+                actionBar.setSelectedNavigationItem(mPreviousPage = position);
             }
         });
         //gesisco la selezione del fragment alla selezione di una tab
         final SimpleActionBarTabListener tabListener = new SimpleActionBarTabListener() {
             @Override
             public void onTabSelected(ActionBar.Tab tab, FragmentTransaction fragmentTransaction) {
-                mViewPager.setCurrentItem(tab.getPosition());
+                //chiudo l'ActionBar contestuale del fragment precedente
+                ((OnChangePageListener)mTabPageAdapter.getItem(mPreviousPage)).finishActionMode();
+                mViewPager.setCurrentItem(mPreviousPage = tab.getPosition());
             }
         };
         //per ogni fragment fornito dall'adapter creo una tab

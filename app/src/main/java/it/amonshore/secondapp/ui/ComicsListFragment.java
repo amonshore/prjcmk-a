@@ -3,18 +3,21 @@ package it.amonshore.secondapp.ui;
 import android.app.Activity;
 import android.os.Bundle;
 import android.support.v4.app.Fragment;
+import android.util.Log;
+import android.view.ActionMode;
 import android.view.LayoutInflater;
+import android.view.Menu;
+import android.view.MenuItem;
 import android.view.View;
 import android.view.ViewGroup;
 import android.widget.AbsListView;
 import android.widget.AdapterView;
-import android.widget.ArrayAdapter;
 import android.widget.ListAdapter;
+import android.widget.ListView;
 import android.widget.TextView;
 
 import it.amonshore.secondapp.R;
-
-import it.amonshore.secondapp.ui.dummy.DummyContent;
+import it.amonshore.secondapp.data.DataManager;
 
 /**
  * A fragment representing a list of Items.
@@ -25,39 +28,14 @@ import it.amonshore.secondapp.ui.dummy.DummyContent;
  * Activities containing this fragment MUST implement the {@link OnFragmentInteractionListener}
  * interface.
  */
-public class ComicsListFragment extends Fragment implements AbsListView.OnItemClickListener {
+public class ComicsListFragment extends Fragment implements AbsListView.OnItemClickListener, OnChangePageListener {
 
-    // TODO: Rename parameter arguments, choose names that match
-    // the fragment initialization parameters, e.g. ARG_ITEM_NUMBER
-    private static final String ARG_PARAM1 = "param1";
-    private static final String ARG_PARAM2 = "param2";
-
-    // TODO: Rename and change types of parameters
-    private String mParam1;
-    private String mParam2;
+    private final static String LOG_TAG = "CLF";
 
     private OnFragmentInteractionListener mListener;
-
-    /**
-     * The fragment's ListView/GridView.
-     */
     private AbsListView mListView;
-
-    /**
-     * The Adapter which will be used to populate the ListView/GridView with
-     * Views.
-     */
     private ListAdapter mAdapter;
-
-    // TODO: Rename and change types of parameters
-    public static ComicsListFragment newInstance(String param1, String param2) {
-        ComicsListFragment fragment = new ComicsListFragment();
-        Bundle args = new Bundle();
-        args.putString(ARG_PARAM1, param1);
-        args.putString(ARG_PARAM2, param2);
-        fragment.setArguments(args);
-        return fragment;
-    }
+    private ActionMode mActionMode;
 
     /**
      * Mandatory empty constructor for the fragment manager to instantiate the
@@ -70,14 +48,8 @@ public class ComicsListFragment extends Fragment implements AbsListView.OnItemCl
     public void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
 
-        if (getArguments() != null) {
-            mParam1 = getArguments().getString(ARG_PARAM1);
-            mParam2 = getArguments().getString(ARG_PARAM2);
-        }
-
-        // TODO: Change Adapter to display your content
-        mAdapter = new ArrayAdapter<DummyContent.DummyItem>(getActivity(),
-                android.R.layout.simple_list_item_1, android.R.id.text1, DummyContent.ITEMS);
+        //
+        mAdapter = new ComicsListAdapter(getActivity(), DataManager.getComics());
     }
 
     @Override
@@ -90,7 +62,38 @@ public class ComicsListFragment extends Fragment implements AbsListView.OnItemCl
         ((AdapterView<ListAdapter>) mListView).setAdapter(mAdapter);
 
         // Set OnItemClickListener so we can be notified on item clicks
-        mListView.setOnItemClickListener(this);
+        //mListView.setOnItemClickListener(this);
+        //
+        mListView.setChoiceMode(ListView.CHOICE_MODE_MULTIPLE_MODAL);
+        mListView.setMultiChoiceModeListener(new AbsListView.MultiChoiceModeListener() {
+            @Override
+            public void onItemCheckedStateChanged(ActionMode mode, int position, long id, boolean checked) {
+                //Log.d(LOG_TAG, "onItemCheckedStateChanged " + position);
+                mode.setTitle(mListView.getCheckedItemCount() + " selected items");
+            }
+
+            @Override
+            public boolean onCreateActionMode(ActionMode mode, Menu menu) {
+                //Log.d(LOG_TAG, "onCreateActionMode");
+                mActionMode = mode;
+                return true;
+            }
+
+            @Override
+            public boolean onActionItemClicked(ActionMode mode, MenuItem item) {
+                return false;
+            }
+
+            @Override
+            public boolean onPrepareActionMode(ActionMode mode, Menu menu) {
+                return false;
+            }
+
+            @Override
+            public void onDestroyActionMode(ActionMode mode) {
+                mActionMode = null;
+            }
+        });
 
         return view;
     }
@@ -117,7 +120,7 @@ public class ComicsListFragment extends Fragment implements AbsListView.OnItemCl
         if (null != mListener) {
             // Notify the active callbacks interface (the activity, if the
             // fragment is attached to one) that an item has been selected.
-            mListener.onFragmentInteraction(DummyContent.ITEMS.get(position).id);
+            //mListener.onFragmentInteraction(DummyContent.ITEMS.get(position).id);
         }
     }
 
@@ -132,6 +135,12 @@ public class ComicsListFragment extends Fragment implements AbsListView.OnItemCl
         if (emptyView instanceof TextView) {
             ((TextView) emptyView).setText(emptyText);
         }
+    }
+
+    @Override
+    public void finishActionMode() {
+        if (mActionMode != null)
+            mActionMode.finish();
     }
 
     /**
