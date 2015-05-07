@@ -10,10 +10,9 @@ public class DataManager {
 
     public static List<Comics> getComics() {
         ArrayList<Comics> list = new ArrayList<>();
-        list.add(new Comics("Item 1"));
-        list.add(new Comics("Item 2"));
-        list.add(new Comics("Item 3"));
-        list.add(new Comics("Item 4"));
+        for (int ii=1; ii<=100; ii++) {
+            list.add(new Comics("Item " + ii));
+        }
         return list;
     }
 

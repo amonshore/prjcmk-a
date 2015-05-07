@@ -16,8 +16,7 @@ import it.amonshore.secondapp.R;
 /**
  * http://developer.android.com/training/implementing-navigation/lateral.html#tabs
  */
-public class MainActivity extends ActionBarActivity
-        implements ComicsListFragment.OnFragmentInteractionListener {
+public class MainActivity extends ActionBarActivity {
 
     private final static String LOG_TAG = "MAC";
 
@@ -98,8 +97,4 @@ public class MainActivity extends ActionBarActivity
         return super.onOptionsItemSelected(item);
     }
 
-    @Override
-    public void onFragmentInteraction(String id) {
-        //TODO ComicsListFragment fornisce un rudimentale sistema di scambio dati con l'activity principale
-    }
 }
