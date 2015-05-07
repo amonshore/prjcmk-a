@@ -1,6 +1,7 @@
 package it.amonshore.secondapp.ui;
 
 import android.content.Intent;
+import android.preference.PreferenceManager;
 import android.support.v4.app.FragmentTransaction;
 import android.support.v4.view.ViewPager;
 import android.support.v7.app.ActionBar;
@@ -24,12 +25,16 @@ public class MainActivity extends ActionBarActivity
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
         //il layout contiene solo il ViewPager
-        //l'action bar Ë fornita dalla super classe
+        //l'action bar √® fornita dalla super classe
         setContentView(R.layout.activity_main);
+
+        //impsota i valori di default, il parametro false assicura che questo venga fatto una sola volta
+        //  indipendentemente da quante volte viene chiamato il metodo
+        PreferenceManager.setDefaultValues(this, R.xml.preferences, false);
 
         //attenzione, usare getSupportActionBar() per recuperare l'action bar
         final ActionBar actionBar = getSupportActionBar();
-        //imposto la modalit‡ di navitazione a tab (sar‡ possibile aggiungere tab all'action bar)
+        //imposto la modalit√† di navitazione a tab (sar√† possibile aggiungere tab all'action bar)
         actionBar.setNavigationMode(ActionBar.NAVIGATION_MODE_TABS);
 
         //l'adapter fornisce i fragment che comporranno la vista a tab
@@ -75,6 +80,8 @@ public class MainActivity extends ActionBarActivity
 
         //noinspection SimplifiableIfStatement
         if (id == R.id.action_settings) {
+            Intent intent = new Intent(this, SettingsActivity.class);
+            startActivity(intent);
             return true;
         }
 
