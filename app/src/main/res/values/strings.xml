@@ -9,6 +9,7 @@
     <string name="pref_title_test1">Test 1</string>
 
     <string name="action_comics_delete">Remove</string>
+    <string name="action_comics_add">Add</string>
 
     <string name="selected_comics">%1d selected</string>
 </resources>

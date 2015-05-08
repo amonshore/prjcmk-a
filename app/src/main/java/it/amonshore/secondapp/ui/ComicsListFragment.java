@@ -1,6 +1,7 @@
 package it.amonshore.secondapp.ui;
 
 import android.app.Activity;
+import android.os.AsyncTask;
 import android.os.Bundle;
 import android.support.v4.app.Fragment;
 import android.util.Log;
@@ -16,6 +17,8 @@ import android.widget.AdapterView;
 import android.widget.ListAdapter;
 import android.widget.ListView;
 import android.widget.TextView;
+
+import java.util.List;
 
 import it.amonshore.secondapp.R;
 import it.amonshore.secondapp.data.Comics;
@@ -33,7 +36,7 @@ public class ComicsListFragment extends Fragment implements OnChangePageListener
     private final static String LOG_TAG = "CLF";
 
     private AbsListView mListView;
-    private ListAdapter mAdapter;
+    private ComicsListAdapter mAdapter;
     private ActionMode mActionMode;
 
     /**
@@ -46,9 +49,12 @@ public class ComicsListFragment extends Fragment implements OnChangePageListener
     @Override
     public void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
+        setHasOptionsMenu(true);
 
-        //
-        mAdapter = new ComicsListAdapter(getActivity(), DataManager.getComics());
+        //TODO recuperare l'ordinamento dalle preferenze
+        mAdapter = new ComicsListAdapter(getActivity(), ComicsListAdapter.ORDER_ASC | ComicsListAdapter.ORDER_BY_NAME);
+        //leggo i dati in modalità asincrona
+        refreshData();
     }
 
     @Override
@@ -60,14 +66,12 @@ public class ComicsListFragment extends Fragment implements OnChangePageListener
         mListView = (AbsListView) view.findViewById(android.R.id.list);
         ((AdapterView<ListAdapter>) mListView).setAdapter(mAdapter);
 
-        // Set OnItemClickListener so we can be notified on item clicks
-        //mListView.setOnItemClickListener(this);
         //
         mListView.setChoiceMode(ListView.CHOICE_MODE_MULTIPLE_MODAL);
         mListView.setOnItemClickListener(new AdapterView.OnItemClickListener() {
             @Override
             public void onItemClick(AdapterView<?> parent, View view, int position, long id) {
-                Log.d(LOG_TAG, "onItemClick " + ((Comics)mAdapter.getItem(position)).getName());
+                Log.d(LOG_TAG, "onItemClick " + ((Comics) mAdapter.getItem(position)).getName());
             }
         });
         mListView.setMultiChoiceModeListener(new AbsListView.MultiChoiceModeListener() {
@@ -112,6 +116,28 @@ public class ComicsListFragment extends Fragment implements OnChangePageListener
         return view;
     }
 
+    @Override
+    public void onCreateOptionsMenu(Menu menu, MenuInflater inflater) {
+        inflater.inflate(R.menu.menu_comics, menu);
+    }
+
+    @Override
+    public boolean onOptionsItemSelected(MenuItem item) {
+        int id = item.getItemId();
+
+        if (id == R.id.action_comics_add) {
+            new UpdateComicsAsyncTask()
+                    .execute(new Comics(System.currentTimeMillis(), "Item " + (mAdapter.getCount() + 1)));
+            return true;
+        } else {
+            return false;
+        }
+    }
+
+    public void refreshData() {
+        new ReadComicsAsyncTask().execute();
+    }
+
     /**
      * The default content for this Fragment has a TextView that is shown when
      * the list is empty. If you would like to change the text, call this method
@@ -129,6 +155,82 @@ public class ComicsListFragment extends Fragment implements OnChangePageListener
     public void finishActionMode() {
         if (mActionMode != null)
             mActionMode.finish();
+    }
+
+    /**
+     * Task asincrono per la lettura dei dati
+     */
+    private class ReadComicsAsyncTask extends AsyncTask<Void, Comics, Integer> {
+        @Override
+        protected Integer doInBackground(Void... params) {
+            List<Comics> list = DataManager.readComics();
+            ComicsListFragment.this.mAdapter.clear();
+
+            for (int ii=0; ii<list.size(); ii++) {
+                publishProgress(list.get(ii));
+                if (isCancelled()) break;
+            }
+
+            return list.size();
+        }
+
+        @Override
+        protected void onProgressUpdate(Comics... values) {
+            ComicsListFragment.this.mAdapter.insertOrUpdate(values[0]);
+        }
+
+        @Override
+        protected void onPostExecute(Integer result) {
+            ComicsListFragment.this.mAdapter.notifyDataSetChanged();
+        }
+    }
+
+    /**
+     * Task asincrono per l'aggiornamento dei dati (nuovo, modifica)
+     * Il terzo parametro indica l'indice dell'elemento aggiunto/modificato
+     */
+    private class UpdateComicsAsyncTask extends AsyncTask<Comics, Comics, Integer> {
+        @Override
+        protected Integer doInBackground(Comics... params) {
+            //TODO salvare i dati con DataManager
+
+            for (Comics comics : params) {
+                publishProgress(comics);
+            }
+            return params.length;
+        }
+
+        @Override
+        protected void onProgressUpdate(Comics... values) {
+            int index = ComicsListFragment.this.mAdapter.insertOrUpdate(values[0]);
+            //TODO aggiornare solo la vista dell'elemento modificato
+
+        }
+
+        @Override
+        protected void onPostExecute(Integer integer) {
+            //ComicsListFragment.this.mAdapter.notifyDataSetChanged();
+        }
+    }
+
+    /**
+     * Task asincrono per la rimoazione dei dati
+     */
+    private class RemoveComicsAsyncTask extends AsyncTask<Comics, Comics, Integer> {
+        @Override
+        protected Integer doInBackground(Comics... params) {
+            return null;
+        }
+
+        @Override
+        protected void onProgressUpdate(Comics... values) {
+            super.onProgressUpdate(values);
+        }
+
+        @Override
+        protected void onPostExecute(Integer integer) {
+            ComicsListFragment.this.mAdapter.notifyDataSetChanged();
+        }
     }
 
 }
