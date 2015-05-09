@@ -8,8 +8,10 @@
     <string name="title_activity_settings">Settings</string>
     <string name="pref_title_test1">Test 1</string>
 
-    <string name="action_comics_delete">Remove</string>
     <string name="action_comics_add">Add</string>
+    <string name="action_comics_delete">Remove</string>
+    <string name="action_comics_sort_by_name">Sort by name</string>
+    <string name="action_comics_sort_by_release">Sort by release</string>
 
     <string name="selected_comics">%1d selected</string>
 </resources>

@@ -4,4 +4,10 @@
     <item android:id="@+id/action_comics_add" android:title="@string/action_comics_add"
         android:icon="@android:drawable/ic_menu_add"
         android:orderInCategory="10" app:showAsAction="ifRoom" />
+    <item android:id="@+id/action_comics_sort_by_name" android:title="@string/action_comics_sort_by_name"
+        android:icon="@android:drawable/ic_menu_sort_alphabetically"
+        android:orderInCategory="20" app:showAsAction="ifRoom" />
+    <item android:id="@+id/action_comics_sort_by_release" android:title="@string/action_comics_sort_by_release"
+        android:icon="@android:drawable/ic_menu_sort_by_size"
+        android:orderInCategory="20" app:showAsAction="ifRoom" />
 </menu>
