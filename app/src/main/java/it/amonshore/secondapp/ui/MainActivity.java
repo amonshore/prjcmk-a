@@ -1,6 +1,7 @@
 package it.amonshore.secondapp.ui;
 
 import android.content.Intent;
+import android.graphics.Color;
 import android.preference.PreferenceManager;
 import android.support.v4.app.FragmentTransaction;
 import android.support.v4.view.ViewPager;
@@ -10,6 +11,8 @@ import android.os.Bundle;
 import android.util.Log;
 import android.view.Menu;
 import android.view.MenuItem;
+
+import com.google.samples.apps.iosched.ui.widget.SlidingTabLayout;
 
 import it.amonshore.secondapp.R;
 
@@ -30,7 +33,8 @@ public class MainActivity extends ActionBarActivity {
         super.onCreate(savedInstanceState);
         //il layout contiene solo il ViewPager
         //l'action bar è fornita dalla super classe
-        setContentView(R.layout.activity_main);
+        //setContentView(R.layout.activity_main);
+        setContentView(R.layout.activity_main_sliding);
 
         //impsota i valori di default, il parametro false assicura che questo venga fatto una sola volta
         //  indipendentemente da quante volte viene chiamato il metodo
@@ -39,7 +43,7 @@ public class MainActivity extends ActionBarActivity {
         //attenzione, usare getSupportActionBar() per recuperare l'action bar
         final ActionBar actionBar = getSupportActionBar();
         //imposto la modalità di navitazione a tab (sarà possibile aggiungere tab all'action bar)
-        actionBar.setNavigationMode(ActionBar.NAVIGATION_MODE_TABS);
+//        actionBar.setNavigationMode(ActionBar.NAVIGATION_MODE_TABS);
 
         //l'adapter fornisce i fragment che comporranno la vista a tab
         mTabPageAdapter = new TabPageAdapter(getSupportFragmentManager());
@@ -55,22 +59,38 @@ public class MainActivity extends ActionBarActivity {
                 actionBar.setSelectedNavigationItem(mPreviousPage = position);
             }
         });
-        //gesisco la selezione del fragment alla selezione di una tab
-        final SimpleActionBarTabListener tabListener = new SimpleActionBarTabListener() {
+//        //gesisco la selezione del fragment alla selezione di una tab
+//        final SimpleActionBarTabListener tabListener = new SimpleActionBarTabListener() {
+//            @Override
+//            public void onTabSelected(ActionBar.Tab tab, FragmentTransaction fragmentTransaction) {
+//                //chiudo l'ActionBar contestuale del fragment precedente
+//                ((OnChangePageListener)mTabPageAdapter.getItem(mPreviousPage)).finishActionMode();
+//                mViewPager.setCurrentItem(mPreviousPage = tab.getPosition());
+//            }
+//        };
+//        //per ogni fragment fornito dall'adapter creo una tab
+//        for (int ii=0; ii<mTabPageAdapter.getCount(); ii++) {
+//            actionBar.addTab(
+//                    actionBar.newTab()
+//                            .setText(mTabPageAdapter.getPageTitle(ii))
+//                            .setTabListener(tabListener));
+//        }
+
+        // Give the SlidingTabLayout the ViewPager
+        SlidingTabLayout slidingTabLayout = (SlidingTabLayout) findViewById(R.id.sliding_tabs);
+        // Set custom tab layout
+        slidingTabLayout.setCustomTabView(R.layout.custom_tab, 0);
+        // Center the tabs in the layout
+        slidingTabLayout.setDistributeEvenly(true);
+        // Customize tab color
+        slidingTabLayout.setCustomTabColorizer(new SlidingTabLayout.TabColorizer() {
             @Override
-            public void onTabSelected(ActionBar.Tab tab, FragmentTransaction fragmentTransaction) {
-                //chiudo l'ActionBar contestuale del fragment precedente
-                ((OnChangePageListener)mTabPageAdapter.getItem(mPreviousPage)).finishActionMode();
-                mViewPager.setCurrentItem(mPreviousPage = tab.getPosition());
+            public int getIndicatorColor(int position) {
+                return getResources().getColor(R.color.tab_indicator);
+//                return Color.RED;
             }
-        };
-        //per ogni fragment fornito dall'adapter creo una tab
-        for (int ii=0; ii<mTabPageAdapter.getCount(); ii++) {
-            actionBar.addTab(
-                    actionBar.newTab()
-                            .setText(mTabPageAdapter.getPageTitle(ii))
-                            .setTabListener(tabListener));
-        }
+        });
+        slidingTabLayout.setViewPager(mViewPager);
     }
 
     @Override
