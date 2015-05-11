@@ -3,6 +3,7 @@ package it.amonshore.secondapp.ui;
 import android.app.Activity;
 import android.os.AsyncTask;
 import android.os.Bundle;
+import android.provider.ContactsContract;
 import android.support.v4.app.Fragment;
 import android.util.Log;
 import android.view.ActionMode;
@@ -38,6 +39,7 @@ public class ComicsListFragment extends Fragment implements OnChangePageListener
     private AbsListView mListView;
     private ComicsListAdapter mAdapter;
     private ActionMode mActionMode;
+    private DataManager mDataManager;
 
     /**
      * Mandatory empty constructor for the fragment manager to instantiate the
@@ -51,6 +53,9 @@ public class ComicsListFragment extends Fragment implements OnChangePageListener
         super.onCreate(savedInstanceState);
         //deve essere chiamato in onCreate
         setHasOptionsMenu(true);
+
+        //
+        mDataManager = DataManager.getDataManager(getActivity());
 
         //TODO recuperare l'ordinamento dalle preferenze
         mAdapter = new ComicsListAdapter(getActivity(), ComicsListAdapter.ORDER_ASC | ComicsListAdapter.ORDER_BY_NAME);
@@ -126,6 +131,7 @@ public class ComicsListFragment extends Fragment implements OnChangePageListener
 
     @Override
     public void onPrepareOptionsMenu(Menu menu) {
+        Log.d(LOG_TAG, "onPrepareOptionsMenu " + mAdapter.getOrder());
         if ((mAdapter.getOrder() & ComicsListAdapter.ORDER_BY_NAME) == ComicsListAdapter.ORDER_BY_NAME) {
             menu.findItem(R.id.action_comics_sort_by_name).setVisible(false);
             menu.findItem(R.id.action_comics_sort_by_release).setVisible(true);
@@ -143,11 +149,12 @@ public class ComicsListFragment extends Fragment implements OnChangePageListener
     @Override
     public boolean onOptionsItemSelected(MenuItem item) {
         int id = item.getItemId();
+        Log.d(LOG_TAG, "onOptionsItemSelected " + item.getTitle());
 
         if (id == R.id.action_comics_add) {
             //TODO aprire l'editor
             new UpdateComicsAsyncTask()
-                    .execute(new Comics(DataManager.getSafeNewId(),
+                    .execute(new Comics(mDataManager.getSafeNewId(),
                             "Item " + (mAdapter.getCount() + 1)));
             return true;
         } else if (id == R.id.action_comics_sort_by_name) {
@@ -200,7 +207,7 @@ public class ComicsListFragment extends Fragment implements OnChangePageListener
     private class ReadComicsAsyncTask extends AsyncTask<Void, Comics, Integer> {
         @Override
         protected Integer doInBackground(Void... params) {
-            List<Comics> list = DataManager.readComics();
+            List<Comics> list = mDataManager.readComics();
             ComicsListFragment.this.mAdapter.clear();
 
             for (int ii=0; ii<list.size(); ii++) {

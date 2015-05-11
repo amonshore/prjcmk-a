@@ -59,7 +59,11 @@ public class ComicsListAdapter extends BaseAdapter {
             this.order = order;
             //TODO impostare il comparator in base all'ordine
             Log.d(LOG_TAG, "setOrder " + order);
-            this.comparator = new NameComparator();
+            if ((order & ORDER_BY_NAME) == ORDER_BY_NAME) {
+                this.comparator = new NameComparator((order & ORDER_DESC) == ORDER_DESC);
+            } else {
+                this.comparator = new ReleaseComparator((order & ORDER_DESC) == ORDER_DESC);
+            }
             Collections.sort(this.sortedIds, this.comparator);
         }
     }
@@ -138,7 +142,8 @@ public class ComicsListAdapter extends BaseAdapter {
         //txtComicsName.setText(comics.getName());
 
         ((TextView)convertView.findViewById(android.R.id.text1)).setText(comics.getName());
-        ((TextView)convertView.findViewById(android.R.id.text2)).setText("id: " + comics.getId());
+        //((TextView)convertView.findViewById(android.R.id.text2)).setText("id: " + comics.getId());
+        ((TextView)convertView.findViewById(android.R.id.text2)).setText(comics.getSeries());
 
         return convertView;
     }
@@ -156,7 +161,10 @@ public class ComicsListAdapter extends BaseAdapter {
 
     private class NameComparator implements Comparator<Long> {
 
-        public boolean desc;
+        private boolean desc;
+        public NameComparator(boolean desc) {
+            this.desc = desc;
+        }
 
         @Override
         public int compare(Long lhs, Long rhs) {
@@ -164,6 +172,27 @@ public class ComicsListAdapter extends BaseAdapter {
             Comics lco = ComicsListAdapter.this.items.get(lhs);
             Comics rco = ComicsListAdapter.this.items.get(rhs);
             if (desc) {
+                return rco.getName().compareToIgnoreCase(lco.getName());
+            } else {
+                return lco.getName().compareToIgnoreCase(rco.getName());
+            }
+        }
+    }
+
+    private class ReleaseComparator implements Comparator<Long> {
+
+        private boolean desc;
+        public ReleaseComparator(boolean desc) {
+            this.desc = desc;
+        }
+
+        @Override
+        public int compare(Long lhs, Long rhs) {
+            //recupero gli elementi in modo da comparare il nome
+            Comics lco = ComicsListAdapter.this.items.get(lhs);
+            Comics rco = ComicsListAdapter.this.items.get(rhs);
+            //TODO ordinare per release
+            if (!desc) {
                 return rco.getName().compareToIgnoreCase(lco.getName());
             } else {
                 return lco.getName().compareToIgnoreCase(rco.getName());
