@@ -1,4 +1,4 @@
 <?xml version="1.0" encoding="utf-8"?>
 <resources>
-    <color name="tab_indicator">@android:color/holo_orange_dark</color>
+    <color name="comikku_yellow_light">#ffc900</color>
 </resources>

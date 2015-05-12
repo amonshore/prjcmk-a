@@ -34,6 +34,7 @@ public class DataManager {
      */
     public static DataManager getDataManager(Context context) {
         if (instance == null || instance.mContext != context) {
+            Log.d(LOG_TAG, "getDataManager " + context);
             instance = new DataManager(context);
         }
 

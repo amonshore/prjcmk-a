@@ -21,6 +21,8 @@ import it.amonshore.secondapp.R;
  */
 public class MainActivity extends ActionBarActivity {
 
+    public final static String PREFS_NAME = "ComikkuPrefs";
+
     private final static String LOG_TAG = "MAC";
 
     TabPageAdapter mTabPageAdapter;
@@ -50,15 +52,16 @@ public class MainActivity extends ActionBarActivity {
         mViewPager = (ViewPager)findViewById(R.id.pager);
         mViewPager.setAdapter(mTabPageAdapter);
         mPreviousPage = 0;
-        //gestisco la selezione delle tab allo swipe dei fragment
-        mViewPager.setOnPageChangeListener(new ViewPager.SimpleOnPageChangeListener() {
-            @Override
-            public void onPageSelected(int position) {
-                //chiudo l'ActionBar contestuale del fragment precedente
-                ((OnChangePageListener)mTabPageAdapter.getItem(mPreviousPage)).finishActionMode();
-                actionBar.setSelectedNavigationItem(mPreviousPage = position);
-            }
-        });
+//        //gestisco la selezione delle tab allo swipe dei fragment
+//        mViewPager.setOnPageChangeListener(new ViewPager.SimpleOnPageChangeListener() {
+//            @Override
+//            public void onPageSelected(int position) {
+//                //chiudo l'ActionBar contestuale del fragment precedente
+//                Log.d(LOG_TAG, "pager OnPageChangeListener " + mPreviousPage);
+//                ((OnChangePageListener)mTabPageAdapter.getItem(mPreviousPage)).finishActionMode();
+//                actionBar.setSelectedNavigationItem(mPreviousPage = position);
+//            }
+//        });
 //        //gesisco la selezione del fragment alla selezione di una tab
 //        final SimpleActionBarTabListener tabListener = new SimpleActionBarTabListener() {
 //            @Override
@@ -86,8 +89,16 @@ public class MainActivity extends ActionBarActivity {
         slidingTabLayout.setCustomTabColorizer(new SlidingTabLayout.TabColorizer() {
             @Override
             public int getIndicatorColor(int position) {
-                return getResources().getColor(R.color.tab_indicator);
-//                return Color.RED;
+                return getResources().getColor(R.color.comikku_yellow_light);
+            }
+        });
+        slidingTabLayout.setOnPageChangeListener(new ViewPager.SimpleOnPageChangeListener() {
+            @Override
+            public void onPageSelected(int position) {
+                //chiudo l'ActionBar contestuale del fragment precedente
+//                Log.d(LOG_TAG, "slidingTabLayout OnPageChangeListener " + mPreviousPage);
+                ((OnChangePageListener) mTabPageAdapter.getItem(mPreviousPage)).finishActionMode();
+                mPreviousPage = position;
             }
         });
         slidingTabLayout.setViewPager(mViewPager);

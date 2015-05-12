@@ -1,6 +1,7 @@
 package it.amonshore.secondapp.ui;
 
 import android.app.Activity;
+import android.content.SharedPreferences;
 import android.os.AsyncTask;
 import android.os.Bundle;
 import android.provider.ContactsContract;
@@ -36,6 +37,8 @@ public class ComicsListFragment extends Fragment implements OnChangePageListener
 
     private final static String LOG_TAG = "CLF";
 
+    private final static String STATE_ORDER = " stateOrder";
+
     private AbsListView mListView;
     private ComicsListAdapter mAdapter;
     private ActionMode mActionMode;
@@ -53,14 +56,41 @@ public class ComicsListFragment extends Fragment implements OnChangePageListener
         super.onCreate(savedInstanceState);
         //deve essere chiamato in onCreate
         setHasOptionsMenu(true);
-
         //
         mDataManager = DataManager.getDataManager(getActivity());
-
-        //TODO recuperare l'ordinamento dalle preferenze
-        mAdapter = new ComicsListAdapter(getActivity(), ComicsListAdapter.ORDER_ASC | ComicsListAdapter.ORDER_BY_NAME);
+        //
+        int order = 0;
+        if (savedInstanceState != null) {
+            //recupero l'ordine usato in precedenza e salvato alla chiusura dell'activity
+            order = savedInstanceState.getInt(STATE_ORDER, ComicsListAdapter.ORDER_BY_NAME);
+        } else {
+            //recupero l'ordinamento dalle preferenze
+            SharedPreferences settings = getActivity().getSharedPreferences(MainActivity.PREFS_NAME, 0);
+            order = settings.getInt(STATE_ORDER, ComicsListAdapter.ORDER_BY_NAME);
+        }
+        //
+        mAdapter = new ComicsListAdapter(getActivity(), order);
         //leggo i dati in modalità asincrona
         refreshData();
+    }
+
+    @Override
+    public void onSaveInstanceState(Bundle savedInstanceState) {
+        //salvo lo stato dell'ordine
+        savedInstanceState.putInt(STATE_ORDER, mAdapter.getOrder());
+        //
+        super.onSaveInstanceState(savedInstanceState);
+    }
+
+    @Override
+    public void onStop() {
+        super.onStop();
+
+        //salvo le preferenze
+        SharedPreferences settings = getActivity().getSharedPreferences(MainActivity.PREFS_NAME, 0);
+        SharedPreferences.Editor editor = settings.edit();
+        editor.putInt(STATE_ORDER, mAdapter.getOrder());
+        editor.commit();
     }
 
     @Override

@@ -2,12 +2,10 @@
 
     <!-- Base application theme. -->
     <style name="AppTheme" parent="Theme.AppCompat.Light.DarkActionBar">
-        <item name="android:actionBarStyle">@style/OrangeActionBarStyle</item>
-        <item name="android:actionBarTabStyle">@style/OrangeActionBarTabStyle</item>
+        <item name="android:actionBarStyle">@style/YelloActionBarStyle</item>
 
         <!-- Support library compatibility -->
-        <item name="actionBarStyle">@style/OrangeActionBarStyle</item>
-        <item name="actionBarTabStyle">@style/OrangeActionBarTabStyle</item>
+        <item name="actionBarStyle">@style/YelloActionBarStyle</item>
     </style>
 
     <!-- ActionBar styles -->
@@ -19,14 +17,13 @@
         <item name="background">@android:color/holo_orange_dark</item>
     </style>
 
-    <!-- ActionBar tabs styles -->
-    <style name="OrangeActionBarTabStyle"
-        parent="@style/Widget.AppCompat.ActionBar.TabView">
-        <!-- tab indicator -->
-        <!--<item name="android:background">@android:color/holo_orange_light</item>-->
+    <!-- ActionBar styles -->
+    <style name="YelloActionBarStyle"
+        parent="@style/Widget.AppCompat.Light.ActionBar.Solid.Inverse">
+        <item name="android:background">@color/comikku_yellow_light</item>
 
         <!-- Support library compatibility -->
-        <!--<item name="background">@android:color/holo_orange_light</item>-->
+        <item name="background">@color/comikku_yellow_light</item>
     </style>
 
 </resources>
