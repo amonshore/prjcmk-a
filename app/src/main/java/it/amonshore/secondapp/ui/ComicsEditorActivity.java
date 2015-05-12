@@ -4,6 +4,8 @@ import android.app.Activity;
 import android.content.Intent;
 import android.support.v7.app.ActionBarActivity;
 import android.os.Bundle;
+import android.text.Editable;
+import android.text.TextWatcher;
 import android.view.Menu;
 import android.view.MenuItem;
 import android.widget.TextView;
@@ -30,7 +32,25 @@ public class ComicsEditorActivity extends ActionBarActivity {
         mComics = (Comics)intent.getSerializableExtra(EXTRA_ENTRY);
         mIsNew = intent.getBooleanExtra(EXTRA_IS_NEW, true);
         //
-        ((TextView)findViewById(R.id.txtEditorComicsName)).setText(mComics.getName());
+        TextView txtName = (TextView)findViewById(R.id.txtEditorComicsName);
+        txtName.setText(mComics.getName());
+        txtName.addTextChangedListener(new TextWatcher() {
+            @Override
+            public void onTextChanged(CharSequence s, int start, int before, int count) {
+
+            }
+
+            @Override
+            public void afterTextChanged(Editable s) {
+                //TODO validazione dati
+                //...TextView.setError
+            }
+
+            @Override
+            public void beforeTextChanged(CharSequence s, int start, int count, int after) {
+
+            }
+        });
     }
 
     @Override

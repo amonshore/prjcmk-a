@@ -16,6 +16,7 @@ import java.io.FileInputStream;
 import java.io.FileReader;
 import java.io.IOException;
 import java.util.ArrayList;
+import java.util.HashSet;
 import java.util.Iterator;
 import java.util.List;
 import java.util.Set;
@@ -47,7 +48,10 @@ public class DataManager {
     private long mLastId;
     private boolean mExternalStorage;
     private Context mContext;
+    //
     private TreeMap<Long, Comics> mComicsCache;
+    //TODO contiene un elenco di tutti gli editori
+    private HashSet<String> mPublishers;
 
     private DataManager(Context context) {
         mContext = context;
@@ -55,11 +59,6 @@ public class DataManager {
         //controllo che la memoria esternza sia disponibile
         mExternalStorage = isExternalStorageWritable();
         Log.d(LOG_TAG, "isExternalStorageWritable " + mExternalStorage);
-//        //TEST
-//        for (int ii=1; ii<=5; ii++) {
-//            list.add(new Comics(++lastId, "Item " + ii));
-//        }
-//        //TEST
     }
 
     private boolean isExternalStorageWritable() {
