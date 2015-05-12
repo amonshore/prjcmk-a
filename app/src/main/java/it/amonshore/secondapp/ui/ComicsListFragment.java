@@ -42,7 +42,6 @@ public class ComicsListFragment extends Fragment implements OnChangePageListener
     private AbsListView mListView;
     private ComicsListAdapter mAdapter;
     private ActionMode mActionMode;
-    private DataManager mDataManager;
 
     /**
      * Mandatory empty constructor for the fragment manager to instantiate the
@@ -56,8 +55,6 @@ public class ComicsListFragment extends Fragment implements OnChangePageListener
         super.onCreate(savedInstanceState);
         //deve essere chiamato in onCreate
         setHasOptionsMenu(true);
-        //
-        mDataManager = DataManager.getDataManager(getActivity());
         //
         int order = 0;
         if (savedInstanceState != null) {
@@ -184,8 +181,7 @@ public class ComicsListFragment extends Fragment implements OnChangePageListener
         if (id == R.id.action_comics_add) {
             //TODO aprire l'editor
             new UpdateComicsAsyncTask()
-                    .execute(new Comics(mDataManager.getSafeNewId(),
-                            "Item " + (mAdapter.getCount() + 1)));
+                    .execute(mAdapter.createNewComics());
             return true;
         } else if (id == R.id.action_comics_sort_by_name) {
             //TODO sort by name
@@ -237,20 +233,8 @@ public class ComicsListFragment extends Fragment implements OnChangePageListener
     private class ReadComicsAsyncTask extends AsyncTask<Void, Comics, Integer> {
         @Override
         protected Integer doInBackground(Void... params) {
-            List<Comics> list = mDataManager.readComics();
-            ComicsListFragment.this.mAdapter.clear();
-
-            for (int ii=0; ii<list.size(); ii++) {
-                publishProgress(list.get(ii));
-                if (isCancelled()) break;
-            }
-
-            return list.size();
-        }
-
-        @Override
-        protected void onProgressUpdate(Comics... values) {
-            ComicsListFragment.this.mAdapter.insertOrUpdate(values[0]);
+            ComicsListFragment.this.mAdapter.refresh();
+            return 0;
         }
 
         @Override

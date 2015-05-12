@@ -16,7 +16,10 @@ import java.io.FileInputStream;
 import java.io.FileReader;
 import java.io.IOException;
 import java.util.ArrayList;
+import java.util.Iterator;
 import java.util.List;
+import java.util.Set;
+import java.util.TreeMap;
 
 /**
  * Created by Calgia on 07/05/2015.
@@ -44,7 +47,7 @@ public class DataManager {
     private long mLastId;
     private boolean mExternalStorage;
     private Context mContext;
-    private List<Comics> mComicsCache;
+    private TreeMap<Long, Comics> mComicsCache;
 
     private DataManager(Context context) {
         mContext = context;
@@ -75,25 +78,27 @@ public class DataManager {
         }
     }
 
-    private List<Comics> parseJSON(String json) {
-        ArrayList<Comics> comics = new ArrayList<>();
+    private TreeMap<Long, Comics> parseJSON(String json) {
+        TreeMap<Long, Comics> map = new TreeMap<>();
         try {
             //TODO attualmente i dati sono strutturati come un array, modificarlo in modo che la struttura sia questa { lastUpdate: <timestamp>, data: <array> }
             JSONArray arr = (JSONArray) new JSONTokener(json).nextValue();
             for (int ii = 0; ii < arr.length(); ii++) {
                 JSONObject obj = arr.getJSONObject(ii);
-                comics.add(json2object(obj));
+                Comics comics = json2object(obj);
+                map.put(comics.getId(), comics);
             }
             //TODO parse json
         } catch (JSONException jsonex) {
             Log.e(LOG_TAG, "parseComics", jsonex);
         }
-        return comics;
+        return map;
     }
 
     private final static String FIELD_ID = "id";
     private final static String FIELD_NAME = "name";
     private final static String FIELD_SERIES = "series";
+    private final static String FIELD_PUBLISHER = "publisher";
 
     private Comics json2object(JSONObject obj) throws JSONException {
         Comics comics = new Comics();
@@ -102,6 +107,7 @@ public class DataManager {
         comics.setId(tryGetId(obj));
         comics.setName(obj.getString(FIELD_NAME));
         comics.setSeries(tryGetString(obj, FIELD_SERIES));
+        comics.setPublisher(tryGetString(obj, FIELD_PUBLISHER));
         //TODO altri campi
         return comics;
     }
@@ -131,7 +137,51 @@ public class DataManager {
      *
      * @return
      */
-    public List<Comics> readComics() {
+    public Set<Long> getComics() {
+        return mComicsCache.keySet();
+    }
+
+    /**
+     *
+     * @param id
+     * @return
+     */
+    public Comics getComics(long id) {
+        return mComicsCache.get(id);
+    }
+
+    /**
+     *
+     * @param comics
+     * @return  true se è stato aggiunto, false se ha sostituito un elemento esistente
+     */
+    public boolean put(Comics comics) {
+        return (mComicsCache.put(comics.getId(), comics) == null);
+    }
+
+    /**
+     *
+     * @param comics
+     * @return  true se l'elemento è stato elmiminato, false se non esisteva
+     */
+    public boolean remove(Comics comics) {
+        return remove(comics.getId());
+    }
+
+    /**
+     *
+     * @param id
+     * @return  true se l'elemento è stato elmiminato, false se non esisteva
+     */
+    public boolean remove(long id) {
+        return (mComicsCache.remove(id) != null);
+    }
+
+    /**
+     *
+     * @return
+     */
+    public int readComics() {
         if (mComicsCache == null) {
             BufferedReader br = null;
             File file = getDataFile();
@@ -155,21 +205,17 @@ public class DataManager {
                     }
                 }
             } else {
-                mComicsCache = new ArrayList<>();
+                mComicsCache = new TreeMap<>();
             }
         }
-        return mComicsCache;
+        return mComicsCache.size();
     }
 
     /**
      *
-     * @param comics
      */
-    public void writeComics(Comics... comics) {
+    public void writeComics() {
         //TODO
-        mComicsCache.clear();
-        for (Comics co : comics)
-            mComicsCache.add(co);
     }
 
 }

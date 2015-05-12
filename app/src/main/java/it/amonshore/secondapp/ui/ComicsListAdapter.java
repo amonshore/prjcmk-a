@@ -11,9 +11,11 @@ import android.widget.TextView;
 import java.util.ArrayList;
 import java.util.Collections;
 import java.util.Comparator;
+import java.util.List;
 import java.util.TreeMap;
 
 import it.amonshore.secondapp.data.Comics;
+import it.amonshore.secondapp.data.DataManager;
 
 /**
  * Created by Calgia on 07/05/2015.
@@ -29,15 +31,15 @@ public class ComicsListAdapter extends BaseAdapter {
     public final static int ORDER_BY_NAME = 2;
     public final static int ORDER_BY_BEST_RELEASE = 4;
 
-    private Context context; //TODO a che serve?
+    private Context context;
+    private DataManager dataManager;
     private ArrayList<Long> sortedIds;
-    private TreeMap<Long, Comics> items;
     private Comparator<Long> comparator;
     private int order;
 
     public ComicsListAdapter(Context context, int order) {
         this.context = context;
-        this.items = new TreeMap<>();
+        this.dataManager = DataManager.getDataManager(context);
         this.sortedIds = new ArrayList<>();
         setOrder(order);
     }
@@ -74,7 +76,7 @@ public class ComicsListAdapter extends BaseAdapter {
      * @return ritorna l'indice dell'elemento o -1 se l'elemento è nuovo
      */
     public int insertOrUpdate(Comics comics) {
-        if (items.put(comics.getId(), comics) == null) {
+        if (this.dataManager.put(comics)) {
             //è un nuovo elemento
             sortedIds.add(comics.getId());
             Collections.sort(this.sortedIds, this.comparator);
@@ -84,6 +86,15 @@ public class ComicsListAdapter extends BaseAdapter {
             Collections.sort(this.sortedIds, this.comparator);
             return sortedIds.indexOf(comics.getId());
         }
+    }
+
+    /**
+     *
+     * @return
+     */
+    public Comics createNewComics() {
+        return new Comics(this.dataManager.getSafeNewId(),
+                "Item " + (getCount() + 1));
     }
 
     /**
@@ -101,7 +112,7 @@ public class ComicsListAdapter extends BaseAdapter {
      * @return
      */
     public boolean remove(long id) {
-        if (this.items.remove(id) != null) {
+        if (this.dataManager.remove(id)) {
             this.sortedIds.remove(id);
             return true;
         } else {
@@ -109,12 +120,16 @@ public class ComicsListAdapter extends BaseAdapter {
         }
     }
 
-    public void clear() {
-        this.items.clear();
-    }
-
-    public Comics[] getComics() {
-        return this.items.values().toArray(new Comics[this.items.size()]);
+    /**
+     *
+     * @return
+     */
+    public int refresh() {
+        this.dataManager.readComics();
+        this.sortedIds.clear();
+        this.sortedIds.addAll(this.dataManager.getComics());
+        Collections.sort(this.sortedIds, this.comparator);
+        return this.sortedIds.size();
     }
 
     @Override
@@ -127,7 +142,7 @@ public class ComicsListAdapter extends BaseAdapter {
 
     @Override
     public int getCount() {
-        return this.items.size();
+        return this.sortedIds.size();
     }
 
     @Override
@@ -143,7 +158,7 @@ public class ComicsListAdapter extends BaseAdapter {
 
         ((TextView)convertView.findViewById(android.R.id.text1)).setText(comics.getName());
         //((TextView)convertView.findViewById(android.R.id.text2)).setText("id: " + comics.getId());
-        ((TextView)convertView.findViewById(android.R.id.text2)).setText(comics.getSeries());
+        ((TextView)convertView.findViewById(android.R.id.text2)).setText(comics.getPublisher());
 
         return convertView;
     }
@@ -156,7 +171,7 @@ public class ComicsListAdapter extends BaseAdapter {
     @Override
     public Object getItem(int position) {
         //recupero prima la chiave dell'elemento alla posizione richiesta
-        return this.items.get(this.sortedIds.get(position));
+        return this.dataManager.getComics(this.sortedIds.get(position));
     }
 
     private class NameComparator implements Comparator<Long> {
@@ -169,8 +184,8 @@ public class ComicsListAdapter extends BaseAdapter {
         @Override
         public int compare(Long lhs, Long rhs) {
             //recupero gli elementi in modo da comparare il nome
-            Comics lco = ComicsListAdapter.this.items.get(lhs);
-            Comics rco = ComicsListAdapter.this.items.get(rhs);
+            Comics lco = ComicsListAdapter.this.dataManager.getComics(lhs);
+            Comics rco = ComicsListAdapter.this.dataManager.getComics(rhs);
             if (desc) {
                 return rco.getName().compareToIgnoreCase(lco.getName());
             } else {
@@ -189,8 +204,8 @@ public class ComicsListAdapter extends BaseAdapter {
         @Override
         public int compare(Long lhs, Long rhs) {
             //recupero gli elementi in modo da comparare il nome
-            Comics lco = ComicsListAdapter.this.items.get(lhs);
-            Comics rco = ComicsListAdapter.this.items.get(rhs);
+            Comics lco = ComicsListAdapter.this.dataManager.getComics(lhs);
+            Comics rco = ComicsListAdapter.this.dataManager.getComics(rhs);
             //TODO ordinare per release
             if (!desc) {
                 return rco.getName().compareToIgnoreCase(lco.getName());
