@@ -1,9 +1,11 @@
 package it.amonshore.secondapp.data;
 
+import java.io.Serializable;
+
 /**
  * Created by Calgia on 07/05/2015.
  */
-public class Comics {
+public class Comics implements Serializable {
 
     private long id;
     private String name;

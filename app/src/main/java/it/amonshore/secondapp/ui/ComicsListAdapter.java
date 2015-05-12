@@ -153,7 +153,7 @@ public class ComicsListAdapter extends BaseAdapter {
         }
 
         Comics comics = (Comics)getItem(position);
-        //TextView txtComicsName = (TextView)convertView.findViewById(R.id.txt_comics_name);
+        //TextView txtComicsName = (TextView)convertView.findViewById(R.id.txtListComicsName);
         //txtComicsName.setText(comics.getName());
 
         ((TextView)convertView.findViewById(android.R.id.text1)).setText(comics.getName());

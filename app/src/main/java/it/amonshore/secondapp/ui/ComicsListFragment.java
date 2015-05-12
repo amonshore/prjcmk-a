@@ -1,6 +1,7 @@
 package it.amonshore.secondapp.ui;
 
 import android.app.Activity;
+import android.content.Intent;
 import android.content.SharedPreferences;
 import android.os.AsyncTask;
 import android.os.Bundle;
@@ -179,9 +180,11 @@ public class ComicsListFragment extends Fragment implements OnChangePageListener
         Log.d(LOG_TAG, "onOptionsItemSelected " + item.getTitle());
 
         if (id == R.id.action_comics_add) {
-            //TODO aprire l'editor
-            new UpdateComicsAsyncTask()
-                    .execute(mAdapter.createNewComics());
+            Intent intent = new Intent(getActivity(), ComicsEditorActivity.class);
+            intent.putExtra(ComicsEditorActivity.EXTRA_ENTRY, mAdapter.createNewComics());
+            intent.putExtra(ComicsEditorActivity.EXTRA_IS_NEW, false);
+            startActivityForResult(intent, ComicsEditorActivity.EDIT_COMICS_REQUEST);
+
             return true;
         } else if (id == R.id.action_comics_sort_by_name) {
             //TODO sort by name
@@ -201,6 +204,17 @@ public class ComicsListFragment extends Fragment implements OnChangePageListener
             return true;
         } else {
             return false;
+        }
+    }
+
+    @Override
+    public void onActivityResult(int requestCode, int resultCode, Intent data) {
+        if (resultCode == Activity.RESULT_OK && requestCode == ComicsEditorActivity.EDIT_COMICS_REQUEST) {
+            Comics comics = (Comics)data.getSerializableExtra(ComicsEditorActivity.EXTRA_ENTRY);
+            boolean isnew = data.getBooleanExtra(ComicsEditorActivity.EXTRA_IS_NEW, true);
+            //TODO aggiungere alla lista e posizionarsi sull'elemento
+            int index = mAdapter.insertOrUpdate(comics);
+            mAdapter.notifyDataSetChanged();
         }
     }
 
