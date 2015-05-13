@@ -2,10 +2,10 @@
 
     <!-- Base application theme. -->
     <style name="AppTheme" parent="Theme.AppCompat.Light.DarkActionBar">
-        <item name="android:actionBarStyle">@style/YelloActionBarStyle</item>
+        <item name="android:actionBarStyle">@style/YellowActionBarStyle</item>
 
         <!-- Support library compatibility -->
-        <item name="actionBarStyle">@style/YelloActionBarStyle</item>
+        <item name="actionBarStyle">@style/YellowActionBarStyle</item>
     </style>
 
     <!-- ActionBar styles -->
@@ -18,7 +18,7 @@
     </style>
 
     <!-- ActionBar styles -->
-    <style name="YelloActionBarStyle"
+    <style name="YellowActionBarStyle"
         parent="@style/Widget.AppCompat.Light.ActionBar.Solid.Inverse">
         <item name="android:background">@color/comikku_yellow_light</item>
 

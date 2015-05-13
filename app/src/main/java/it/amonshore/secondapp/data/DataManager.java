@@ -2,12 +2,14 @@ package it.amonshore.secondapp.data;
 
 import android.content.Context;
 import android.os.Environment;
+import android.text.TextUtils;
 import android.util.Log;
 
 import org.json.JSONArray;
 import org.json.JSONException;
 import org.json.JSONObject;
 import org.json.JSONTokener;
+import org.w3c.dom.Text;
 
 import java.io.BufferedInputStream;
 import java.io.BufferedReader;
@@ -28,12 +30,25 @@ import java.util.TreeMap;
 public class DataManager {
 
     private final static String LOG_TAG = "DMA";
+
     private final static String FILE_NAME = "data.json";
+    private final static String FIELD_ID = "id";
+    private final static String FIELD_NAME = "name";
+    private final static String FIELD_SERIES = "series";
+    private final static String FIELD_PUBLISHER = "publisher";
+    private final static String FIELD_AUTHORS = "authors";
+    private final static String FIELD_PRICE = "price";
+    private final static String FIELD_PERIODICITY = "periodicity";
+    private final static String FIELD_RESERVED = "reserved";
+    private final static String FIELD_NOTES = "notes";
+    private final static String FIELD_RELEASES = "releases";
+
     //
     private static DataManager instance;
 
     /**
      *
+     * @param context   usare Context.getApplicationContext()
      * @return
      */
     public static DataManager getDataManager(Context context) {
@@ -77,27 +92,21 @@ public class DataManager {
         }
     }
 
-    private TreeMap<Long, Comics> parseJSON(String json) {
-        TreeMap<Long, Comics> map = new TreeMap<>();
+    private void parseJSON(String json) {
         try {
             //TODO attualmente i dati sono strutturati come un array, modificarlo in modo che la struttura sia questa { lastUpdate: <timestamp>, data: <array> }
             JSONArray arr = (JSONArray) new JSONTokener(json).nextValue();
             for (int ii = 0; ii < arr.length(); ii++) {
                 JSONObject obj = arr.getJSONObject(ii);
                 Comics comics = json2object(obj);
-                map.put(comics.getId(), comics);
+                mComicsCache.put(comics.getId(), comics);
+                putPublisher(comics.getPublisher());
             }
             //TODO parse json
         } catch (JSONException jsonex) {
             Log.e(LOG_TAG, "parseComics", jsonex);
         }
-        return map;
     }
-
-    private final static String FIELD_ID = "id";
-    private final static String FIELD_NAME = "name";
-    private final static String FIELD_SERIES = "series";
-    private final static String FIELD_PUBLISHER = "publisher";
 
     private Comics json2object(JSONObject obj) throws JSONException {
         Comics comics = new Comics();
@@ -107,6 +116,11 @@ public class DataManager {
         comics.setName(obj.getString(FIELD_NAME));
         comics.setSeries(tryGetString(obj, FIELD_SERIES));
         comics.setPublisher(tryGetString(obj, FIELD_PUBLISHER));
+        comics.setAuthors(tryGetString(obj, FIELD_AUTHORS));
+        comics.setPrice(tryGetDouble(obj, FIELD_PRICE));
+        comics.setPeriodicity(tryGetString(obj, FIELD_PERIODICITY));
+        comics.setReserved(tryGetBoolean(obj, FIELD_RESERVED)); //TODO se il valore è stringa (T/F) lo perdo
+        comics.setNotes(tryGetString(obj, FIELD_NOTES));
         //TODO altri campi
         return comics;
     }
@@ -121,6 +135,20 @@ public class DataManager {
 
     private String tryGetString(JSONObject obj, String field) throws JSONException {
         return obj.isNull(field) ? null : obj.getString(field);
+    }
+
+    private double tryGetDouble(JSONObject obj, String field) throws JSONException {
+        return obj.isNull(field) ? 0.0d : obj.getDouble(field);
+    }
+
+    private boolean tryGetBoolean(JSONObject obj, String field) throws JSONException {
+        return obj.optBoolean(field, false);
+    }
+
+    private void putPublisher(String publisher) {
+        if (publisher != null && TextUtils.getTrimmedLength(publisher) > 0) {
+            mPublishers.add(publisher);
+        }
     }
 
     /**
@@ -142,6 +170,14 @@ public class DataManager {
 
     /**
      *
+     * @return
+     */
+    public String[] getPublishers() {
+        return mPublishers.toArray(new String[mPublishers.size()]);
+    }
+
+    /**
+     *
      * @param id
      * @return
      */
@@ -155,6 +191,7 @@ public class DataManager {
      * @return  true se è stato aggiunto, false se ha sostituito un elemento esistente
      */
     public boolean put(Comics comics) {
+        putPublisher(comics.getPublisher());
         return (mComicsCache.put(comics.getId(), comics) == null);
     }
 
@@ -184,6 +221,8 @@ public class DataManager {
         if (mComicsCache == null) {
             BufferedReader br = null;
             File file = getDataFile();
+            mComicsCache = new TreeMap<>();
+            mPublishers = new HashSet<>();
             Log.d(LOG_TAG, "readComics " + file.getAbsolutePath());
             if (file.exists()) {
                 try {
@@ -194,7 +233,7 @@ public class DataManager {
                         sb.append(line);
                         sb.append(System.lineSeparator());
                     }
-                    mComicsCache = parseJSON(sb.toString());
+                    parseJSON(sb.toString());
                 } catch (IOException ioex) {
                     Log.e(LOG_TAG, "readComics", ioex);
                 } finally {
@@ -203,8 +242,6 @@ public class DataManager {
                     } catch (IOException ioex) {
                     }
                 }
-            } else {
-                mComicsCache = new TreeMap<>();
             }
         }
         return mComicsCache.size();

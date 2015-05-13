@@ -1,6 +1,6 @@
 <resources>
-    <string name="app_name">SecondApp</string>
-    <string name="title_activity_main">Second app</string>
+    <string name="app_name">Comikku-A</string>
+    <string name="title_activity_main">Comikku</string>
 
     <string name="hello_world">Hello world!</string>
     <string name="action_settings">Settings</string>
@@ -15,12 +15,23 @@
     <string name="action_comics_sort_by_release">Sort by release</string>
 
     <string name="selected_comics">%1d selected</string>
-    <string name="title_activity_comics_editor">ComicsEditorActivity</string>
+    <string name="title_activity_comics_editor">New comics</string>
 
     <!-- comics editor -->
     <string name="editor_comics_name">Name</string>
-    <string name="editor_comics_name_hint">Enter comics name</string>
-
-    <string name="editor_comics_series">Series</string>
+    <string name="editor_comics_name_empty">Name can not be empty</string>
     <string name="editor_comics_publisher">Publisher</string>
+    <string name="editor_comics_series">Series</string>
+    <string name="editor_comics_authors">Authors</string>
+    <string name="editor_comics_price">Price</string>
+    <string name="editor_comics_periodicity">Periodicity</string>
+    <string-array name="editor_comics_periodicity_array">
+        <item>Weekly</item>
+        <item>Monthly</item>
+        <item>Every 2 months</item>
+        <item>Every 3 months</item>
+        <item>Every 4 months</item>
+        <item>Every 6 months</item>
+        <item>Every year</item>
+    </string-array>
 </resources>

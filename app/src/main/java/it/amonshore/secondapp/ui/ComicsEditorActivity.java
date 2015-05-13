@@ -5,13 +5,20 @@ import android.content.Intent;
 import android.support.v7.app.ActionBarActivity;
 import android.os.Bundle;
 import android.text.Editable;
-import android.text.TextWatcher;
+import android.text.TextUtils;
 import android.view.Menu;
 import android.view.MenuItem;
+import android.widget.ArrayAdapter;
+import android.widget.AutoCompleteTextView;
+import android.widget.EditText;
+import android.widget.Spinner;
 import android.widget.TextView;
+
+import java.text.NumberFormat;
 
 import it.amonshore.secondapp.R;
 import it.amonshore.secondapp.data.Comics;
+import it.amonshore.secondapp.data.DataManager;
 
 public class ComicsEditorActivity extends ActionBarActivity {
 
@@ -22,41 +29,73 @@ public class ComicsEditorActivity extends ActionBarActivity {
 
     private Comics mComics;
     private boolean mIsNew;
+    private DataManager mDataManager;
+    private boolean bCanSave;
+
+    private EditText mTxtName, mTxtSeries, mTxtAuthors, mTxtPrice;
+    private AutoCompleteTextView mTxtPublisher;
+    private Spinner mSpPeriodicity;
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
         setContentView(R.layout.activity_comics_editor);
+        //uso il contesto dell'applicazione, usato anche nell'Activity principale
+        mDataManager = DataManager.getDataManager(getApplicationContext());
         //leggo i parametri
         Intent intent = getIntent();
         mComics = (Comics)intent.getSerializableExtra(EXTRA_ENTRY);
         mIsNew = intent.getBooleanExtra(EXTRA_IS_NEW, true);
-        //
-        TextView txtName = (TextView)findViewById(R.id.txtEditorComicsName);
-        txtName.setText(mComics.getName());
-        txtName.addTextChangedListener(new TextWatcher() {
-            @Override
-            public void onTextChanged(CharSequence s, int start, int before, int count) {
-
-            }
-
+        if (mIsNew) {
+            setTitle(R.string.title_activity_comics_editor);
+        } else {
+            setTitle(mComics.getName());
+        }
+        //imposto i valori e creo i listener
+        mTxtName = (EditText)findViewById(R.id.txt_editor_comics_name);
+        mTxtName.setText(mComics.getName());
+        mTxtName.addTextChangedListener(new SimpleTextWatcher() {
             @Override
             public void afterTextChanged(Editable s) {
-                //TODO validazione dati
-                //...TextView.setError
-            }
-
-            @Override
-            public void beforeTextChanged(CharSequence s, int start, int count, int after) {
-
+                checkComicsName();
             }
         });
+        //
+        mTxtPublisher = (AutoCompleteTextView)findViewById(R.id.txt_editor_comics_publisher);
+        mTxtPublisher.setText(mComics.getPublisher());
+        mTxtPublisher.setAdapter(new ArrayAdapter<String>(this,
+                android.R.layout.simple_list_item_1,
+                mDataManager.getPublishers()));
+        //
+        mTxtSeries = (EditText)findViewById(R.id.txt_editor_comics_series);
+        mTxtSeries.setText(mComics.getSeries());
+        //
+        mTxtAuthors = (EditText)findViewById(R.id.txt_editor_comics_authors);
+        mTxtAuthors.setText(mComics.getAuthors());
+        //
+        mTxtPrice = (EditText)findViewById(R.id.txt_editor_comics_price);
+        mTxtPrice.setText(Double.toString(mComics.getPrice()));
+        //
+        mSpPeriodicity = (Spinner)findViewById(R.id.txt_editor_comics_periodicity);
+        ArrayAdapter<CharSequence> adapter = ArrayAdapter.createFromResource(this,
+                R.array.editor_comics_periodicity_array, android.R.layout.simple_spinner_item);
+        adapter.setDropDownViewResource(android.R.layout.simple_spinner_dropdown_item);
+        mSpPeriodicity.setAdapter(adapter);
+        //TODO mSpPeriodicity.setSelection
+        //
+        checkComicsName();
     }
 
     @Override
     public boolean onCreateOptionsMenu(Menu menu) {
         // Inflate the menu; this adds items to the action bar if it is present.
         getMenuInflater().inflate(R.menu.menu_comics_editor, menu);
+        return true;
+    }
+
+    @Override
+    public boolean onPrepareOptionsMenu(Menu menu) {
+        menu.findItem(R.id.action_save).setEnabled(bCanSave);
         return true;
     }
 
@@ -71,6 +110,12 @@ public class ComicsEditorActivity extends ActionBarActivity {
         if (id == R.id.action_save) {
             //TODO eseguire i controlli sui dati
             //preparo i dati per la risposta
+            mComics.setName(getViewText(mTxtName));
+            mComics.setPublisher(getViewText(mTxtPublisher));
+            mComics.setSeries(getViewText(mTxtSeries));
+            mComics.setAuthors(getViewText(mTxtAuthors));
+            mComics.setPrice(getViewDouble(mTxtPrice));
+            //
             Intent intent = new Intent();
             intent.putExtra(EXTRA_ENTRY, mComics);
             intent.putExtra(EXTRA_IS_NEW, mIsNew);
@@ -81,5 +126,28 @@ public class ComicsEditorActivity extends ActionBarActivity {
         }
 
         return super.onOptionsItemSelected(item);
+    }
+
+    private String getViewText(EditText view) {
+        return view.getText().toString().trim();
+    }
+
+    private double getViewDouble(EditText view) {
+        try {
+            return Double.parseDouble(view.getText().toString());
+        } catch (NumberFormatException nfex) {
+            return 0.0d;
+        }
+    }
+
+    private void checkComicsName() {
+        if (TextUtils.getTrimmedLength(mTxtName.getText()) == 0) {
+            mTxtName.setError(getString(R.string.editor_comics_name_empty));
+            bCanSave = false;
+        } else {
+            mTxtName.setError(null);
+            bCanSave = true;
+        }
+        invalidateOptionsMenu();
     }
 }

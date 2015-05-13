@@ -11,9 +11,8 @@ import android.widget.TextView;
 import java.util.ArrayList;
 import java.util.Collections;
 import java.util.Comparator;
-import java.util.List;
-import java.util.TreeMap;
 
+import it.amonshore.secondapp.R;
 import it.amonshore.secondapp.data.Comics;
 import it.amonshore.secondapp.data.DataManager;
 
@@ -73,14 +72,14 @@ public class ComicsListAdapter extends BaseAdapter {
     /**
      *
      * @param comics
-     * @return ritorna l'indice dell'elemento o -1 se l'elemento è nuovo
+     * @return ritorna la posizione dell'elemento
      */
     public int insertOrUpdate(Comics comics) {
         if (this.dataManager.put(comics)) {
             //è un nuovo elemento
             sortedIds.add(comics.getId());
             Collections.sort(this.sortedIds, this.comparator);
-            return -1;
+            return this.sortedIds.indexOf(comics.getId());
         } else {
             //è un elemento già esistente
             Collections.sort(this.sortedIds, this.comparator);
@@ -93,8 +92,7 @@ public class ComicsListAdapter extends BaseAdapter {
      * @return
      */
     public Comics createNewComics() {
-        return new Comics(this.dataManager.getSafeNewId(),
-                "Item " + (getCount() + 1));
+        return new Comics(this.dataManager.getSafeNewId());
     }
 
     /**
@@ -148,17 +146,16 @@ public class ComicsListAdapter extends BaseAdapter {
     @Override
     public View getView(int position, View convertView, ViewGroup parent) {
         if (convertView == null) {
-            //convertView = LayoutInflater.from(context).inflate(R.layout.list_comics_item, null);
-            convertView = LayoutInflater.from(context).inflate(android.R.layout.simple_list_item_activated_2, null);
+            convertView = LayoutInflater.from(context).inflate(R.layout.list_comics_item, null);
+            //convertView = LayoutInflater.from(context).inflate(android.R.layout.simple_list_item_activated_2, null);
         }
 
         Comics comics = (Comics)getItem(position);
-        //TextView txtComicsName = (TextView)convertView.findViewById(R.id.txtListComicsName);
-        //txtComicsName.setText(comics.getName());
-
-        ((TextView)convertView.findViewById(android.R.id.text1)).setText(comics.getName());
-        //((TextView)convertView.findViewById(android.R.id.text2)).setText("id: " + comics.getId());
-        ((TextView)convertView.findViewById(android.R.id.text2)).setText(comics.getPublisher());
+        //Log.d(LOG_TAG, "getView @" + position + " id " + comics.getId() + " " + comics.getName());
+        //((TextView)convertView.findViewById(android.R.id.text1)).setText(comics.getName());
+        //((TextView)convertView.findViewById(android.R.id.text2)).setText(comics.getPublisher());
+        ((TextView)convertView.findViewById(R.id.txt_list_comics_name)).setText(comics.getName());
+        ((TextView)convertView.findViewById(R.id.txt_list_comics_publisher)).setText(comics.getPublisher());
 
         return convertView;
     }

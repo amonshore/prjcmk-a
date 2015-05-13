@@ -9,19 +9,116 @@
     <TextView
         android:layout_width="wrap_content"
         android:layout_height="wrap_content"
-        android:textAppearance="?android:attr/textAppearanceMedium"
+        android:textAppearance="?android:attr/textAppearanceSmall"
         android:text="@string/editor_comics_name"
-        android:id="@+id/lblEditorComicsName"
+        android:id="@+id/lbl_editor_comics_name"
         android:layout_alignParentTop="true"
         android:layout_alignParentStart="true" />
 
     <EditText
         android:layout_width="wrap_content"
         android:layout_height="wrap_content"
-        android:id="@+id/txtEditorComicsName"
-        android:layout_below="@+id/lblEditorComicsName"
+        android:id="@+id/txt_editor_comics_name"
+        android:layout_below="@+id/lbl_editor_comics_name"
         android:layout_alignParentStart="true"
         android:layout_alignParentEnd="true"
-        android:hint="@string/editor_comics_name_hint"
-        android:inputType="textCapSentences|text" />
+        android:inputType="text|textNoSuggestions|textCapSentences"
+        android:layout_marginBottom="10dp">
+        <requestFocus/>
+    </EditText>
+
+    <TextView
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:textAppearance="?android:attr/textAppearanceSmall"
+        android:text="@string/editor_comics_publisher"
+        android:id="@+id/lbl_editor_comics_publisher"
+        android:layout_below="@+id/txt_editor_comics_name"
+        android:layout_alignParentStart="true" />
+
+    <AutoCompleteTextView
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:id="@+id/txt_editor_comics_publisher"
+        android:layout_below="@+id/lbl_editor_comics_publisher"
+        android:layout_alignParentStart="true"
+        android:layout_alignParentEnd="true"
+        android:inputType="text|textCapSentences"
+        android:layout_marginBottom="10dp" />
+
+    <TextView
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:textAppearance="?android:attr/textAppearanceSmall"
+        android:text="@string/editor_comics_series"
+        android:id="@+id/lbl_editor_comics_series"
+        android:layout_below="@+id/txt_editor_comics_publisher"
+        android:layout_alignParentStart="true" />
+
+    <EditText
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:id="@+id/txt_editor_comics_series"
+        android:layout_below="@+id/lbl_editor_comics_series"
+        android:layout_alignParentStart="true"
+        android:layout_alignParentEnd="true"
+        android:inputType="text|textCapSentences"
+        android:layout_marginBottom="10dp" />
+
+    <TextView
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:textAppearance="?android:attr/textAppearanceSmall"
+        android:text="@string/editor_comics_authors"
+        android:id="@+id/lbl_editor_comics_authors"
+        android:layout_below="@+id/txt_editor_comics_series"
+        android:layout_alignParentStart="true" />
+
+    <EditText
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:id="@+id/txt_editor_comics_authors"
+        android:layout_below="@+id/lbl_editor_comics_authors"
+        android:layout_alignParentStart="true"
+        android:layout_alignParentEnd="true"
+        android:inputType="text|textNoSuggestions|textCapSentences"
+        android:layout_marginBottom="10dp" />
+
+    <TextView
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:textAppearance="?android:attr/textAppearanceSmall"
+        android:text="@string/editor_comics_price"
+        android:id="@+id/lbl_editor_comics_price"
+        android:layout_below="@+id/txt_editor_comics_authors"
+        android:layout_alignParentStart="true" />
+
+    <EditText
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:id="@+id/txt_editor_comics_price"
+        android:layout_below="@+id/lbl_editor_comics_price"
+        android:layout_alignParentStart="true"
+        android:layout_alignParentEnd="true"
+        android:inputType="numberDecimal"
+        android:layout_marginBottom="10dp" />
+
+    <TextView
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:textAppearance="?android:attr/textAppearanceSmall"
+        android:text="@string/editor_comics_periodicity"
+        android:id="@+id/lbl_editor_comics_periodicity"
+        android:layout_below="@+id/lbl_editor_comics_price"
+        android:layout_alignParentStart="true" />
+
+    <Spinner
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:id="@+id/txt_editor_comics_periodicity"
+        android:layout_below="@+id/lbl_editor_comics_periodicity"
+        android:layout_alignParentStart="true"
+        android:layout_alignParentEnd="true"
+        android:layout_marginBottom="10dp" />
+
 </RelativeLayout>

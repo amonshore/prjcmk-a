@@ -67,7 +67,7 @@ public class ComicsListFragment extends Fragment implements OnChangePageListener
             order = settings.getInt(STATE_ORDER, ComicsListAdapter.ORDER_BY_NAME);
         }
         //
-        mAdapter = new ComicsListAdapter(getActivity(), order);
+        mAdapter = new ComicsListAdapter(getActivity().getApplicationContext(), order);
         //leggo i dati in modalità asincrona
         refreshData();
     }
@@ -105,7 +105,8 @@ public class ComicsListFragment extends Fragment implements OnChangePageListener
         mListView.setOnItemClickListener(new AdapterView.OnItemClickListener() {
             @Override
             public void onItemClick(AdapterView<?> parent, View view, int position, long id) {
-                Log.d(LOG_TAG, "onItemClick " + ((Comics) mAdapter.getItem(position)).getName());
+                //Log.d(LOG_TAG, "onItemClick " + ((Comics) mAdapter.getItem(position)).getName());
+                showComicsEditor((Comics) mAdapter.getItem(position), false);
             }
         });
         mListView.setMultiChoiceModeListener(new AbsListView.MultiChoiceModeListener() {
@@ -180,11 +181,7 @@ public class ComicsListFragment extends Fragment implements OnChangePageListener
         Log.d(LOG_TAG, "onOptionsItemSelected " + item.getTitle());
 
         if (id == R.id.action_comics_add) {
-            Intent intent = new Intent(getActivity(), ComicsEditorActivity.class);
-            intent.putExtra(ComicsEditorActivity.EXTRA_ENTRY, mAdapter.createNewComics());
-            intent.putExtra(ComicsEditorActivity.EXTRA_IS_NEW, false);
-            startActivityForResult(intent, ComicsEditorActivity.EDIT_COMICS_REQUEST);
-
+            showComicsEditor(mAdapter.createNewComics(), true);
             return true;
         } else if (id == R.id.action_comics_sort_by_name) {
             //TODO sort by name
@@ -213,7 +210,8 @@ public class ComicsListFragment extends Fragment implements OnChangePageListener
             Comics comics = (Comics)data.getSerializableExtra(ComicsEditorActivity.EXTRA_ENTRY);
             boolean isnew = data.getBooleanExtra(ComicsEditorActivity.EXTRA_IS_NEW, true);
             //TODO aggiungere alla lista e posizionarsi sull'elemento
-            int index = mAdapter.insertOrUpdate(comics);
+            int position = mAdapter.insertOrUpdate(comics);
+            //Log.d(LOG_TAG, "onActivityResult @" + index + " id " + comics.getId() + " " + comics.getName());
             mAdapter.notifyDataSetChanged();
         }
     }
@@ -239,6 +237,13 @@ public class ComicsListFragment extends Fragment implements OnChangePageListener
     public void finishActionMode() {
         if (mActionMode != null)
             mActionMode.finish();
+    }
+
+    private void showComicsEditor(Comics comics, boolean isNew) {
+        Intent intent = new Intent(getActivity(), ComicsEditorActivity.class);
+        intent.putExtra(ComicsEditorActivity.EXTRA_ENTRY, comics);
+        intent.putExtra(ComicsEditorActivity.EXTRA_IS_NEW, isNew);
+        startActivityForResult(intent, ComicsEditorActivity.EDIT_COMICS_REQUEST);
     }
 
     /**

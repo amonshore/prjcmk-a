@@ -21,8 +21,12 @@ public class Comics implements Serializable {
     protected Comics() {
     }
 
-    public Comics(long id, String name) {
+    public Comics(long id) {
         this.id = id;
+    }
+
+    public Comics(long id, String name) {
+        this(id);
         this.name = name;
     }
 
