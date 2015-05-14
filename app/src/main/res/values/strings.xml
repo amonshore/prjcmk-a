@@ -17,15 +17,19 @@
     <string name="selected_comics">%1d selected</string>
     <string name="title_activity_comics_editor">New comics</string>
 
-    <!-- comics editor -->
-    <string name="editor_comics_name">Name</string>
-    <string name="editor_comics_name_empty">Name can not be empty</string>
-    <string name="editor_comics_publisher">Publisher</string>
-    <string name="editor_comics_series">Series</string>
-    <string name="editor_comics_authors">Authors</string>
-    <string name="editor_comics_price">Price</string>
-    <string name="editor_comics_periodicity">Periodicity</string>
-    <string-array name="editor_comics_periodicity_array">
+    <!-- periodicity -->
+    <string-array name="periodicity_key_array">
+        <item></item>
+        <item>w1</item>
+        <item>M1</item>
+        <item>M2</item>
+        <item>M3</item>
+        <item>M4</item>
+        <item>M6</item>
+        <item>Y1</item>
+    </string-array>
+    <string-array name="periodicity_value_array">
+        <item>Unknown</item>
         <item>Weekly</item>
         <item>Monthly</item>
         <item>Every 2 months</item>
@@ -34,4 +38,13 @@
         <item>Every 6 months</item>
         <item>Every year</item>
     </string-array>
+
+    <!-- comics editor -->
+    <string name="editor_comics_name">Name</string>
+    <string name="editor_comics_name_empty">Name can not be empty</string>
+    <string name="editor_comics_publisher">Publisher</string>
+    <string name="editor_comics_series">Series</string>
+    <string name="editor_comics_authors">Authors</string>
+    <string name="editor_comics_price">Price</string>
+    <string name="editor_comics_periodicity">Periodicity</string>
 </resources>
