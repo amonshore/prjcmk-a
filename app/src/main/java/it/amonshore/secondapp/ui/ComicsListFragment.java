@@ -5,7 +5,6 @@ import android.content.Intent;
 import android.content.SharedPreferences;
 import android.os.AsyncTask;
 import android.os.Bundle;
-import android.provider.ContactsContract;
 import android.support.v4.app.Fragment;
 import android.util.Log;
 import android.view.ActionMode;
@@ -21,11 +20,8 @@ import android.widget.ListAdapter;
 import android.widget.ListView;
 import android.widget.TextView;
 
-import java.util.List;
-
 import it.amonshore.secondapp.R;
 import it.amonshore.secondapp.data.Comics;
-import it.amonshore.secondapp.data.DataManager;
 
 /**
  * A fragment representing a list of Items.
@@ -43,13 +39,6 @@ public class ComicsListFragment extends Fragment implements OnChangePageListener
     private AbsListView mListView;
     private ComicsListAdapter mAdapter;
     private ActionMode mActionMode;
-
-    /**
-     * Mandatory empty constructor for the fragment manager to instantiate the
-     * fragment (e.g. upon screen orientation changes).
-     */
-    public ComicsListFragment() {
-    }
 
     @Override
     public void onCreate(Bundle savedInstanceState) {
@@ -113,7 +102,7 @@ public class ComicsListFragment extends Fragment implements OnChangePageListener
             @Override
             public void onItemCheckedStateChanged(ActionMode mode, int position, long id, boolean checked) {
                 //Log.d(LOG_TAG, "onItemCheckedStateChanged " + position);
-                mode.setTitle(getString(R.string.selected_comics, mListView.getCheckedItemCount()));
+                mode.setTitle(getString(R.string.selected_items, mListView.getCheckedItemCount()));
             }
 
             @Override

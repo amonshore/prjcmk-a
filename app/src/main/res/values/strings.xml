@@ -14,7 +14,7 @@
     <string name="action_comics_sort_by_name">Sort by name</string>
     <string name="action_comics_sort_by_release">Sort by release</string>
 
-    <string name="selected_comics">%1d selected</string>
+    <string name="selected_items">%1d selected</string>
     <string name="title_activity_comics_editor">New comics</string>
 
     <!-- periodicity -->
