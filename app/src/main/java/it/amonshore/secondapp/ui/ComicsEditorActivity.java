@@ -88,9 +88,6 @@ public class ComicsEditorActivity extends ActionBarActivity {
         adapter.setDropDownViewResource(android.R.layout.simple_spinner_dropdown_item);
         mSpPeriodicity.setAdapter(adapter);
         mPeriodicityKeys = getResources().getStringArray(R.array.periodicity_key_array);
-        Log.d(LOG_TAG, "mComics.getPeriodicity() " + mComics.getPeriodicity() + " " +
-                Utils.indexOf(mPeriodicityKeys, mComics.getPeriodicity(), 0) +
-                (mComics.getPeriodicity() == mPeriodicityKeys[2]));
         mSpPeriodicity.setSelection(Utils.indexOf(mPeriodicityKeys, mComics.getPeriodicity(), 0));
         //
         checkComicsName();
@@ -125,8 +122,6 @@ public class ComicsEditorActivity extends ActionBarActivity {
             mComics.setSeries(getViewText(mTxtSeries));
             mComics.setAuthors(getViewText(mTxtAuthors));
             mComics.setPrice(getViewDouble(mTxtPrice));
-            Log.d(LOG_TAG, "mSpPeriodicity.getSelectedItemPosition " +
-                    mSpPeriodicity.getSelectedItemPosition() + " " + mSpPeriodicity.getSelectedItem());
             mComics.setPeriodicity(mPeriodicityKeys[mSpPeriodicity.getSelectedItemPosition()]);
             //
             Intent intent = new Intent();

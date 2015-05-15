@@ -1,6 +1,8 @@
 package it.amonshore.secondapp.data;
 
 import java.io.Serializable;
+import java.util.ArrayList;
+import java.util.Date;
 
 /**
  * Created by Calgia on 07/05/2015.
@@ -17,17 +19,15 @@ public class Comics implements Serializable {
     private boolean reserved;
     private String notes;
     //TODO releases
+    private ArrayList<Release> releases;
 
     protected Comics() {
+        releases = new ArrayList<>();
     }
 
     public Comics(long id) {
+        this();
         this.id = id;
-    }
-
-    public Comics(long id, String name) {
-        this(id);
-        this.name = name;
     }
 
     public long getId() {
@@ -100,5 +100,83 @@ public class Comics implements Serializable {
 
     public void setNotes(String notes) {
         this.notes = notes;
+    }
+
+    private int indexOf(int number) {
+        for (int ii = 0; ii < releases.size(); ii++) {
+            if (releases.get(ii).getNumber() == number) {
+                return ii;
+            }
+        }
+        return -1;
+    }
+
+    /**
+     * Crea una nuova release associata a questo fumetto. La release non viene aggiunta all'elenco: usare addRelease().
+     * @return  nuova release
+     */
+    public Release createRelease() {
+        return new Release(this.getId());
+    }
+
+    /**
+     * Assegna una nuova release al fumetto. Deve essere creata con createRelease() della stessa istanza di Comics, pena
+     * il lancio di una RuntimeException.
+     * Se esiste già una release con lo stesso numero (getNumber()), la sostituirà.
+     *
+     * @param release
+     * @return true se è stata aggiunta, false se ha sostiuito una release esistente.
+     */
+    public boolean putRelease(Release release) {
+        if (release.getComicsId() != this.id) {
+            throw new RuntimeException(String.format("Release comics id not valid: exptected %s, found %s", this.id, release.getComicsId()));
+        }
+
+        int index = indexOf(release.getNumber());
+        if (index == -1) {
+            releases.add(release);
+            return true;
+        } else {
+            releases.set(index, release);
+            return false;
+        }
+    }
+
+    /**
+     *
+     * @param number
+     * @return true se è stata elminata, false altrimenti
+     */
+    public boolean removeRelease(int number) {
+        int index = indexOf(number);
+        if (index >= 0) {
+            releases.remove(index);
+            return true;
+        } else {
+            return false;
+        }
+    }
+
+    /**
+     *
+     */
+    public void removeAllReleases() {
+        releases.clear();
+    }
+
+    /**
+     *
+     * @return
+     */
+    public int getReleaseCount() {
+        return releases.size();
+    }
+
+    /**
+     *
+     * @return  tutte le release
+     */
+    public Release[] getReleases() {
+        return releases.toArray(new Release[releases.size()]);
     }
 }
