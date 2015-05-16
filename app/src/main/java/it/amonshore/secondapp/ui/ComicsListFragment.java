@@ -6,7 +6,6 @@ import android.content.SharedPreferences;
 import android.os.AsyncTask;
 import android.os.Bundle;
 import android.support.v4.app.Fragment;
-import android.util.Log;
 import android.view.ActionMode;
 import android.view.LayoutInflater;
 import android.view.Menu;
@@ -22,6 +21,7 @@ import android.widget.TextView;
 
 import it.amonshore.secondapp.R;
 import it.amonshore.secondapp.data.Comics;
+import it.amonshore.secondapp.data.Utils;
 
 /**
  * A fragment representing a list of Items.
@@ -31,8 +31,6 @@ import it.amonshore.secondapp.data.Comics;
  * <p/>
  */
 public class ComicsListFragment extends Fragment implements OnChangePageListener {
-
-    private final static String LOG_TAG = "CLF";
 
     private final static String STATE_ORDER = " stateOrder";
 
@@ -94,20 +92,20 @@ public class ComicsListFragment extends Fragment implements OnChangePageListener
         mListView.setOnItemClickListener(new AdapterView.OnItemClickListener() {
             @Override
             public void onItemClick(AdapterView<?> parent, View view, int position, long id) {
-                //Log.d(LOG_TAG, "onItemClick " + ((Comics) mAdapter.getItem(position)).getName());
+                //Utils.d("onItemClick " + ((Comics) mAdapter.getItem(position)).getName());
                 showComicsEditor((Comics) mAdapter.getItem(position), false);
             }
         });
         mListView.setMultiChoiceModeListener(new AbsListView.MultiChoiceModeListener() {
             @Override
             public void onItemCheckedStateChanged(ActionMode mode, int position, long id, boolean checked) {
-                //Log.d(LOG_TAG, "onItemCheckedStateChanged " + position);
+                //Utils.d("onItemCheckedStateChanged " + position);
                 mode.setTitle(getString(R.string.selected_items, mListView.getCheckedItemCount()));
             }
 
             @Override
             public boolean onCreateActionMode(ActionMode mode, Menu menu) {
-                //Log.d(LOG_TAG, "onCreateActionMode");
+                //Utils.d("onCreateActionMode");
                 MenuInflater inflater = mode.getMenuInflater();
                 inflater.inflate(R.menu.menu_comics_cab, menu);
                 mActionMode = mode;
@@ -116,7 +114,7 @@ public class ComicsListFragment extends Fragment implements OnChangePageListener
 
             @Override
             public boolean onActionItemClicked(ActionMode mode, MenuItem item) {
-                Log.d(LOG_TAG, "onActionItemClicked " + item.getTitle());
+                Utils.d("onActionItemClicked " + item.getTitle());
                 //risponde alla selezione di una azione del menu_comics_cab
                 long menuId = item.getItemId();
                 if (menuId == R.id.action_comics_delete) {
@@ -149,7 +147,7 @@ public class ComicsListFragment extends Fragment implements OnChangePageListener
 
     @Override
     public void onPrepareOptionsMenu(Menu menu) {
-        Log.d(LOG_TAG, "onPrepareOptionsMenu " + mAdapter.getOrder());
+        Utils.d("onPrepareOptionsMenu " + mAdapter.getOrder());
         if ((mAdapter.getOrder() & ComicsListAdapter.ORDER_BY_NAME) == ComicsListAdapter.ORDER_BY_NAME) {
             menu.findItem(R.id.action_comics_sort_by_name).setVisible(false);
             menu.findItem(R.id.action_comics_sort_by_release).setVisible(true);
@@ -167,7 +165,7 @@ public class ComicsListFragment extends Fragment implements OnChangePageListener
     @Override
     public boolean onOptionsItemSelected(MenuItem item) {
         int id = item.getItemId();
-        Log.d(LOG_TAG, "onOptionsItemSelected " + item.getTitle());
+        Utils.d("onOptionsItemSelected " + item.getTitle());
 
         if (id == R.id.action_comics_add) {
             showComicsEditor(mAdapter.createNewComics(), true);
@@ -200,7 +198,7 @@ public class ComicsListFragment extends Fragment implements OnChangePageListener
             boolean isnew = data.getBooleanExtra(ComicsEditorActivity.EXTRA_IS_NEW, true);
             //TODO aggiungere alla lista e posizionarsi sull'elemento
             int position = mAdapter.insertOrUpdate(comics);
-            //Log.d(LOG_TAG, "onActivityResult @" + index + " id " + comics.getId() + " " + comics.getName());
+            //Utils.d("onActivityResult @" + index + " id " + comics.getId() + " " + comics.getName());
             mAdapter.notifyDataSetChanged();
         }
     }
@@ -268,7 +266,7 @@ public class ComicsListFragment extends Fragment implements OnChangePageListener
         @Override
         protected void onProgressUpdate(Comics... values) {
             int index = ComicsListFragment.this.mAdapter.insertOrUpdate(values[0]);
-            Log.d(LOG_TAG, "update comics " + index);
+            Utils.d("update comics " + index);
             if (index < 0) {
                 ComicsListFragment.this.mAdapter.notifyDataSetChanged();
             } else {
@@ -293,7 +291,7 @@ public class ComicsListFragment extends Fragment implements OnChangePageListener
         @Override
         protected void onProgressUpdate(Long... values) {
             boolean res = ComicsListFragment.this.mAdapter.remove(values[0]);
-            Log.d(LOG_TAG, "delete comics " + values[0] + " -> " + res);
+            Utils.d("delete comics " + values[0] + " -> " + res);
         }
 
         @Override

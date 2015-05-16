@@ -25,8 +25,6 @@ import it.amonshore.secondapp.data.Utils;
 
 public class ComicsEditorActivity extends ActionBarActivity {
 
-    private final static String LOG_TAG = "CEA";
-
     public final static int EDIT_COMICS_REQUEST = 1001;
 
     public final static String EXTRA_ENTRY = "entry";

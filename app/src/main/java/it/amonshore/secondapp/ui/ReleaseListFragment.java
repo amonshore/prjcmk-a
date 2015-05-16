@@ -4,7 +4,6 @@ import android.content.Intent;
 import android.os.AsyncTask;
 import android.os.Bundle;
 import android.support.v4.app.Fragment;
-import android.util.Log;
 import android.view.ActionMode;
 import android.view.LayoutInflater;
 import android.view.Menu;
@@ -21,13 +20,13 @@ import android.widget.TextView;
 import it.amonshore.secondapp.R;
 import it.amonshore.secondapp.data.Comics;
 import it.amonshore.secondapp.data.Release;
+import it.amonshore.secondapp.data.ReleaseId;
+import it.amonshore.secondapp.data.Utils;
 
 /**
  * Created by Calgia on 15/05/2015.
  */
 public class ReleaseListFragment extends Fragment implements OnChangePageListener {
-
-    private final static String LOG_TAG = "RLF";
 
     private AbsListView mListView;
     private ReleaseListAdapter mAdapter;
@@ -59,20 +58,20 @@ public class ReleaseListFragment extends Fragment implements OnChangePageListene
         mListView.setOnItemClickListener(new AdapterView.OnItemClickListener() {
             @Override
             public void onItemClick(AdapterView<?> parent, View view, int position, long id) {
-                //Log.d(LOG_TAG, "onItemClick " + ((Comics) mAdapter.getItem(position)).getName());
-                showReleaseEditor((Release) mAdapter.getItem(position), false);
+                //Utils.d("onItemClick " + ((Comics) mAdapter.getItem(position)).getName());
+                //TODO showReleaseEditor((ReleaseId) mAdapter.getItem(position), false);
             }
         });
         mListView.setMultiChoiceModeListener(new AbsListView.MultiChoiceModeListener() {
             @Override
             public void onItemCheckedStateChanged(ActionMode mode, int position, long id, boolean checked) {
-                //Log.d(LOG_TAG, "onItemCheckedStateChanged " + position);
+                //Utils.d("onItemCheckedStateChanged " + position);
                 mode.setTitle(getString(R.string.selected_items, mListView.getCheckedItemCount()));
             }
 
             @Override
             public boolean onCreateActionMode(ActionMode mode, Menu menu) {
-                //Log.d(LOG_TAG, "onCreateActionMode");
+                //Utils.d("onCreateActionMode");
                 MenuInflater inflater = mode.getMenuInflater();
                 inflater.inflate(R.menu.menu_releases_cab, menu);
                 mActionMode = mode;
@@ -81,7 +80,7 @@ public class ReleaseListFragment extends Fragment implements OnChangePageListene
 
             @Override
             public boolean onActionItemClicked(ActionMode mode, MenuItem item) {
-                Log.d(LOG_TAG, "onActionItemClicked " + item.getTitle());
+                Utils.d("onActionItemClicked " + item.getTitle());
                 //risponde alla selezione di una azione del menu_releases_cab
                 long menuId = item.getItemId();
                 if (menuId == R.id.action_release_delete) {
@@ -116,6 +115,7 @@ public class ReleaseListFragment extends Fragment implements OnChangePageListene
     @Override
     public void onPrepareOptionsMenu(Menu menu) {
         //TODO prepara il menu in base a cosa è stato selezionato
+        super.onPrepareOptionsMenu(menu);
     }
 
     @Override
@@ -126,7 +126,7 @@ public class ReleaseListFragment extends Fragment implements OnChangePageListene
     @Override
     public boolean onOptionsItemSelected(MenuItem item) {
         int id = item.getItemId();
-        Log.d(LOG_TAG, "onOptionsItemSelected " + item.getTitle());
+        Utils.d("onOptionsItemSelected " + item.getTitle());
         if (id == R.id.action_release_add) {
             //TODO apri l'editor showComicsEditor(..., true);
             return true;
@@ -164,7 +164,7 @@ public class ReleaseListFragment extends Fragment implements OnChangePageListene
             mActionMode.finish();
     }
 
-    private void showReleaseEditor(Release release, boolean isNew) {
+    private void showReleaseEditor(ReleaseId releaseId, boolean isNew) {
         //TODO apri editor release
 //        Intent intent = new Intent(getActivity(), ComicsEditorActivity.class);
 //        intent.putExtra(ComicsEditorActivity.EXTRA_ENTRY, comics);

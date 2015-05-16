@@ -1,7 +1,6 @@
 package it.amonshore.secondapp.ui;
 
 import android.content.Context;
-import android.util.Log;
 import android.view.LayoutInflater;
 import android.view.View;
 import android.view.ViewGroup;
@@ -15,6 +14,7 @@ import java.util.Comparator;
 import it.amonshore.secondapp.R;
 import it.amonshore.secondapp.data.Comics;
 import it.amonshore.secondapp.data.DataManager;
+import it.amonshore.secondapp.data.Utils;
 
 /**
  * Created by Calgia on 07/05/2015.
@@ -22,8 +22,6 @@ import it.amonshore.secondapp.data.DataManager;
  * L'id di ogni elemento della lista è dato da Comics.getId()
  */
 public class ComicsListAdapter extends BaseAdapter {
-
-    private final static String LOG_TAG = "CLA";
 
     public final static int ORDER_ASC = 0;
     public final static int ORDER_DESC = 1;
@@ -59,7 +57,7 @@ public class ComicsListAdapter extends BaseAdapter {
         if (order != this.mOrder) {
             this.mOrder = order;
             //TODO impostare il mComparator in base all'ordine
-            Log.d(LOG_TAG, "setOrder " + order);
+            Utils.d("setOrder " + order);
             if ((order & ORDER_BY_NAME) == ORDER_BY_NAME) {
                 this.mComparator = new NameComparator((order & ORDER_DESC) == ORDER_DESC);
             } else {
@@ -92,7 +90,7 @@ public class ComicsListAdapter extends BaseAdapter {
      * @return
      */
     public Comics createNewComics() {
-        return new Comics(this.mDataManager.getSafeNewId());
+        return new Comics(this.mDataManager.getSafeNewComicsId());
     }
 
     /**
@@ -151,7 +149,7 @@ public class ComicsListAdapter extends BaseAdapter {
         }
 
         Comics comics = (Comics)getItem(position);
-        //Log.d(LOG_TAG, "getView @" + position + " id " + comics.getId() + " " + comics.getName());
+        //Utils.d("getView @" + position + " id " + comics.getId() + " " + comics.getName());
         //((TextView)convertView.findViewById(android.R.id.text1)).setText(comics.getName());
         //((TextView)convertView.findViewById(android.R.id.text2)).setText(comics.getPublisher());
         ((TextView)convertView.findViewById(R.id.txt_list_comics_name)).setText(comics.getName());

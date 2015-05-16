@@ -23,8 +23,6 @@ public class MainActivity extends ActionBarActivity {
 
     public final static String PREFS_NAME = "ComikkuPrefs";
 
-    private final static String LOG_TAG = "MAC";
-
     TabPageAdapter mTabPageAdapter;
     ViewPager mViewPager;
     //salvo la page/fragment precedente
@@ -57,7 +55,7 @@ public class MainActivity extends ActionBarActivity {
 //            @Override
 //            public void onPageSelected(int position) {
 //                //chiudo l'ActionBar contestuale del fragment precedente
-//                Log.d(LOG_TAG, "pager OnPageChangeListener " + mPreviousPage);
+//                Utils.d("pager OnPageChangeListener " + mPreviousPage);
 //                ((OnChangePageListener)mTabPageAdapter.getItem(mPreviousPage)).finishActionMode();
 //                actionBar.setSelectedNavigationItem(mPreviousPage = position);
 //            }
@@ -96,7 +94,7 @@ public class MainActivity extends ActionBarActivity {
             @Override
             public void onPageSelected(int position) {
                 //chiudo l'ActionBar contestuale del fragment precedente
-//                Log.d(LOG_TAG, "slidingTabLayout OnPageChangeListener " + mPreviousPage);
+//                Utils.d("slidingTabLayout OnPageChangeListener " + mPreviousPage);
                 ((OnChangePageListener) mTabPageAdapter.getItem(mPreviousPage)).finishActionMode();
                 mPreviousPage = position;
             }
