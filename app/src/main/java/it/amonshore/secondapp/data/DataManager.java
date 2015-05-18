@@ -13,6 +13,9 @@ import java.io.BufferedReader;
 import java.io.File;
 import java.io.FileReader;
 import java.io.IOException;
+import java.text.ParseException;
+import java.text.SimpleDateFormat;
+import java.util.Date;
 import java.util.HashSet;
 import java.util.Set;
 import java.util.TreeMap;
@@ -65,6 +68,7 @@ public class DataManager {
 //    private ReleasesTreeMap mReleasesCache;
     //contiene un elenco di tutti gli editori
     private HashSet<String> mPublishers;
+    private SimpleDateFormat mDateFormat;
 
     private DataManager(Context context) {
         mContext = context;
@@ -72,6 +76,8 @@ public class DataManager {
         //controllo che la memoria esternza sia disponibile
         mExternalStorage = isExternalStorageWritable();
         Utils.d("isExternalStorageWritable " + mExternalStorage);
+        //date format non localizzata
+        mDateFormat = new SimpleDateFormat("yyyy-MM-dd");
     }
 
     private boolean isExternalStorageWritable() {
@@ -131,7 +137,7 @@ public class DataManager {
     private Release json2release(Release release, JSONObject obj) throws JSONException {
         //{"comicsId":"94225d77-377c-11e4-8352-bb818c016cd9","number":5,"date":null,"price":null,"reminder":null,"purchased":"T","_kk":345}
         release.setNumber(obj.getInt(FIELD_NUMBER));
-        //TODO release.setDate( ... );
+        release.setDate(tryGetDate(obj, FIELD_DATE));
         release.setPrice(tryGetDouble(obj, FIELD_PRICE));
         release.setReminder(tryGetBoolean(obj, FIELD_REMINDER));
         release.setPurchased(tryGetBoolean(obj, FIELD_PURCHASED));
@@ -162,6 +168,24 @@ public class DataManager {
             return true;
         else
             return obj.optBoolean(field, false);
+    }
+
+    private Date tryGetDate(JSONObject obj, String field) throws JSONException {
+        if (obj.isNull(field)) {
+            return null;
+        } else {
+            String str = obj.getString(field);
+            if (TextUtils.isEmpty(str)) {
+                return null;
+            } else {
+                try {
+                    return mDateFormat.parse(str);
+                } catch (ParseException pex) {
+                    //Utils.e("DataManager.tryGateDate " + str, pex);
+                    return null;
+                }
+            }
+        }
     }
 
     private void putPublisher(String publisher) {

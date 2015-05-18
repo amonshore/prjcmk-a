@@ -64,4 +64,8 @@ public class Release implements Serializable {
     public void setPurchased(boolean purchased) {
         this.purchased = purchased;
     }
+
+    public boolean isWishlist() {
+        return date == null;
+    }
 }

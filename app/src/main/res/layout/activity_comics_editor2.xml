@@ -22,6 +22,7 @@
                     android:layout_width="wrap_content"
                     android:layout_height="wrap_content"
                     android:textAppearance="?android:attr/textAppearanceSmall"
+                    android:textColor="@android:color/holo_blue_light"
                     android:text="@string/editor_comics_name"
                     android:id="@+id/lbl_editor_comics_name" />
 
@@ -38,6 +39,7 @@
                     android:layout_width="wrap_content"
                     android:layout_height="wrap_content"
                     android:textAppearance="?android:attr/textAppearanceSmall"
+                    android:textColor="@android:color/holo_blue_light"
                     android:text="@string/editor_comics_publisher"
                     android:id="@+id/lbl_editor_comics_publisher" />
 
@@ -52,6 +54,7 @@
                     android:layout_width="wrap_content"
                     android:layout_height="wrap_content"
                     android:textAppearance="?android:attr/textAppearanceSmall"
+                    android:textColor="@android:color/holo_blue_light"
                     android:text="@string/editor_comics_series"
                     android:id="@+id/lbl_editor_comics_series" />
 
@@ -66,6 +69,7 @@
                     android:layout_width="wrap_content"
                     android:layout_height="wrap_content"
                     android:textAppearance="?android:attr/textAppearanceSmall"
+                    android:textColor="@android:color/holo_blue_light"
                     android:text="@string/editor_comics_authors"
                     android:id="@+id/lbl_editor_comics_authors" />
 
@@ -80,6 +84,7 @@
                     android:layout_width="wrap_content"
                     android:layout_height="wrap_content"
                     android:textAppearance="?android:attr/textAppearanceSmall"
+                    android:textColor="@android:color/holo_blue_light"
                     android:text="@string/editor_comics_price"
                     android:id="@+id/lbl_editor_comics_price" />
 
@@ -94,6 +99,7 @@
                     android:layout_width="wrap_content"
                     android:layout_height="wrap_content"
                     android:textAppearance="?android:attr/textAppearanceSmall"
+                    android:textColor="@android:color/holo_blue_light"
                     android:text="@string/editor_comics_periodicity"
                     android:id="@+id/lbl_editor_comics_periodicity"/>
 
