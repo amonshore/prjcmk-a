@@ -331,7 +331,7 @@ public final class Collections2 {
    *
    * <p><i>Notes:</i> This is an implementation of the algorithm for
    * Lexicographical Permutations Generation, described in Knuth's "The Art of
-   * Computer Programming", Volume 4, Chapter 7, Section 7.2.1.2. The
+   * Computer Programming", Volume 4, Chapter 7, GroupInfo 7.2.1.2. The
    * iteration order follows the lexicographical order. This means that
    * the first permutation will be in ascending order, and the last will be in
    * descending order.
@@ -386,7 +386,7 @@ public final class Collections2 {
    *
    * <p><i>Notes:</i> This is an implementation of the algorithm for
    * Lexicographical Permutations Generation, described in Knuth's "The Art of
-   * Computer Programming", Volume 4, Chapter 7, Section 7.2.1.2. The
+   * Computer Programming", Volume 4, Chapter 7, GroupInfo 7.2.1.2. The
    * iteration order follows the lexicographical order. This means that
    * the first permutation will be in ascending order, and the last will be in
    * descending order.
@@ -543,7 +543,7 @@ public final class Collections2 {
    *
    * <p><i>Notes:</i> This is an implementation of the Plain Changes algorithm
    * for permutations generation, described in Knuth's "The Art of Computer
-   * Programming", Volume 4, Chapter 7, Section 7.2.1.2.
+   * Programming", Volume 4, Chapter 7, GroupInfo 7.2.1.2.
    *
    * <p>If the input list contains equal elements, some of the generated
    * permutations will be equal.

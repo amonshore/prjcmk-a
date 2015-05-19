@@ -531,7 +531,7 @@ public final class LongMath {
    */
   @GwtIncompatible("TODO")
   public static long checkedMultiply(long a, long b) {
-    // Hacker's Delight, Section 2-12
+    // Hacker's Delight, GroupInfo 2-12
     int leadingZeros = Long.numberOfLeadingZeros(a) + Long.numberOfLeadingZeros(~a)
         + Long.numberOfLeadingZeros(b) + Long.numberOfLeadingZeros(~b);
     /*

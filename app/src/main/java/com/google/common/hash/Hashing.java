@@ -247,7 +247,7 @@ public final class Hashing {
 
   /**
    * Returns a hash function implementing the CRC32C checksum algorithm (32 hash bits) as described
-   * by RFC 3720, Section 12.1.
+   * by RFC 3720, GroupInfo 12.1.
    *
    * @since 18.0
    */
