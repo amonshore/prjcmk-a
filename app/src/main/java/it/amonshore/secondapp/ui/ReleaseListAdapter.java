@@ -1,42 +1,32 @@
 package it.amonshore.secondapp.ui;
 
 import android.content.Context;
+import android.util.SparseArray;
+import android.view.LayoutInflater;
+import android.view.View;
+import android.view.ViewGroup;
+import android.widget.AdapterView;
+import android.widget.TextView;
+import android.widget.Toast;
 
 import com.applidium.headerlistview.SectionAdapter;
-import com.google.common.base.Supplier;
-import com.google.common.collect.Multimaps;
-import com.google.common.collect.SortedSetMultimap;
 
+import java.security.acl.Group;
 import java.text.SimpleDateFormat;
-import java.util.ArrayList;
 import java.util.Calendar;
-import java.util.Collection;
 import java.util.Date;
-import java.util.HashMap;
 import java.util.Locale;
-import java.util.SortedSet;
-import java.util.TreeSet;
 
+import it.amonshore.secondapp.R;
 import it.amonshore.secondapp.data.Comics;
 import it.amonshore.secondapp.data.DataManager;
 import it.amonshore.secondapp.data.Release;
 import it.amonshore.secondapp.data.ReleaseId;
+import it.amonshore.secondapp.data.SortedList;
+import it.amonshore.secondapp.data.Utils;
 
 /**
  * Created by Calgia on 15/05/2015.
- *
- * TODO alla classe può essere specificato cosa far vedere (tutto, wishlist, expired, etc)
- *
- * Gruppo periodo attuale (settimana/mese)
- * Gruppo periodo prossimo (settimana/mese)
- * Gruppo periodo altro
- * Gruppo persi: release non acquistate, con data specificata e scaduta (inferiore a inizio periodo)
- * Gruppo desiderati: release non acquistate, con data non specificata
- * Gruppo da acquistare: release non acquistate
- * Gruppo acquistati: release acquistate
- * Gruppo scaduti: release non acquistate, con data speficiata e scaduta (inferiore a oggi)
- * Gruppo sconosciuto
- *
  */
 public class ReleaseListAdapter extends SectionAdapter {
 
@@ -69,15 +59,15 @@ public class ReleaseListAdapter extends SectionAdapter {
     /**
      * Gruppo periodo corrente
      */
-    private final static int GROUP_PERIOD = 0;
+    private final static int GROUP_PERIOD = 1;
     /**
      * Gruppo periodo successivo
      */
-    private final static int GROUP_PERIOD_NEXT = 1;
+    private final static int GROUP_PERIOD_NEXT = 2;
     /**
      * Gruppo periodo altro
      */
-    private final static int GROUP_PERIOD_OTHER = 2;
+    private final static int GROUP_PERIOD_OTHER = 3;
     /**
      * Gruppo persi: release non acquistate, con data specificata e scaduta (inferiore a inizio periodo)
      */
@@ -106,16 +96,13 @@ public class ReleaseListAdapter extends SectionAdapter {
     private Context mContext;
     private DataManager mDataManager;
     //elenco dei gruppi
-    ArrayList<GroupInfo> mGroupInfos;
-    //contiene le release suddivise per gruppo (la chiave)
-    private SortedSetMultimap<Integer, ReleaseId> mGroups;
+    SparseArray<GroupInfo> mGroupInfos;
     //
     private SimpleDateFormat mDateFormat;
     //modalità: indica cosa far vedere e come deve essere raggruppato
     private int mMode;
     //
     private Calendar mToday;
-
 
     /**
      *
@@ -125,9 +112,8 @@ public class ReleaseListAdapter extends SectionAdapter {
     public ReleaseListAdapter(Context context, int mode) {
         mContext = context;
         mDataManager = DataManager.getDataManager(context);
-        //mSortedIds = new ArrayList<>();
-        prepareGroups();
-        //
+        mMode = mode;
+        mGroupInfos = new SparseArray<>();
         mDateFormat = new SimpleDateFormat("c dd MMM", Locale.getDefault());
         mToday = Calendar.getInstance();
     }
@@ -182,99 +168,37 @@ public class ReleaseListAdapter extends SectionAdapter {
      * @return
      */
     public int refresh(Comics comics) {
-        //mSortedIds.clear();
-        mGroups.clear();
+        Utils.d("ReleaseListAdapter.refresh");
+        clear();
+        int tot = 0;
         if (comics == null) {
             //estraggo le release da tutti i comics
             for (long comicsId: mDataManager.getComics()) {
                 for (Release release : mDataManager.getComics(comicsId).getReleases()) {
-                    //mSortedIds.add(new ReleaseId(comicsId, release.getNumber()));
-                    putReleaseInGroup(release);
+                    if (putReleaseInGroup(release) != GROUP_UNKNOWN) tot++;
                 }
             }
         } else {
             //estraggo le release dal solo comics in parametro
             for (Release release : comics.getReleases()) {
-                //mSortedIds.add(new ReleaseId(comics.getId(), release.getNumber()));
-                putReleaseInGroup(release);
+                if (putReleaseInGroup(release) != GROUP_UNKNOWN) tot++;
             }
         }
-        //TODO ordinare, raggruppare etc
-        //return mSortedIds.size();
-        return mGroups.size();
+        return tot;
     }
 
-//    @Override
-//    public boolean hasStableIds() {
-//        //visto che tutti gli id degli elementi non possono cambiare nel tempo
-//        //  ritorno true, questo fa in modo che ListView.getCheckedItemIds() ritorni
-//        //  gli id degli elementi checkati (altrimenti non funziona)
-//        return true;
-//    }
-//
-//    @Override
-//    public int getCount() {
-//        //return mSortedIds.size();
-//    }
-//
-//    @Override
-//    public View getView(int position, View convertView, ViewGroup parent) {
-//        if (convertView == null) {
-//            convertView = LayoutInflater.from(mContext).inflate(R.layout.list_release_item, null);
-//        }
-//
-//        ReleaseId rid = (ReleaseId)getItem(position);
-//        Comics comics = mDataManager.getComics(rid.getComicsId());
-//        Release release = comics.getRelease(rid.getNumber());
-//        String relDate = "";
-//        if (release.getDate() != null) {
-//            relDate = mDateFormat.format(release.getDate());
-//        }
-//        //Utils.d("getView @" + position + " id " + comics.getId() + " " + comics.getName());
-//                ((TextView) convertView.findViewById(R.id.txt_list_release_name)).setText(comics.getName());
-//        ((TextView)convertView.findViewById(R.id.txt_list_release_info))
-//                .setText(String.format("#%s - %s", release.getNumber(), relDate));
-//
-//        return convertView;
-//    }
-//
-//    @Override
-//    public long getItemId(int position) {
-//        return (long)position;
-//    }
-//
-//    @Override
-//    public Object getItem(int position) {
-//        return mSortedIds.get(position);
-//    }
-
-    private void prepareGroups() {
-        //
-        mGroupInfos = new ArrayList<>();
-        //
-        mGroups = Multimaps.newSortedSetMultimap(new HashMap<Integer, Collection<ReleaseId>> (), new Supplier<SortedSet<ReleaseId>>() {
-            @Override
-            public SortedSet<ReleaseId> get() {
-                //TODO passare un comparator
-                return new TreeSet<ReleaseId>();
-            }
-        });
-        //
-        if (mMode == MODE_SHOPPING) {
-            mGroupInfos.add(new GroupInfo(GROUP_PERIOD, android.R.layout.simple_list_item_1, android.R.id.text1, "Periodo corrente"));
-            mGroupInfos.add(new GroupInfo(GROUP_LOST, android.R.layout.simple_list_item_1, android.R.id.text1, "Persi"));
-            mGroupInfos.add(new GroupInfo(GROUP_WISHLIST, android.R.layout.simple_list_item_1, android.R.id.text1, "Desiderati"));
-        } else if (mMode == MODE_CALENDAR) {
-            mGroupInfos.add(new GroupInfo(GROUP_PERIOD, android.R.layout.simple_list_item_1, android.R.id.text1, "Periodo corrente"));
-            mGroupInfos.add(new GroupInfo(GROUP_PERIOD_NEXT, android.R.layout.simple_list_item_1, android.R.id.text1, "Periodo successivo"));
-            mGroupInfos.add(new GroupInfo(GROUP_PERIOD_OTHER, android.R.layout.simple_list_item_1, android.R.id.text1, "Periodo altro"));
-        } else if (mMode == MODE_LAW) {
-            mGroupInfos.add(new GroupInfo(GROUP_EXPIRED, android.R.layout.simple_list_item_1, android.R.id.text1, "Scaduti"));
-            mGroupInfos.add(new GroupInfo(GROUP_WISHLIST, android.R.layout.simple_list_item_1, android.R.id.text1, "Desiderati"));
-        } else if (mMode == MODE_COMICS) {
-            mGroupInfos.add(new GroupInfo(GROUP_TO_PURCHASE, android.R.layout.simple_list_item_1, android.R.id.text1, "Da acquistare"));
-            mGroupInfos.add(new GroupInfo(GROUP_PURCHASED, android.R.layout.simple_list_item_1, android.R.id.text1, "Acquistati"));
+    public void clear() {
+        for (int ii = 0; ii < mGroupInfos.size(); ii++) {
+            mGroupInfos.valueAt(ii).releases.clear();
         }
+    }
+
+    @Override
+    public boolean hasStableIds() {
+        //visto che tutti gli id degli elementi non possono cambiare nel tempo
+        //  ritorno true, questo fa in modo che ListView.getCheckedItemIds() ritorni
+        //  gli id degli elementi checkati (altrimenti non funziona)
+        return true;
     }
 
     private int putReleaseInGroup(Release release) {
@@ -302,9 +226,46 @@ public class ReleaseListAdapter extends SectionAdapter {
         }
     }
 
+    private void checkGroup(int group) {
+        if (mGroupInfos.indexOfKey(group) < 0) {
+            switch (group) {
+                case GROUP_PERIOD:
+                    mGroupInfos.put(GROUP_PERIOD,
+                            new GroupInfo(GROUP_PERIOD, android.R.layout.simple_list_item_1, android.R.id.text1, "Periodo corrente"));
+                    break;
+                case GROUP_LOST:
+                    mGroupInfos.put(GROUP_LOST,
+                            new GroupInfo(GROUP_LOST, android.R.layout.simple_list_item_1, android.R.id.text1, "Persi"));
+                    break;
+                case GROUP_WISHLIST:
+                    mGroupInfos.put(GROUP_WISHLIST,
+                            new GroupInfo(GROUP_WISHLIST, android.R.layout.simple_list_item_1, android.R.id.text1, "Desiderati"));
+                    break;
+//        } else if (mMode == MODE_CALENDAR) {
+//            mGroupInfos.put(GROUP_PERIOD, new GroupInfo(GROUP_PERIOD, android.R.layout.simple_list_item_1, android.R.id.text1, "Periodo corrente"));
+//            mGroupInfos.put(GROUP_PERIOD_NEXT, new GroupInfo(GROUP_PERIOD_NEXT, android.R.layout.simple_list_item_1, android.R.id.text1, "Periodo successivo"));
+//            mGroupInfos.put(GROUP_PERIOD_OTHER, new GroupInfo(GROUP_PERIOD_OTHER, android.R.layout.simple_list_item_1, android.R.id.text1, "Periodo altro"));
+//        } else if (mMode == MODE_LAW) {
+//            mGroupInfos.put(GROUP_EXPIRED, new GroupInfo(GROUP_EXPIRED, android.R.layout.simple_list_item_1, android.R.id.text1, "Scaduti"));
+//            mGroupInfos.put(GROUP_WISHLIST, new GroupInfo(GROUP_WISHLIST, android.R.layout.simple_list_item_1, android.R.id.text1, "Desiderati"));
+//        } else if (mMode == MODE_COMICS) {
+//            mGroupInfos.put(GROUP_TO_PURCHASE, new GroupInfo(GROUP_TO_PURCHASE, android.R.layout.simple_list_item_1, android.R.id.text1, "Da acquistare"));
+//            mGroupInfos.put(GROUP_PURCHASED, new GroupInfo(GROUP_PURCHASED, android.R.layout.simple_list_item_1, android.R.id.text1, "Acquistati"));
+//        }
+
+            }
+        }
+    }
+
     private boolean tryPutInPeriod(Release release) {
         //TODO data specificata e nel periodo
-        return false;
+        if (release.getDate() != null) {
+            checkGroup(GROUP_PERIOD);
+            mGroupInfos.get(GROUP_PERIOD).releases.add(new ReleaseId(release.getComicsId(), release.getNumber()));
+            return true;
+        } else {
+            return false;
+        }
     }
 
     private boolean tryPutInPeriodNext(Release release) {
@@ -319,7 +280,7 @@ public class ReleaseListAdapter extends SectionAdapter {
 
     private boolean tryPutInExpired(Release release) {
         //TODO non acquisati, data specificata e < oggi
-        if (!release.isPurchased() && release.getDate() != null && release.getDate().getTime() < )
+        //if (!release.isPurchased() && release.getDate() != null && release.getDate().getTime() < )
         return  false;
     }
 
@@ -331,7 +292,8 @@ public class ReleaseListAdapter extends SectionAdapter {
     private boolean tryPutInWishlist(Release release) {
         //TODO non acquistati, data non specificata
         if (!release.isPurchased() && release.isWishlist()) {
-            mGroups.put(GROUP_WISHLIST, new ReleaseId(release.getComicsId(), release.getNumber()));
+            checkGroup(GROUP_WISHLIST);
+            mGroupInfos.get(GROUP_WISHLIST).releases.add(new ReleaseId(release.getComicsId(), release.getNumber()));
             return true;
         } else {
             return false;
@@ -340,7 +302,7 @@ public class ReleaseListAdapter extends SectionAdapter {
 
     private boolean tryPutInToPurchase(Release release) {
         if (!release.isPurchased()) {
-            mGroups.put(GROUP_TO_PURCHASE, new ReleaseId(release.getComicsId(), release.getNumber()));
+            mGroupInfos.get(GROUP_TO_PURCHASE).releases.add(new ReleaseId(release.getComicsId(), release.getNumber()));
             return true;
         } else {
             return false;
@@ -349,7 +311,7 @@ public class ReleaseListAdapter extends SectionAdapter {
 
     private boolean tryPutInPurchased(Release release) {
         if (release.isPurchased()) {
-            mGroups.put(GROUP_PURCHASED, new ReleaseId(release.getComicsId(), release.getNumber()));
+            mGroupInfos.get(GROUP_PURCHASED).releases.add(new ReleaseId(release.getComicsId(), release.getNumber()));
             return true;
         } else {
             return false;
@@ -363,7 +325,86 @@ public class ReleaseListAdapter extends SectionAdapter {
 
     @Override
     public int numberOfSections() {
-        return mGroups.size();
+        return mGroupInfos.size();
+    }
+
+    @Override
+    public int numberOfRows(int section) {
+        if (section < 0 || section >= mGroupInfos.size()) {
+            //Utils.d("numberOfRows " + section + " " + mGroupInfos.size());
+            return 0;
+        }
+        return mGroupInfos.valueAt(section).releases.size();
+    }
+
+    @Override
+    public Object getRowItem(int section, int row) {
+        return mGroupInfos.valueAt(section).releases.get(row);
+    }
+
+    @Override
+    public boolean hasSectionHeaderView(int section) {
+        return true;
+    }
+
+    @Override
+    public View getRowView(int section, int row, View convertView, ViewGroup parent) {
+        if (convertView == null) {
+            convertView = LayoutInflater.from(mContext).inflate(R.layout.list_release_item, null);
+            //convertView.setId(R.layout.list_release_item);
+        }
+
+        ReleaseId rid = (ReleaseId)getRowItem(section, row);
+        Comics comics = mDataManager.getComics(rid.getComicsId());
+        Release release = comics.getRelease(rid.getNumber());
+        String relDate = "";
+        if (release.getDate() != null) {
+            relDate = mDateFormat.format(release.getDate());
+        }
+//        Utils.d("getRowView @" + section + "/" + row + " " + comics.getName() + " " + convertView);
+//        if (convertView.findViewById(R.id.txt_list_release_name) == null) {
+//            Utils.d("isnull " + convertView.getId() + " " + R.layout.list_release_item);
+//        }
+        ((TextView)convertView.findViewById(R.id.txt_list_release_name)).setText(comics.getName());
+        ((TextView)convertView.findViewById(R.id.txt_list_release_info))
+                .setText(String.format("#%s - %s", release.getNumber(), relDate));
+
+        return convertView;
+    }
+
+    @Override
+    public int getSectionHeaderViewTypeCount() {
+        //ATTENZIONE incasina tutto return mGroupInfos.size();
+        return 1;
+    }
+
+    @Override
+    public int getSectionHeaderItemViewType(int section) {
+        //Utils.d("getSectionHeaderItemViewType " + section);
+        ////ATTENZIONE incasina tutto return mGroupInfos.valueAt(section).group;
+        return 0;
+    }
+
+    @Override
+    public View getSectionHeaderView(int section, View convertView, ViewGroup parent) {
+        //TODO
+        if (convertView == null) {
+            convertView = LayoutInflater.from(mContext).inflate(R.layout.list_release_header, null);
+            //convertView.setId(R.layout.list_release_header);
+        }
+//        Utils.d("getSectionHeaderView @" + section + " " + convertView);
+//        if (convertView.findViewById(R.id.txt_list_release_header) == null) {
+//            Utils.d("isnull2 " + convertView.getId() + " " + R.layout.list_release_header);
+//        }
+        GroupInfo group = mGroupInfos.valueAt(section);
+        ((TextView) convertView.findViewById(R.id.txt_list_release_header)).setText(group.caption);
+        return convertView;
+    }
+
+    @Override
+    public void onRowItemClick(AdapterView<?> parent, View view, int section, int row, long id) {
+        super.onRowItemClick(parent, view, section, row, id);
+        Toast.makeText(mContext, "Section " + section + " row " + row, Toast.LENGTH_LONG).show();
     }
 
     /**
@@ -378,12 +419,16 @@ public class ReleaseListAdapter extends SectionAdapter {
         public int textResId;
         //
         public CharSequence caption;
+        //
+        public SortedList<ReleaseId> releases;
 
         public GroupInfo(int group, int layoutResId, int textResId, CharSequence caption) {
             this.group = group;
             this.layoutResId = layoutResId;
             this.textResId = textResId;
             this.caption = caption;
+            //TODO passare comparator
+            this.releases = new SortedList<>();
         }
     }
 

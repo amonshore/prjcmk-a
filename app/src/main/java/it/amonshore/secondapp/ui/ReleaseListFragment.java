@@ -17,6 +17,8 @@ import android.widget.ListAdapter;
 import android.widget.ListView;
 import android.widget.TextView;
 
+import com.applidium.headerlistview.HeaderListView;
+
 import it.amonshore.secondapp.R;
 import it.amonshore.secondapp.data.Comics;
 import it.amonshore.secondapp.data.Release;
@@ -27,6 +29,8 @@ import it.amonshore.secondapp.data.Utils;
  * Created by Calgia on 15/05/2015.
  */
 public class ReleaseListFragment extends Fragment implements OnChangePageListener {
+
+    public final static String ARG_MODE = "arg_mode";
 
     private AbsListView mListView;
     private ReleaseListAdapter mAdapter;
@@ -39,8 +43,11 @@ public class ReleaseListFragment extends Fragment implements OnChangePageListene
         super.onCreate(savedInstanceState);
         //deve essere chiamato in onCreate
         setHasOptionsMenu(true);
+        //recupero i parametri
+        Bundle args = getArguments();
+        int mode = args.getInt(ARG_MODE, ReleaseListAdapter.MODE_SHOPPING);
         //
-        mAdapter = new ReleaseListAdapter(getActivity().getApplicationContext());
+        mAdapter = new ReleaseListAdapter(getActivity().getApplicationContext(), mode);
         //leggo i dati in modalità asincrona
         refreshData();
     }
@@ -48,68 +55,74 @@ public class ReleaseListFragment extends Fragment implements OnChangePageListene
     @Override
     public View onCreateView(LayoutInflater inflater, ViewGroup container,
                              Bundle savedInstanceState) {
+//        View view = inflater.inflate(R.layout.fragment_releases, container, false);
+//
+//        // Set the adapter
+//        mListView = (AbsListView) view.findViewById(android.R.id.list);
+//        ((AdapterView<ListAdapter>) mListView).setAdapter(mAdapter);
+//        //
+//        mListView.setChoiceMode(ListView.CHOICE_MODE_MULTIPLE_MODAL);
+//        mListView.setOnItemClickListener(new AdapterView.OnItemClickListener() {
+//            @Override
+//            public void onItemClick(AdapterView<?> parent, View view, int position, long id) {
+//                //Utils.d("onItemClick " + ((Comics) mAdapter.getItem(position)).getName());
+//                //TODO showReleaseEditor((ReleaseId) mAdapter.getItem(position), false);
+//            }
+//        });
+//        mListView.setMultiChoiceModeListener(new AbsListView.MultiChoiceModeListener() {
+//            @Override
+//            public void onItemCheckedStateChanged(ActionMode mode, int position, long id, boolean checked) {
+//                //Utils.d("onItemCheckedStateChanged " + position);
+//                mode.setTitle(getString(R.string.selected_items, mListView.getCheckedItemCount()));
+//            }
+//
+//            @Override
+//            public boolean onCreateActionMode(ActionMode mode, Menu menu) {
+//                //Utils.d("onCreateActionMode");
+//                MenuInflater inflater = mode.getMenuInflater();
+//                inflater.inflate(R.menu.menu_releases_cab, menu);
+//                mActionMode = mode;
+//                return true;
+//            }
+//
+//            @Override
+//            public boolean onActionItemClicked(ActionMode mode, MenuItem item) {
+//                Utils.d("onActionItemClicked " + item.getTitle());
+//                //risponde alla selezione di una azione del menu_releases_cab
+//                long menuId = item.getItemId();
+//                if (menuId == R.id.action_release_delete) {
+//                    //TODO delete
+////                    long[] ags = mListView.getCheckedItemIds();
+////                    Long[] lgs = new Long[ags.length];
+////                    for (int ii = 0; ii < ags.length; ii++) {
+////                        lgs[ii] = ags[ii];
+////                    }
+////                    new RemoveComicsAsyncTask().execute(lgs);
+//                    finishActionMode();
+//                    return true;
+//                } else {
+//                    return false;
+//                }
+//            }
+//
+//            @Override
+//            public boolean onPrepareActionMode(ActionMode mode, Menu menu) {
+//                return false;
+//            }
+//
+//            @Override
+//            public void onDestroyActionMode(ActionMode mode) {
+//                mActionMode = null;
+//            }
+//        });
+//
+//        return view;
+
         View view = inflater.inflate(R.layout.fragment_releases, container, false);
-
-        // Set the adapter
-        mListView = (AbsListView) view.findViewById(android.R.id.list);
-        ((AdapterView<ListAdapter>) mListView).setAdapter(mAdapter);
-        //
-        mListView.setChoiceMode(ListView.CHOICE_MODE_MULTIPLE_MODAL);
-        mListView.setOnItemClickListener(new AdapterView.OnItemClickListener() {
-            @Override
-            public void onItemClick(AdapterView<?> parent, View view, int position, long id) {
-                //Utils.d("onItemClick " + ((Comics) mAdapter.getItem(position)).getName());
-                //TODO showReleaseEditor((ReleaseId) mAdapter.getItem(position), false);
-            }
-        });
-        mListView.setMultiChoiceModeListener(new AbsListView.MultiChoiceModeListener() {
-            @Override
-            public void onItemCheckedStateChanged(ActionMode mode, int position, long id, boolean checked) {
-                //Utils.d("onItemCheckedStateChanged " + position);
-                mode.setTitle(getString(R.string.selected_items, mListView.getCheckedItemCount()));
-            }
-
-            @Override
-            public boolean onCreateActionMode(ActionMode mode, Menu menu) {
-                //Utils.d("onCreateActionMode");
-                MenuInflater inflater = mode.getMenuInflater();
-                inflater.inflate(R.menu.menu_releases_cab, menu);
-                mActionMode = mode;
-                return true;
-            }
-
-            @Override
-            public boolean onActionItemClicked(ActionMode mode, MenuItem item) {
-                Utils.d("onActionItemClicked " + item.getTitle());
-                //risponde alla selezione di una azione del menu_releases_cab
-                long menuId = item.getItemId();
-                if (menuId == R.id.action_release_delete) {
-                    //TODO delete
-//                    long[] ags = mListView.getCheckedItemIds();
-//                    Long[] lgs = new Long[ags.length];
-//                    for (int ii = 0; ii < ags.length; ii++) {
-//                        lgs[ii] = ags[ii];
-//                    }
-//                    new RemoveComicsAsyncTask().execute(lgs);
-                    finishActionMode();
-                    return true;
-                } else {
-                    return false;
-                }
-            }
-
-            @Override
-            public boolean onPrepareActionMode(ActionMode mode, Menu menu) {
-                return false;
-            }
-
-            @Override
-            public void onDestroyActionMode(ActionMode mode) {
-                mActionMode = null;
-            }
-        });
-
-        return view;
+        HeaderListView list = (HeaderListView)view.findViewById(android.R.id.list);
+        list.setAdapter(mAdapter);
+        mListView = list.getListView();
+        return  view;
     }
 
     @Override

@@ -1,9 +1,9 @@
 package it.amonshore.secondapp.ui;
 
+import android.os.Bundle;
 import android.support.v4.app.Fragment;
 import android.support.v4.app.FragmentManager;
 import android.support.v4.app.FragmentStatePagerAdapter;
-import android.util.Log;
 
 import java.util.ArrayList;
 
@@ -12,10 +12,9 @@ import java.util.ArrayList;
  */
 public class TabPageAdapter extends FragmentStatePagerAdapter {
 
-    public final static int TOT_PAGES = 3;
     public final static int PAGE_COMICS = 0;
-    public final static int PAGE_RELEASES = 1;
-    public final static int PAGE_WISHLIST = 2;
+    public final static int PAGE_SHOPPING = 1;
+    public final static int PAGE_LAW = 2;
     //
     ArrayList<Fragment> mPages;
 
@@ -25,8 +24,24 @@ public class TabPageAdapter extends FragmentStatePagerAdapter {
         //preparo le pagine
         mPages = new ArrayList<>();
         mPages.add(new ComicsListFragment());
-        mPages.add(new ReleaseListFragment());
-        mPages.add(FakeBlankFragment.newInstance("Fake page B"));
+
+        Bundle args;
+        Fragment frg;
+
+        args = new Bundle();
+        args.putInt(ReleaseListFragment.ARG_MODE, ReleaseListAdapter.MODE_SHOPPING);
+        frg = new ReleaseListFragment();
+        frg.setArguments(args);
+        mPages.add(frg);
+
+//TODO switchando tra le page ricevo questo errore
+        //java.lang.IllegalArgumentException: Wrong state class, expecting View State but received class android.widget.AbsListView$SavedState instead.
+        //This usually happens when two views of different type have the same id in the same hierarchy. This view's id is id/list. Make sure other views do not use the same id.
+//        args = new Bundle();
+//        args.putInt(ReleaseListFragment.ARG_MODE, ReleaseListAdapter.MODE_LAW);
+//        frg = new ReleaseListFragment();
+//        frg.setArguments(args);
+//        mPages.add(frg);
     }
 
     @Override
@@ -37,7 +52,7 @@ public class TabPageAdapter extends FragmentStatePagerAdapter {
 
     @Override
     public int getCount() {
-        return TOT_PAGES;
+        return mPages.size();
     }
 
     @Override
@@ -45,8 +60,10 @@ public class TabPageAdapter extends FragmentStatePagerAdapter {
         //TODO recuperare i tioli della pagine dalle risorse (direttamente dai fragment?)
         if (position == PAGE_COMICS) {
             return "Comics";
-        } else if (position == PAGE_RELEASES) {
+        } else if (position == PAGE_SHOPPING) {
             return "Releases";
+        } else if (position == PAGE_LAW) {
+            return "Wishlist";
         } else {
             return "Page " + (position + 1);
         }
