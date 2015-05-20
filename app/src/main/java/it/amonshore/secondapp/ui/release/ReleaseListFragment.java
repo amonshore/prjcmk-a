@@ -1,4 +1,4 @@
-package it.amonshore.secondapp.ui;
+package it.amonshore.secondapp.ui.release;
 
 import android.content.Intent;
 import android.os.AsyncTask;
@@ -13,7 +13,6 @@ import android.view.View;
 import android.view.ViewGroup;
 import android.widget.AbsListView;
 import android.widget.AdapterView;
-import android.widget.ListAdapter;
 import android.widget.ListView;
 import android.widget.TextView;
 
@@ -21,9 +20,11 @@ import com.applidium.headerlistview.HeaderListView;
 
 import it.amonshore.secondapp.R;
 import it.amonshore.secondapp.data.Comics;
+import it.amonshore.secondapp.data.DataManager;
 import it.amonshore.secondapp.data.Release;
 import it.amonshore.secondapp.data.ReleaseId;
-import it.amonshore.secondapp.data.Utils;
+import it.amonshore.secondapp.Utils;
+import it.amonshore.secondapp.ui.OnChangePageListener;
 
 /**
  * Created by Calgia on 15/05/2015.
@@ -31,10 +32,14 @@ import it.amonshore.secondapp.data.Utils;
 public class ReleaseListFragment extends Fragment implements OnChangePageListener {
 
     public final static String ARG_MODE = "arg_mode";
+    public final static String ARG_COMICS_ID = "arg_comics_id";
+    public final static String ARG_GROUP_BY_MONTH = "arg_group_by_month";
+    public final static String ARG_WEEK_START_ON_MONDAY = "arg_week_start_monday";
 
     private AbsListView mListView;
     private ReleaseListAdapter mAdapter;
     private ActionMode mActionMode;
+    private DataManager mDataManager;
     //TODO deve essere passato in qualche modo, può essere null
     private Comics mComics;
 
@@ -43,11 +48,19 @@ public class ReleaseListFragment extends Fragment implements OnChangePageListene
         super.onCreate(savedInstanceState);
         //deve essere chiamato in onCreate
         setHasOptionsMenu(true);
+        mDataManager = DataManager.getDataManager(getActivity().getApplicationContext());
         //recupero i parametri
         Bundle args = getArguments();
+        long comicsId = args.getLong(ARG_COMICS_ID);
         int mode = args.getInt(ARG_MODE, ReleaseListAdapter.MODE_SHOPPING);
+        boolean groupByMonth = args.getBoolean(ARG_GROUP_BY_MONTH, false);
+        boolean weekStartOnMonday = args.getBoolean(ARG_WEEK_START_ON_MONDAY, true);
+        if (comicsId != 0) {
+            mComics = mDataManager.getComics(comicsId);
+        }
         //
-        mAdapter = new ReleaseListAdapter(getActivity().getApplicationContext(), mode);
+        mAdapter = new ReleaseListAdapter(getActivity().getApplicationContext(),
+                mode, groupByMonth, weekStartOnMonday);
         //leggo i dati in modalità asincrona
         refreshData();
     }
@@ -55,73 +68,69 @@ public class ReleaseListFragment extends Fragment implements OnChangePageListene
     @Override
     public View onCreateView(LayoutInflater inflater, ViewGroup container,
                              Bundle savedInstanceState) {
-//        View view = inflater.inflate(R.layout.fragment_releases, container, false);
-//
-//        // Set the adapter
-//        mListView = (AbsListView) view.findViewById(android.R.id.list);
-//        ((AdapterView<ListAdapter>) mListView).setAdapter(mAdapter);
-//        //
-//        mListView.setChoiceMode(ListView.CHOICE_MODE_MULTIPLE_MODAL);
-//        mListView.setOnItemClickListener(new AdapterView.OnItemClickListener() {
-//            @Override
-//            public void onItemClick(AdapterView<?> parent, View view, int position, long id) {
-//                //Utils.d("onItemClick " + ((Comics) mAdapter.getItem(position)).getName());
-//                //TODO showReleaseEditor((ReleaseId) mAdapter.getItem(position), false);
-//            }
-//        });
-//        mListView.setMultiChoiceModeListener(new AbsListView.MultiChoiceModeListener() {
-//            @Override
-//            public void onItemCheckedStateChanged(ActionMode mode, int position, long id, boolean checked) {
-//                //Utils.d("onItemCheckedStateChanged " + position);
-//                mode.setTitle(getString(R.string.selected_items, mListView.getCheckedItemCount()));
-//            }
-//
-//            @Override
-//            public boolean onCreateActionMode(ActionMode mode, Menu menu) {
-//                //Utils.d("onCreateActionMode");
-//                MenuInflater inflater = mode.getMenuInflater();
-//                inflater.inflate(R.menu.menu_releases_cab, menu);
-//                mActionMode = mode;
-//                return true;
-//            }
-//
-//            @Override
-//            public boolean onActionItemClicked(ActionMode mode, MenuItem item) {
-//                Utils.d("onActionItemClicked " + item.getTitle());
-//                //risponde alla selezione di una azione del menu_releases_cab
-//                long menuId = item.getItemId();
-//                if (menuId == R.id.action_release_delete) {
-//                    //TODO delete
-////                    long[] ags = mListView.getCheckedItemIds();
-////                    Long[] lgs = new Long[ags.length];
-////                    for (int ii = 0; ii < ags.length; ii++) {
-////                        lgs[ii] = ags[ii];
-////                    }
-////                    new RemoveComicsAsyncTask().execute(lgs);
-//                    finishActionMode();
-//                    return true;
-//                } else {
-//                    return false;
-//                }
-//            }
-//
-//            @Override
-//            public boolean onPrepareActionMode(ActionMode mode, Menu menu) {
-//                return false;
-//            }
-//
-//            @Override
-//            public void onDestroyActionMode(ActionMode mode) {
-//                mActionMode = null;
-//            }
-//        });
-//
-//        return view;
-
         View view = inflater.inflate(R.layout.fragment_releases, container, false);
         HeaderListView list = (HeaderListView)view.findViewById(android.R.id.list);
+        //
         list.setAdapter(mAdapter);
+        //questa è la vera lista
         mListView = list.getListView();
+        //fix per crash -> http://stackoverflow.com/questions/25807332/crash-when-returning-to-fragment-as-a-tab-view-with-same-id
+        mListView.setId(View.NO_ID);
+        mListView.setChoiceMode(ListView.CHOICE_MODE_MULTIPLE_MODAL);
+        mListView.setOnItemClickListener(new AdapterView.OnItemClickListener() {
+            @Override
+            public void onItemClick(AdapterView<?> parent, View view, int position, long id) {
+                //Utils.d("onItemClick " + ((Comics) mAdapter.getItem(position)).getName());
+                //TODO showReleaseEditor((ReleaseId) mAdapter.getItem(position), false);
+            }
+        });
+        mListView.setMultiChoiceModeListener(new AbsListView.MultiChoiceModeListener() {
+            @Override
+            public void onItemCheckedStateChanged(ActionMode mode, int position, long id, boolean checked) {
+                //Utils.d("onItemCheckedStateChanged " + position);
+                mode.setTitle(getString(R.string.selected_items, mListView.getCheckedItemCount()));
+            }
+
+            @Override
+            public boolean onCreateActionMode(ActionMode mode, Menu menu) {
+                //Utils.d("onCreateActionMode");
+                MenuInflater inflater = mode.getMenuInflater();
+                inflater.inflate(R.menu.menu_releases_cab, menu);
+                mActionMode = mode;
+                return true;
+            }
+
+            @Override
+            public boolean onActionItemClicked(ActionMode mode, MenuItem item) {
+                Utils.d("onActionItemClicked " + item.getTitle());
+                //risponde alla selezione di una azione del menu_releases_cab
+                long menuId = item.getItemId();
+                if (menuId == R.id.action_release_delete) {
+                    //TODO delete
+//                    long[] ags = mListView.getCheckedItemIds();
+//                    Long[] lgs = new Long[ags.length];
+//                    for (int ii = 0; ii < ags.length; ii++) {
+//                        lgs[ii] = ags[ii];
+//                    }
+//                    new RemoveComicsAsyncTask().execute(lgs);
+                    finishActionMode();
+                    return true;
+                } else {
+                    return false;
+                }
+            }
+
+            @Override
+            public boolean onPrepareActionMode(ActionMode mode, Menu menu) {
+                return false;
+            }
+
+            @Override
+            public void onDestroyActionMode(ActionMode mode) {
+                mActionMode = null;
+            }
+        });
+
         return  view;
     }
 

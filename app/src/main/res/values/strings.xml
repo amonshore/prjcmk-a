@@ -17,6 +17,23 @@
     <string name="selected_items">%1d selected</string>
     <string name="title_activity_comics_editor">New comics</string>
 
+    <!-- page captions -->
+    <string name="title_page_comics">Comics</string>
+    <string name="title_page_shopping">Releases</string>
+    <string name="title_page_wishlist">Wishlist</string>
+
+    <!-- release section titles -->
+    <string name="title_release_section_lost">Lost</string>
+    <string name="title_release_section_wishlist">Wishlist</string>
+    <string name="title_release_section_current_week">This week</string>
+    <string name="title_release_section_current_month">This month</string>
+    <string name="title_release_section_next_week">Next week</string>
+    <string name="title_release_section_next_month">Next month</string>
+    <string name="title_release_section_future">In the future</string>
+    <string name="title_release_section_expired">Expired</string>
+    <string name="title_release_section_to_purchase">To purchase</string>
+    <string name="title_release_section_purchased">Purchased</string>
+
     <!-- periodicity -->
     <string-array name="periodicity_key_array">
         <item></item>

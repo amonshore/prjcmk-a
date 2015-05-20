@@ -30,7 +30,7 @@
                 android:value="it.amonshore.secondapp.ui.MainActivity" />
         </activity>
         <activity
-            android:name=".ui.ComicsEditorActivity"
+            android:name=".ui.comics.ComicsEditorActivity"
             android:label="@string/title_activity_comics_editor"
             android:parentActivityName=".ui.MainActivity" >
             <meta-data

@@ -1,11 +1,17 @@
 package it.amonshore.secondapp.ui;
 
+import android.content.Context;
 import android.os.Bundle;
 import android.support.v4.app.Fragment;
 import android.support.v4.app.FragmentManager;
 import android.support.v4.app.FragmentStatePagerAdapter;
 
 import java.util.ArrayList;
+
+import it.amonshore.secondapp.R;
+import it.amonshore.secondapp.ui.comics.ComicsListFragment;
+import it.amonshore.secondapp.ui.release.ReleaseListAdapter;
+import it.amonshore.secondapp.ui.release.ReleaseListFragment;
 
 /**
  * Created by Calgia on 06/05/2015.
@@ -16,32 +22,32 @@ public class TabPageAdapter extends FragmentStatePagerAdapter {
     public final static int PAGE_SHOPPING = 1;
     public final static int PAGE_LAW = 2;
     //
-    ArrayList<Fragment> mPages;
+    private Context mContext;
+    private ArrayList<Fragment> mPages;
 
-    public TabPageAdapter(FragmentManager fm) {
+    public TabPageAdapter(Context context, FragmentManager fm) {
         super(fm);
-
+        mContext = context;
         //preparo le pagine
         mPages = new ArrayList<>();
         mPages.add(new ComicsListFragment());
-
+        //
         Bundle args;
         Fragment frg;
-
+        //
         args = new Bundle();
         args.putInt(ReleaseListFragment.ARG_MODE, ReleaseListAdapter.MODE_SHOPPING);
+        //TODO args.putBoolean(ReleaseListFragment.ARG_GROUP_BY_MONTH, true);
+        //TODO args.putBoolean(ReleaseListFragment.ARG_WEEK_START_ON_MONDAY, false);
         frg = new ReleaseListFragment();
         frg.setArguments(args);
         mPages.add(frg);
-
-//TODO switchando tra le page ricevo questo errore
-        //java.lang.IllegalArgumentException: Wrong state class, expecting View State but received class android.widget.AbsListView$SavedState instead.
-        //This usually happens when two views of different type have the same id in the same hierarchy. This view's id is id/list. Make sure other views do not use the same id.
-//        args = new Bundle();
-//        args.putInt(ReleaseListFragment.ARG_MODE, ReleaseListAdapter.MODE_LAW);
-//        frg = new ReleaseListFragment();
-//        frg.setArguments(args);
-//        mPages.add(frg);
+        //
+        args = new Bundle();
+        args.putInt(ReleaseListFragment.ARG_MODE, ReleaseListAdapter.MODE_LAW);
+        frg = new ReleaseListFragment();
+        frg.setArguments(args);
+        mPages.add(frg);
     }
 
     @Override
@@ -57,13 +63,12 @@ public class TabPageAdapter extends FragmentStatePagerAdapter {
 
     @Override
     public CharSequence getPageTitle(int position) {
-        //TODO recuperare i tioli della pagine dalle risorse (direttamente dai fragment?)
         if (position == PAGE_COMICS) {
-            return "Comics";
+            return mContext.getString(R.string.title_page_comics);
         } else if (position == PAGE_SHOPPING) {
-            return "Releases";
+            return mContext.getString(R.string.title_page_shopping);
         } else if (position == PAGE_LAW) {
-            return "Wishlist";
+            return mContext.getString(R.string.title_page_wishlist);
         } else {
             return "Page " + (position + 1);
         }

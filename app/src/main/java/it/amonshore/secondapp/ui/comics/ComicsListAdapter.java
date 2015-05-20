@@ -1,4 +1,4 @@
-package it.amonshore.secondapp.ui;
+package it.amonshore.secondapp.ui.comics;
 
 import android.content.Context;
 import android.view.LayoutInflater;
@@ -14,7 +14,7 @@ import java.util.Comparator;
 import it.amonshore.secondapp.R;
 import it.amonshore.secondapp.data.Comics;
 import it.amonshore.secondapp.data.DataManager;
-import it.amonshore.secondapp.data.Utils;
+import it.amonshore.secondapp.Utils;
 
 /**
  * Created by Calgia on 07/05/2015.

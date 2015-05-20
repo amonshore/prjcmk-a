@@ -1,4 +1,4 @@
-package it.amonshore.secondapp.ui;
+package it.amonshore.secondapp.ui.comics;
 
 import android.app.Activity;
 import android.content.Intent;
@@ -21,7 +21,9 @@ import android.widget.TextView;
 
 import it.amonshore.secondapp.R;
 import it.amonshore.secondapp.data.Comics;
-import it.amonshore.secondapp.data.Utils;
+import it.amonshore.secondapp.Utils;
+import it.amonshore.secondapp.ui.MainActivity;
+import it.amonshore.secondapp.ui.OnChangePageListener;
 
 /**
  * A fragment representing a list of Items.

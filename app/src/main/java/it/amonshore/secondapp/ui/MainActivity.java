@@ -46,7 +46,7 @@ public class MainActivity extends ActionBarActivity {
 //        actionBar.setNavigationMode(ActionBar.NAVIGATION_MODE_TABS);
 
         //l'adapter fornisce i fragment che comporranno la vista a tab
-        mTabPageAdapter = new TabPageAdapter(getSupportFragmentManager());
+        mTabPageAdapter = new TabPageAdapter(this, getSupportFragmentManager());
         mViewPager = (ViewPager)findViewById(R.id.pager);
         mViewPager.setAdapter(mTabPageAdapter);
         mPreviousPage = 0;

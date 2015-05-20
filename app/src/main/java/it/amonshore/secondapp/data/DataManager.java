@@ -20,6 +20,8 @@ import java.util.HashSet;
 import java.util.Set;
 import java.util.TreeMap;
 
+import it.amonshore.secondapp.Utils;
+
 /**
  * Created by Calgia on 07/05/2015.
  */
@@ -161,10 +163,10 @@ public class DataManager {
     }
 
     private boolean tryGetBoolean(JSONObject obj, String field) throws JSONException {
-        String str = obj.getString(field);
-        if (str == "F")
+        String str = obj.optString(field);
+        if ("F".equals(str))
             return false;
-        else if (str == "T")
+        else if ("T".equals(str))
             return true;
         else
             return obj.optBoolean(field, false);
