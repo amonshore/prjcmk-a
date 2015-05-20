@@ -16,6 +16,7 @@
 
     <string name="selected_items">%1d selected</string>
     <string name="title_activity_comics_editor">New comics</string>
+    <string name="title_activity_comics_detail">Comics detail</string>
 
     <!-- page captions -->
     <string name="title_page_comics">Comics</string>

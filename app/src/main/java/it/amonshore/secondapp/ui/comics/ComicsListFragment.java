@@ -95,7 +95,8 @@ public class ComicsListFragment extends Fragment implements OnChangePageListener
             @Override
             public void onItemClick(AdapterView<?> parent, View view, int position, long id) {
                 //Utils.d("onItemClick " + ((Comics) mAdapter.getItem(position)).getName());
-                showComicsEditor((Comics) mAdapter.getItem(position), false);
+                //showComicsEditor((Comics) mAdapter.getItem(position), false);
+                showComicsDetail((Comics) mAdapter.getItem(position));
             }
         });
         mListView.setMultiChoiceModeListener(new AbsListView.MultiChoiceModeListener() {
@@ -233,6 +234,12 @@ public class ComicsListFragment extends Fragment implements OnChangePageListener
         intent.putExtra(ComicsEditorActivity.EXTRA_ENTRY, comics);
         intent.putExtra(ComicsEditorActivity.EXTRA_IS_NEW, isNew);
         startActivityForResult(intent, ComicsEditorActivity.EDIT_COMICS_REQUEST);
+    }
+
+    private void showComicsDetail(Comics comics) {
+        Intent intent = new Intent(getActivity(), ComicsDetailActivity.class);
+        intent.putExtra(ComicsDetailActivity.EXTRA_ENTRY, comics);
+        startActivity(intent);
     }
 
     /**

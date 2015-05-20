@@ -19,9 +19,16 @@ android {
     }
 }
 
+repositories {
+    maven {
+        url "https://jitpack.io"
+    }
+}
+
 dependencies {
     compile fileTree(include: ['*.jar'], dir: 'libs')
     compile 'com.android.support:appcompat-v7:22.0.0'
     compile 'com.android.support:support-v4:22.0.0'
     compile 'com.darwinsys:hirondelle-date4j:1.5.1'
+    compile 'com.github.kanytu:android-parallax-listview:v1.1'
 }
