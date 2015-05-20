@@ -29,7 +29,8 @@ public class DataManager {
 
 //    public final static long ALL_COMICS = 0;
 
-    private final static String FILE_NAME = "data.json";
+    //private final static String FILE_NAME = "data.json";
+    private final static String FILE_NAME = "USER_backup.json";
     private final static String FIELD_ID = "id";
     private final static String FIELD_NAME = "name";
     private final static String FIELD_SERIES = "series";

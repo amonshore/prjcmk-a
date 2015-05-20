@@ -12,6 +12,7 @@ import android.widget.Toast;
 import com.applidium.headerlistview.SectionAdapter;
 
 import java.text.SimpleDateFormat;
+import java.util.ArrayList;
 import java.util.Date;
 import java.util.Locale;
 import java.util.TimeZone;
@@ -27,6 +28,8 @@ import it.amonshore.secondapp.Utils;
 
 /**
  * Created by Calgia on 15/05/2015.
+ *
+ * Per gestire le sezioni visibili in ogni visibilità vedere putReleaseInSection
  */
 public class ReleaseListAdapter extends SectionAdapter {
 
@@ -87,7 +90,7 @@ public class ReleaseListAdapter extends SectionAdapter {
     private Context mContext;
     private DataManager mDataManager;
     //elenco delle sezioni
-    private SparseArray<Section> mSections;
+    private ArrayList<Section> mSections;
     //
     private SimpleDateFormat mDateFormat;
     //modalità: indica cosa far vedere e come deve essere raggruppato
@@ -115,7 +118,7 @@ public class ReleaseListAdapter extends SectionAdapter {
         mMode = mode;
         mGroupByMonth = groupByMonth;
         mWeekStartOnMonday = weekStartOnMonday;
-        mSections = new SparseArray<>();
+        mSections = new ArrayList<>();
         mDateFormat = new SimpleDateFormat("c dd MMM", Locale.getDefault());
         TimeZone timeZone = TimeZone.getDefault();
         mToday = DateTime.today(timeZone).getStartOfDay();
@@ -233,7 +236,7 @@ public class ReleaseListAdapter extends SectionAdapter {
      */
     public void clear() {
         for (int ii = 0; ii < mSections.size(); ii++) {
-            mSections.valueAt(ii).releases.clear();
+            mSections.get(ii).releases.clear();
         }
     }
 
@@ -270,53 +273,56 @@ public class ReleaseListAdapter extends SectionAdapter {
         }
     }
 
-    private void checkSection(int section) {
-        if (mSections.indexOfKey(section) < 0) {
+    private int indexOfSection(int section) {
+        for (int ii = 0; ii < mSections.size(); ii++) {
+            if (mSections.get(ii).group == section) return ii;
+        }
+        return -1;
+    }
+
+    private int checkSection(int section) {
+        int index;
+        if ((index = indexOfSection(section)) < 0) {
             switch (section) {
                 case SECTION_PERIOD:
-                    mSections.put(SECTION_PERIOD,
-                            new Section(SECTION_PERIOD, R.layout.list_release_header_period, R.id.txt_list_release_header,
-                                    mContext.getString(mGroupByMonth ? R.string.title_release_section_current_month :
-                                            R.string.title_release_section_current_week)));
+                    mSections.add(new Section(SECTION_PERIOD,
+                            mContext.getString(mGroupByMonth ? R.string.title_release_section_current_month :
+                                    R.string.title_release_section_current_week)));
                     break;
                 case SECTION_LOST:
-                    mSections.put(SECTION_LOST,
-                            new Section(SECTION_LOST, R.layout.list_release_header_lost, R.id.txt_list_release_header,
-                                    mContext.getString(R.string.title_release_section_lost)));
+                    mSections.add(new Section(SECTION_LOST,
+                            mContext.getString(R.string.title_release_section_lost)));
                     break;
                 case SECTION_WISHLIST:
-                    mSections.put(SECTION_WISHLIST,
-                            new Section(SECTION_WISHLIST, R.layout.list_release_header_wishlist, R.id.txt_list_release_header,
-                                    mContext.getString(R.string.title_release_section_wishlist)));
+                    mSections.add(new Section(SECTION_WISHLIST,
+                            mContext.getString(R.string.title_release_section_wishlist)));
                     break;
                 case SECTION_PERIOD_NEXT:
-                    mSections.put(SECTION_PERIOD_NEXT,
-                            new Section(SECTION_PERIOD_NEXT, R.layout.list_release_header, R.id.txt_list_release_header,
-                                    mContext.getString(mGroupByMonth ? R.string.title_release_section_next_month :
-                                            R.string.title_release_section_next_week)));
+                    mSections.add(new Section(SECTION_PERIOD_NEXT,
+                            mContext.getString(mGroupByMonth ? R.string.title_release_section_next_month :
+                                    R.string.title_release_section_next_week)));
                     break;
                 case SECTION_PERIOD_OTHER:
-                    mSections.put(SECTION_PERIOD_OTHER,
-                            new Section(SECTION_PERIOD_OTHER, R.layout.list_release_header, R.id.txt_list_release_header,
-                                    mContext.getString(R.string.title_release_section_future)));
+                    mSections.add(new Section(SECTION_PERIOD_OTHER,
+                            mContext.getString(R.string.title_release_section_future)));
                     break;
                 case SECTION_EXPIRED:
-                    mSections.put(SECTION_EXPIRED,
-                            new Section(SECTION_EXPIRED, R.layout.list_release_header, R.id.txt_list_release_header,
-                                    mContext.getString(R.string.title_release_section_expired)));
+                    mSections.add(new Section(SECTION_EXPIRED,
+                            mContext.getString(R.string.title_release_section_expired)));
                     break;
                 case SECTION_TO_PURCHASE:
-                    mSections.put(SECTION_TO_PURCHASE,
-                            new Section(SECTION_TO_PURCHASE, R.layout.list_release_header, R.id.txt_list_release_header,
-                                    mContext.getString(R.string.title_release_section_to_purchase)));
+                    mSections.add(new Section(SECTION_TO_PURCHASE,
+                            mContext.getString(R.string.title_release_section_to_purchase)));
                     break;
                 case SECTION_PURCHASED:
-                    mSections.put(SECTION_PURCHASED,
-                            new Section(SECTION_PURCHASED, R.layout.list_release_header, R.id.txt_list_release_header,
-                                    mContext.getString(R.string.title_release_section_purchased)));
+                    mSections.add(new Section(SECTION_PURCHASED,
+                            mContext.getString(R.string.title_release_section_purchased)));
                     break;
             }
+            index = mSections.size() - 1;
         }
+
+        return index;
     }
 
     private boolean tryPutInPeriod(Release release) {
@@ -324,8 +330,8 @@ public class ReleaseListAdapter extends SectionAdapter {
         if (release.getDate() != null &&
                 mPeriodStartMs <= release.getDate().getTime() &&
                 mPeriodEndMs >= release.getDate().getTime()) {
-            checkSection(SECTION_PERIOD);
-            mSections.get(SECTION_PERIOD).releases.add(new ReleaseId(release.getComicsId(), release.getNumber()));
+            int index = checkSection(SECTION_PERIOD);
+            mSections.get(index).releases.add(new ReleaseId(release.getComicsId(), release.getNumber()));
             return true;
         } else {
             return false;
@@ -337,8 +343,8 @@ public class ReleaseListAdapter extends SectionAdapter {
         if (release.getDate() != null &&
                 mNextPeriodStartMs <= release.getDate().getTime() &&
                 mNextPeriodEndMs >= release.getDate().getTime()) {
-            checkSection(SECTION_PERIOD_NEXT);
-            mSections.get(SECTION_PERIOD_NEXT).releases.add(new ReleaseId(release.getComicsId(), release.getNumber()));
+            int index = checkSection(SECTION_PERIOD_NEXT);
+            mSections.get(index).releases.add(new ReleaseId(release.getComicsId(), release.getNumber()));
             return true;
         } else {
             return false;
@@ -349,8 +355,8 @@ public class ReleaseListAdapter extends SectionAdapter {
         //data specificata e nel periodo altro
         if (release.getDate() != null &&
                 release.getDate().getTime() > mNextPeriodEndMs) {
-            checkSection(SECTION_PERIOD_OTHER);
-            mSections.get(SECTION_PERIOD_OTHER).releases.add(new ReleaseId(release.getComicsId(), release.getNumber()));
+            int index = checkSection(SECTION_PERIOD_OTHER);
+            mSections.get(index).releases.add(new ReleaseId(release.getComicsId(), release.getNumber()));
             return true;
         } else {
             return false;
@@ -361,8 +367,8 @@ public class ReleaseListAdapter extends SectionAdapter {
         //non acquisati, data specificata e < oggi
         if (!release.isPurchased() && release.getDate() != null &&
                 release.getDate().getTime() < mTodayMs) {
-            checkSection(SECTION_EXPIRED);
-            mSections.get(SECTION_EXPIRED).releases.add(new ReleaseId(release.getComicsId(), release.getNumber()));
+            int index = checkSection(SECTION_EXPIRED);
+            mSections.get(index).releases.add(new ReleaseId(release.getComicsId(), release.getNumber()));
             return true;
         } else {
             return false;
@@ -373,8 +379,8 @@ public class ReleaseListAdapter extends SectionAdapter {
         //non acquistati, data specificata e < start_period
         if (!release.isPurchased() && release.getDate() != null &&
                 release.getDate().getTime() < mPeriodStartMs) {
-            checkSection(SECTION_LOST);
-            mSections.get(SECTION_LOST).releases.add(new ReleaseId(release.getComicsId(), release.getNumber()));
+            int index = checkSection(SECTION_LOST);
+            mSections.get(index).releases.add(new ReleaseId(release.getComicsId(), release.getNumber()));
             return true;
         } else {
             return false;
@@ -384,8 +390,8 @@ public class ReleaseListAdapter extends SectionAdapter {
     private boolean tryPutInWishlist(Release release) {
         //non acquistati, data non specificata
         if (!release.isPurchased() && release.isWishlist()) {
-            checkSection(SECTION_WISHLIST);
-            mSections.get(SECTION_WISHLIST).releases.add(new ReleaseId(release.getComicsId(), release.getNumber()));
+            int index = checkSection(SECTION_WISHLIST);
+            mSections.get(index).releases.add(new ReleaseId(release.getComicsId(), release.getNumber()));
             return true;
         } else {
             return false;
@@ -394,8 +400,8 @@ public class ReleaseListAdapter extends SectionAdapter {
 
     private boolean tryPutInToPurchase(Release release) {
         if (!release.isPurchased()) {
-            checkSection(SECTION_TO_PURCHASE);
-            mSections.get(SECTION_TO_PURCHASE).releases.add(new ReleaseId(release.getComicsId(), release.getNumber()));
+            int index = checkSection(SECTION_TO_PURCHASE);
+            mSections.get(index).releases.add(new ReleaseId(release.getComicsId(), release.getNumber()));
             return true;
         } else {
             return false;
@@ -404,8 +410,8 @@ public class ReleaseListAdapter extends SectionAdapter {
 
     private boolean tryPutInPurchased(Release release) {
         if (release.isPurchased()) {
-            checkSection(SECTION_PURCHASED);
-            mSections.get(SECTION_PURCHASED).releases.add(new ReleaseId(release.getComicsId(), release.getNumber()));
+            int index = checkSection(SECTION_PURCHASED);
+            mSections.get(index).releases.add(new ReleaseId(release.getComicsId(), release.getNumber()));
             return true;
         } else {
             return false;
@@ -423,12 +429,12 @@ public class ReleaseListAdapter extends SectionAdapter {
             //Utils.d("numberOfRows " + section + " " + mSections.size());
             return 0;
         }
-        return mSections.valueAt(section).releases.size();
+        return mSections.get(section).releases.size();
     }
 
     @Override
     public Object getRowItem(int section, int row) {
-        return mSections.valueAt(section).releases.get(row);
+        return mSections.get(section).releases.get(row);
     }
 
     @Override
@@ -463,31 +469,26 @@ public class ReleaseListAdapter extends SectionAdapter {
     @Override
     public int getSectionHeaderViewTypeCount() {
         //ATTENZIONE incasina tutto
-        return mSections.size();
-        //return 1;
+        return 1;
     }
 
     @Override
     public int getSectionHeaderItemViewType(int section) {
-        Utils.d("getSectionHeaderItemViewType " + section);
-        ////ATTENZIONE incasina tutto return mSections.valueAt(section).group;
-        //return 0;
-        return section;
+        return 0;
     }
 
     @Override
     public View getSectionHeaderView(int section, View convertView, ViewGroup parent) {
-        Section sect = mSections.valueAt(section);
-        Utils.d("getSectionHeaderView " + section + " " + sect.caption + " " + (convertView != null));
         //
         if (convertView == null) {
-            convertView = LayoutInflater.from(mContext).inflate(sect.layoutResId, null);
+            convertView = LayoutInflater.from(mContext).inflate(R.layout.list_release_header, null);
         }
 //        Utils.d("getSectionHeaderView @" + section + " " + convertView);
 //        if (convertView.findViewById(R.id.txt_list_release_header) == null) {
 //            Utils.d("isnull2 " + convertView.getId() + " " + R.layout.list_release_header);
 //        }
-        ((TextView) convertView.findViewById(sect.textResId)).setText(sect.caption);
+        Section sect = mSections.get(section);
+        ((TextView) convertView.findViewById(R.id.txt_list_release_header)).setText(sect.caption);
         return convertView;
     }
 
@@ -501,21 +502,15 @@ public class ReleaseListAdapter extends SectionAdapter {
      *
      */
     private final static class Section {
-        //codice gruppo, chiave di mGroups
+        //codice sezione
         public int group;
-        //layout da utilizzare per la sezione
-        public int layoutResId;
-        //text view
-        public int textResId;
         //
         public CharSequence caption;
         //
         public SortedList<ReleaseId> releases;
 
-        public Section(int group, int layoutResId, int textResId, CharSequence caption) {
+        public Section(int group, CharSequence caption) {
             this.group = group;
-            this.layoutResId = layoutResId;
-            this.textResId = textResId;
             this.caption = caption;
             //TODO passare comparator
             this.releases = new SortedList<>();
