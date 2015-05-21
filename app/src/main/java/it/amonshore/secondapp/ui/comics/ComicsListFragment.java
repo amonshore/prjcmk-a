@@ -5,7 +5,6 @@ import android.content.Intent;
 import android.content.SharedPreferences;
 import android.os.AsyncTask;
 import android.os.Bundle;
-import android.support.v4.app.Fragment;
 import android.view.ActionMode;
 import android.view.LayoutInflater;
 import android.view.Menu;
@@ -22,8 +21,8 @@ import android.widget.TextView;
 import it.amonshore.secondapp.R;
 import it.amonshore.secondapp.data.Comics;
 import it.amonshore.secondapp.Utils;
+import it.amonshore.secondapp.ui.AFragment;
 import it.amonshore.secondapp.ui.MainActivity;
-import it.amonshore.secondapp.ui.OnChangePageListener;
 
 /**
  * A fragment representing a list of Items.
@@ -32,13 +31,14 @@ import it.amonshore.secondapp.ui.OnChangePageListener;
  * with a GridView.
  * <p/>
  */
-public class ComicsListFragment extends Fragment implements OnChangePageListener {
+public class ComicsListFragment extends AFragment {
 
     private final static String STATE_ORDER = " stateOrder";
 
     private AbsListView mListView;
     private ComicsListAdapter mAdapter;
     private ActionMode mActionMode;
+    private boolean mNeedUpdateOnResume;
 
     @Override
     public void onCreate(Bundle savedInstanceState) {
@@ -57,8 +57,6 @@ public class ComicsListFragment extends Fragment implements OnChangePageListener
         }
         //
         mAdapter = new ComicsListAdapter(getActivity().getApplicationContext(), order);
-        //leggo i dati in modalità asincrona
-        refreshData();
     }
 
     @Override
@@ -150,7 +148,6 @@ public class ComicsListFragment extends Fragment implements OnChangePageListener
 
     @Override
     public void onPrepareOptionsMenu(Menu menu) {
-        Utils.d("onPrepareOptionsMenu " + mAdapter.getOrder());
         if ((mAdapter.getOrder() & ComicsListAdapter.ORDER_BY_NAME) == ComicsListAdapter.ORDER_BY_NAME) {
             menu.findItem(R.id.action_comics_sort_by_name).setVisible(false);
             menu.findItem(R.id.action_comics_sort_by_release).setVisible(true);
@@ -206,10 +203,6 @@ public class ComicsListFragment extends Fragment implements OnChangePageListener
         }
     }
 
-    public void refreshData() {
-        new ReadComicsAsyncTask().execute();
-    }
-
     /**
      * The default content for this Fragment has a TextView that is shown when
      * the list is empty. If you would like to change the text, call this method
@@ -229,6 +222,29 @@ public class ComicsListFragment extends Fragment implements OnChangePageListener
             mActionMode.finish();
     }
 
+    @Override
+    public void needDataRefresh(int cause) {
+        //leggo i dati in modalità asincrona, se il fragment non è ancora visisbile pospongo il caricamento
+        if (this.isResumed() || (cause & AFragment.CAUSE_SAFE) == AFragment.CAUSE_SAFE) {
+            //se la causa è il cambio pagina aggiorno i dati solose l'adapter è vuoto
+            if ((cause & AFragment.CAUSE_PAGE_CHANGED) != AFragment.CAUSE_PAGE_CHANGED || mAdapter.isEmpty()) {
+                mNeedUpdateOnResume = false;
+                new UpdateListAsyncTask().execute();
+            }
+        } else {
+            mNeedUpdateOnResume = true;
+        }
+    }
+
+    @Override
+    public void onResume() {
+        super.onResume();
+        if (mNeedUpdateOnResume) {
+            mNeedUpdateOnResume = false;
+            new UpdateListAsyncTask().execute();
+        }
+    }
+
     private void showComicsEditor(Comics comics, boolean isNew) {
         Intent intent = new Intent(getActivity(), ComicsEditorActivity.class);
         intent.putExtra(ComicsEditorActivity.EXTRA_ENTRY, comics);
@@ -243,9 +259,9 @@ public class ComicsListFragment extends Fragment implements OnChangePageListener
     }
 
     /**
-     * Task asincrono per la lettura dei dati
+     * Task asincrono per aggiornamento della lista
      */
-    private class ReadComicsAsyncTask extends AsyncTask<Void, Comics, Integer> {
+    private class UpdateListAsyncTask extends AsyncTask<Void, Comics, Integer> {
         @Override
         protected Integer doInBackground(Void... params) {
             ComicsListFragment.this.mAdapter.refresh();

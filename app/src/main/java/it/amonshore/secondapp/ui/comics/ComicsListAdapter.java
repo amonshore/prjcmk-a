@@ -57,7 +57,6 @@ public class ComicsListAdapter extends BaseAdapter {
         if (order != mOrder) {
             mOrder = order;
             //TODO impostare il mComparator in base all'ordine
-            Utils.d("setOrder " + order);
             if ((order & ORDER_BY_NAME) == ORDER_BY_NAME) {
                 mComparator = new NameComparator((order & ORDER_DESC) == ORDER_DESC);
             } else {
@@ -121,7 +120,6 @@ public class ComicsListAdapter extends BaseAdapter {
      * @return
      */
     public int refresh() {
-        mDataManager.readComics();
         mSortedIds.clear();
         mSortedIds.addAll(mDataManager.getComics());
         Collections.sort(mSortedIds, mComparator);

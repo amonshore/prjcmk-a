@@ -26,13 +26,13 @@ import it.amonshore.secondapp.data.DataManager;
 import it.amonshore.secondapp.data.Release;
 import it.amonshore.secondapp.data.ReleaseId;
 import it.amonshore.secondapp.Utils;
-import it.amonshore.secondapp.ui.OnChangePageListener;
+import it.amonshore.secondapp.ui.AFragment;
 import it.amonshore.secondapp.ui.SettingsActivity;
 
 /**
  * Created by Calgia on 15/05/2015.
  */
-public class ReleaseListFragment extends Fragment implements OnChangePageListener {
+public class ReleaseListFragment extends AFragment {
 
     public final static String ARG_MODE = "arg_mode";
     public final static String ARG_COMICS_ID = "arg_comics_id";
@@ -45,6 +45,7 @@ public class ReleaseListFragment extends Fragment implements OnChangePageListene
     private Comics mComics;
     private boolean mGroupByMonth;
     private boolean mWeekStartOnMonday;
+    private boolean mNeedUpdateOnResume;
 
     @Override
     public void onCreate(Bundle savedInstanceState) {
@@ -53,16 +54,17 @@ public class ReleaseListFragment extends Fragment implements OnChangePageListene
         setHasOptionsMenu(true);
         mDataManager = DataManager.getDataManager(getActivity().getApplicationContext());
         //recupero i parametri
+        int mode = ReleaseListAdapter.MODE_SHOPPING;
         Bundle args = getArguments();
-        long comicsId = args.getLong(ARG_COMICS_ID);
-        int mode = args.getInt(ARG_MODE, ReleaseListAdapter.MODE_SHOPPING);
-        if (comicsId != 0) {
-            mComics = mDataManager.getComics(comicsId);
+        if (args != null) {
+            long comicsId = args.getLong(ARG_COMICS_ID);
+            mode = args.getInt(ARG_MODE, ReleaseListAdapter.MODE_SHOPPING);
+            if (comicsId != 0) {
+                mComics = mDataManager.getComics(comicsId);
+            }
         }
         //
         mAdapter = new ReleaseListAdapter(getActivity().getApplicationContext(), mode);
-        //leggo i dati in modalità asincrona
-        refreshData();
     }
 
     @Override
@@ -134,6 +136,11 @@ public class ReleaseListFragment extends Fragment implements OnChangePageListene
         return  view;
     }
 
+    public void setComics(Comics comics, int mode) {
+        mComics = comics;
+        mAdapter.setMode(mode);
+    }
+
     @Override
     public void onPrepareOptionsMenu(Menu menu) {
         //TODO prepara il menu in base a cosa è stato selezionato
@@ -162,16 +169,6 @@ public class ReleaseListFragment extends Fragment implements OnChangePageListene
         //TODO risponde all'editor delle release
     }
 
-    public void refreshData() {
-        //TODO indicare per quali fumetti leggere i dati
-        //recupero le preferenze
-        SharedPreferences sharedPref = PreferenceManager.getDefaultSharedPreferences(getActivity());
-        mGroupByMonth = sharedPref.getBoolean(SettingsActivity.KEY_PREF_GROUP_BY_MONTH, false);
-        mWeekStartOnMonday = sharedPref.getBoolean(SettingsActivity.KEY_PREF_WEEK_START_ON_MONDAY, false);
-        //
-        new ReadReleasesAsyncTask().execute();
-    }
-
     /**
      * The default content for this Fragment has a TextView that is shown when
      * the list is empty. If you would like to change the text, call this method
@@ -191,6 +188,32 @@ public class ReleaseListFragment extends Fragment implements OnChangePageListene
             mActionMode.finish();
     }
 
+    @Override
+    public void needDataRefresh(int cause) {
+        //leggo i dati in modalità asincrona, se il fragment non è ancora visisbile pospongo il caricamento
+        if (this.isResumed() || (cause & AFragment.CAUSE_SAFE) == AFragment.CAUSE_SAFE) {
+            //se la causa è il cambio pagina aggiorno i dati solose l'adapter è vuoto
+            if ((cause & AFragment.CAUSE_PAGE_CHANGED) != AFragment.CAUSE_PAGE_CHANGED || mAdapter.isEmpty()) {
+                mNeedUpdateOnResume = false;
+                Utils.d("needDataRefresh ok");
+                new ReadReleasesAsyncTask().execute();
+            }
+        } else {
+            Utils.d("needDataRefresh posponed");
+            mNeedUpdateOnResume = true;
+        }
+    }
+
+    @Override
+    public void onResume() {
+        super.onResume();
+        if (mNeedUpdateOnResume) {
+            Utils.d("onResume refresh");
+            mNeedUpdateOnResume = false;
+            new ReadReleasesAsyncTask().execute();
+        }
+    }
+
     private void showReleaseEditor(ReleaseId releaseId, boolean isNew) {
         //TODO apri editor release
 //        Intent intent = new Intent(getActivity(), ComicsEditorActivity.class);
@@ -205,14 +228,19 @@ public class ReleaseListFragment extends Fragment implements OnChangePageListene
     private class ReadReleasesAsyncTask extends AsyncTask<Void, Release, Integer> {
         @Override
         protected Integer doInBackground(Void... params) {
-            ReleaseListFragment.this.mAdapter.refresh(ReleaseListFragment.this.mComics,
+            //TODO settings -> che schifo! rivedere dove leggere le preferenze
+            SharedPreferences sharedPref = PreferenceManager.getDefaultSharedPreferences(getActivity());
+            mGroupByMonth = sharedPref.getBoolean(SettingsActivity.KEY_PREF_GROUP_BY_MONTH, false);
+            mWeekStartOnMonday = sharedPref.getBoolean(SettingsActivity.KEY_PREF_WEEK_START_ON_MONDAY, false);
+
+            return ReleaseListFragment.this.mAdapter.refresh(ReleaseListFragment.this.mComics,
                     ReleaseListFragment.this.mGroupByMonth, ReleaseListFragment.this.mWeekStartOnMonday);
-            return 0;
         }
 
         @Override
         protected void onPostExecute(Integer result) {
-            ReleaseListFragment.this.mAdapter.notifyDataSetChanged();
+            Utils.d("ReadReleasesAsyncTask " + result);
+            ReleaseListFragment.this.mAdapter.notifyDataSetInvalidated();
         }
     }
 

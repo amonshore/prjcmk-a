@@ -5,6 +5,7 @@ import android.os.Bundle;
 import android.support.v4.app.Fragment;
 import android.support.v4.app.FragmentManager;
 import android.support.v4.app.FragmentStatePagerAdapter;
+import android.view.ViewGroup;
 
 import java.util.ArrayList;
 
@@ -23,7 +24,7 @@ public class TabPageAdapter extends FragmentStatePagerAdapter {
     public final static int PAGE_LAW = 2;
     //
     private Context mContext;
-    private ArrayList<Fragment> mPages;
+    private ArrayList<AFragment> mPages;
 
     public TabPageAdapter(Context context, FragmentManager fm) {
         super(fm);
@@ -33,7 +34,7 @@ public class TabPageAdapter extends FragmentStatePagerAdapter {
         mPages.add(new ComicsListFragment());
         //
         Bundle args;
-        Fragment frg;
+        AFragment frg;
         //
         args = new Bundle();
         args.putInt(ReleaseListFragment.ARG_MODE, ReleaseListAdapter.MODE_SHOPPING);
@@ -49,8 +50,18 @@ public class TabPageAdapter extends FragmentStatePagerAdapter {
     }
 
     @Override
+    public Object instantiateItem(ViewGroup container, int position) {
+        //see http://stackoverflow.com/questions/17629463/fragmentpageradapter-how-to-handle-orientation-changes
+        //altrimenti sbarella durante la rotazione della schermo
+        //  perché l'adapter mantiene in memoria i "vecchi" fragment
+        //return super.instantiateItem(container, position);
+        AFragment fragment = (AFragment)super.instantiateItem(container, position);
+        mPages.set(position, fragment);
+        return fragment;
+    }
+
+    @Override
     public Fragment getItem(int position) {
-        //Utils.d("getItem " + position);
         return mPages.get(position);
     }
 
@@ -69,6 +80,12 @@ public class TabPageAdapter extends FragmentStatePagerAdapter {
             return mContext.getString(R.string.title_page_wishlist);
         } else {
             return "Page " + (position + 1);
+        }
+    }
+
+    public void refreshDataOnFragments(int cause) {
+        for (AFragment frg : mPages) {
+            frg.needDataRefresh(cause);
         }
     }
 }

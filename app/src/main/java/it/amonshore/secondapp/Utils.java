@@ -29,6 +29,15 @@ public class Utils {
     }
 
     /**
+     *
+     * @param aClass
+     * @param msg
+     */
+    public static void d(Class aClass, String msg) {
+        Log.d(aClass.getName(), msg);
+    }
+
+    /**
      * Log.e(LOG_TAG, msg, err)
      *
      * @param msg

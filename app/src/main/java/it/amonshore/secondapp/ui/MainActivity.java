@@ -2,15 +2,12 @@ package it.amonshore.secondapp.ui;
 
 import android.content.Intent;
 import android.content.SharedPreferences;
-import android.graphics.Color;
+import android.os.AsyncTask;
 import android.preference.PreferenceManager;
-import android.support.v4.app.Fragment;
-import android.support.v4.app.FragmentTransaction;
 import android.support.v4.view.ViewPager;
 import android.support.v7.app.ActionBar;
 import android.support.v7.app.ActionBarActivity;
 import android.os.Bundle;
-import android.util.Log;
 import android.view.Menu;
 import android.view.MenuItem;
 
@@ -18,7 +15,8 @@ import com.google.samples.apps.iosched.ui.widget.SlidingTabLayout;
 
 import it.amonshore.secondapp.R;
 import it.amonshore.secondapp.Utils;
-import it.amonshore.secondapp.ui.release.ReleaseListFragment;
+import it.amonshore.secondapp.data.Comics;
+import it.amonshore.secondapp.data.DataManager;
 
 /**
  * http://developer.android.com/training/implementing-navigation/lateral.html#tabs
@@ -27,10 +25,11 @@ public class MainActivity extends ActionBarActivity implements SharedPreferences
 
     public final static String PREFS_NAME = "ComikkuPrefs";
 
-    TabPageAdapter mTabPageAdapter;
-    ViewPager mViewPager;
+    private TabPageAdapter mTabPageAdapter;
+    private ViewPager mViewPager;
+    private DataManager mDataManager;
     //salvo la page/fragment precedente
-    int mPreviousPage;
+    private int mPreviousPage;
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
@@ -39,7 +38,8 @@ public class MainActivity extends ActionBarActivity implements SharedPreferences
         //l'action bar è fornita dalla super classe
         //setContentView(R.layout.activity_main);
         setContentView(R.layout.activity_main_sliding);
-
+        //
+        mDataManager = DataManager.getDataManager(this.getApplicationContext());
         //impsota i valori di default, il parametro false assicura che questo venga fatto una sola volta
         //  indipendentemente da quante volte viene chiamato il metodo
         PreferenceManager.setDefaultValues(this, R.xml.preferences, false);
@@ -57,33 +57,6 @@ public class MainActivity extends ActionBarActivity implements SharedPreferences
         mViewPager = (ViewPager)findViewById(R.id.pager);
         mViewPager.setAdapter(mTabPageAdapter);
         mPreviousPage = 0;
-//        //gestisco la selezione delle tab allo swipe dei fragment
-//        mViewPager.setOnPageChangeListener(new ViewPager.SimpleOnPageChangeListener() {
-//            @Override
-//            public void onPageSelected(int position) {
-//                //chiudo l'ActionBar contestuale del fragment precedente
-//                Utils.d("pager OnPageChangeListener " + mPreviousPage);
-//                ((OnChangePageListener)mTabPageAdapter.getItem(mPreviousPage)).finishActionMode();
-//                actionBar.setSelectedNavigationItem(mPreviousPage = position);
-//            }
-//        });
-//        //gesisco la selezione del fragment alla selezione di una tab
-//        final SimpleActionBarTabListener tabListener = new SimpleActionBarTabListener() {
-//            @Override
-//            public void onTabSelected(ActionBar.Tab tab, FragmentTransaction fragmentTransaction) {
-//                //chiudo l'ActionBar contestuale del fragment precedente
-//                ((OnChangePageListener)mTabPageAdapter.getItem(mPreviousPage)).finishActionMode();
-//                mViewPager.setCurrentItem(mPreviousPage = tab.getPosition());
-//            }
-//        };
-//        //per ogni fragment fornito dall'adapter creo una tab
-//        for (int ii=0; ii<mTabPageAdapter.getCount(); ii++) {
-//            actionBar.addTab(
-//                    actionBar.newTab()
-//                            .setText(mTabPageAdapter.getPageTitle(ii))
-//                            .setTabListener(tabListener));
-//        }
-
         // Give the SlidingTabLayout the ViewPager
         SlidingTabLayout slidingTabLayout = (SlidingTabLayout) findViewById(R.id.sliding_tabs);
         // Set custom tab layout
@@ -100,9 +73,11 @@ public class MainActivity extends ActionBarActivity implements SharedPreferences
         slidingTabLayout.setOnPageChangeListener(new ViewPager.SimpleOnPageChangeListener() {
             @Override
             public void onPageSelected(int position) {
+                //Utils.d("slidingTabLayout OnPageChangeListener " + mPreviousPage + " -> " + position);
                 //chiudo l'ActionBar contestuale del fragment precedente
-//                Utils.d("slidingTabLayout OnPageChangeListener " + mPreviousPage);
-                ((OnChangePageListener) mTabPageAdapter.getItem(mPreviousPage)).finishActionMode();
+                ((AFragment) mTabPageAdapter.getItem(mPreviousPage)).finishActionMode();
+                //aggiorno i dati sulla page corrente causa cambio pagina (quindi se i dati ci sono non fa nulla)
+                ((AFragment) mTabPageAdapter.getItem(position)).needDataRefresh(AFragment.CAUSE_PAGE_CHANGED);
                 mPreviousPage = position;
             }
         });
@@ -112,9 +87,21 @@ public class MainActivity extends ActionBarActivity implements SharedPreferences
     @Override
     public void onSharedPreferenceChanged(SharedPreferences sharedPreferences, String key) {
         Utils.d("onSharedPreferenceChanged " + key + " " + sharedPreferences.getBoolean(key, false));
-        if (SettingsActivity.KEY_PREF_GROUP_BY_MONTH.equals(key)) {
-            ((ReleaseListFragment)mTabPageAdapter.getItem(TabPageAdapter.PAGE_SHOPPING)).refreshData();
-        }
+//        if (SettingsActivity.KEY_PREF_GROUP_BY_MONTH.equals(key)) {
+//            ((AFragment)mTabPageAdapter.getItem(TabPageAdapter.PAGE_SHOPPING))
+//                    .needDataRefresh(AFragment.CAUSE_SETTINGS_CHANGED);
+//        }
+    }
+
+    @Override
+    protected void onResume() {
+        super.onResume();
+    }
+
+    @Override
+    protected void onPostResume() {
+        super.onPostResume();
+        new ReadDataAsyncTask().execute();
     }
 
     @Override
@@ -139,6 +126,27 @@ public class MainActivity extends ActionBarActivity implements SharedPreferences
         }
 
         return super.onOptionsItemSelected(item);
+    }
+
+    /**
+     * Task asincrono per la lettura dei dati
+     */
+    private class ReadDataAsyncTask extends AsyncTask<Void, Comics, Integer> {
+        @Override
+        protected Integer doInBackground(Void... params) {
+            Utils.d("readComics");
+            if (MainActivity.this.mDataManager.isDataLoaded()) {
+                return AFragment.CAUSE_LOADING;
+            } else {
+                MainActivity.this.mDataManager.readComics();
+                return AFragment.CAUSE_LOADING;
+            }
+        }
+
+        @Override
+        protected void onPostExecute(Integer result) {
+            MainActivity.this.mTabPageAdapter.refreshDataOnFragments(result);
+        }
     }
 
 }

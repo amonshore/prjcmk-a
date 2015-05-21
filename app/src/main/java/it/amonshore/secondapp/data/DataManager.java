@@ -66,6 +66,7 @@ public class DataManager {
     private long mLastComicsId;
     private boolean mExternalStorage;
     private Context mContext;
+    private boolean mDataLoaded;
     //
     private TreeMap<Long, Comics> mComicsCache;
 //    private ReleasesTreeMap mReleasesCache;
@@ -318,6 +319,7 @@ public class DataManager {
                     }
                 }
             }
+            mDataLoaded = true;
         }
         return mComicsCache.size();
     }
@@ -334,5 +336,13 @@ public class DataManager {
 //        protected long currentComicsId;
 //
 //    }
+
+    /**
+     *
+     * @return
+     */
+    public boolean isDataLoaded() {
+        return mDataLoaded;
+    }
 
 }

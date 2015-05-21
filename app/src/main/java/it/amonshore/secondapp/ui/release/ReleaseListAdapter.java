@@ -120,6 +120,14 @@ public class ReleaseListAdapter extends SectionAdapter {
 
     /**
      *
+     * @param mode
+     */
+    public void setMode(int mode) {
+        mMode = mode;
+    }
+
+    /**
+     *
      * @return
      */
     public int getMode() {
@@ -183,6 +191,7 @@ public class ReleaseListAdapter extends SectionAdapter {
     }
 
     /**
+     * TODO funziona malissimo se chiamata una seconda volta, i dati soprattutto gli header si incasinano
      *
      * @param comics se specificato aggiorna i dati con i soli
      * @param groupByMonth
@@ -190,7 +199,7 @@ public class ReleaseListAdapter extends SectionAdapter {
      * @return
      */
     public int refresh(Comics comics, boolean groupByMonth, boolean weekStartOnMonday) {
-        Utils.d("ReleaseListAdapter.refresh");
+        //Utils.d("ReleaseListAdapter.refresh");
         clear();
         //imposto le date
         TimeZone timeZone = TimeZone.getDefault();
@@ -237,9 +246,10 @@ public class ReleaseListAdapter extends SectionAdapter {
      *
      */
     public void clear() {
-        for (int ii = 0; ii < mSections.size(); ii++) {
-            mSections.get(ii).releases.clear();
-        }
+//        for (int ii = 0; ii < mSections.size(); ii++) {
+//            mSections.get(ii).releases.clear();
+//        }
+        mSections.clear();
     }
 
     @Override
