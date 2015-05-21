@@ -1,8 +1,10 @@
 package it.amonshore.secondapp.ui;
 
 import android.content.Intent;
+import android.content.SharedPreferences;
 import android.graphics.Color;
 import android.preference.PreferenceManager;
+import android.support.v4.app.Fragment;
 import android.support.v4.app.FragmentTransaction;
 import android.support.v4.view.ViewPager;
 import android.support.v7.app.ActionBar;
@@ -15,11 +17,13 @@ import android.view.MenuItem;
 import com.google.samples.apps.iosched.ui.widget.SlidingTabLayout;
 
 import it.amonshore.secondapp.R;
+import it.amonshore.secondapp.Utils;
+import it.amonshore.secondapp.ui.release.ReleaseListFragment;
 
 /**
  * http://developer.android.com/training/implementing-navigation/lateral.html#tabs
  */
-public class MainActivity extends ActionBarActivity {
+public class MainActivity extends ActionBarActivity implements SharedPreferences.OnSharedPreferenceChangeListener {
 
     public final static String PREFS_NAME = "ComikkuPrefs";
 
@@ -39,6 +43,9 @@ public class MainActivity extends ActionBarActivity {
         //impsota i valori di default, il parametro false assicura che questo venga fatto una sola volta
         //  indipendentemente da quante volte viene chiamato il metodo
         PreferenceManager.setDefaultValues(this, R.xml.preferences, false);
+        //registro il listerner per il cambiamento dei settings
+        SharedPreferences prefs = PreferenceManager.getDefaultSharedPreferences(this);
+        prefs.registerOnSharedPreferenceChangeListener(this);
 
         //attenzione, usare getSupportActionBar() per recuperare l'action bar
         final ActionBar actionBar = getSupportActionBar();
@@ -100,6 +107,14 @@ public class MainActivity extends ActionBarActivity {
             }
         });
         slidingTabLayout.setViewPager(mViewPager);
+    }
+
+    @Override
+    public void onSharedPreferenceChanged(SharedPreferences sharedPreferences, String key) {
+        Utils.d("onSharedPreferenceChanged " + key + " " + sharedPreferences.getBoolean(key, false));
+        if (SettingsActivity.KEY_PREF_GROUP_BY_MONTH.equals(key)) {
+            ((ReleaseListFragment)mTabPageAdapter.getItem(TabPageAdapter.PAGE_SHOPPING)).refreshData();
+        }
     }
 
     @Override

@@ -109,37 +109,13 @@ public class ReleaseListAdapter extends SectionAdapter {
      *
      * @param context
      * @param mode una delle costanti MODE
-     * @param groupByMonth
-     * @param weekStartOnMonday
      */
-    public ReleaseListAdapter(Context context, int mode, boolean groupByMonth, boolean weekStartOnMonday) {
+    public ReleaseListAdapter(Context context, int mode) {
         mContext = context;
         mDataManager = DataManager.getDataManager(context);
         mMode = mode;
-        mGroupByMonth = groupByMonth;
-        mWeekStartOnMonday = weekStartOnMonday;
         mSections = new ArrayList<>();
         mDateFormat = new SimpleDateFormat("c dd MMM", Locale.getDefault());
-        TimeZone timeZone = TimeZone.getDefault();
-        mToday = DateTime.today(timeZone).getStartOfDay();
-        //calcolo la data/ora di inizio/fine periodo
-        if (groupByMonth) {
-            mPeriodStart = mToday.getStartOfMonth();
-            mPeriodEnd = mToday.getEndOfMonth();
-            mNextPeriodStart = mPeriodStart.plus(0, 1, 0, 0, 0, 0, 0, DateTime.DayOverflow.Spillover);
-            mNextPeriodEnd = mNextPeriodStart.getEndOfMonth();
-        } else {
-            mPeriodStart = Utils.getStartOfWeek(mToday, mWeekStartOnMonday).getStartOfDay();
-            mPeriodEnd = mPeriodStart.plusDays(6).getEndOfDay();
-            mNextPeriodStart = mPeriodStart.plusDays(7);
-            mNextPeriodEnd = mPeriodEnd.plusDays(7);
-        }
-        //converto in ms per una comparazione più rapida
-        mTodayMs = mToday.getMilliseconds(timeZone);
-        mPeriodStartMs = mPeriodStart.getMilliseconds(timeZone);
-        mPeriodEndMs = mPeriodEnd.getMilliseconds(timeZone);
-        mNextPeriodStartMs = mNextPeriodStart.getMilliseconds(timeZone);
-        mNextPeriodEndMs = mNextPeriodEnd.getMilliseconds(timeZone);
    }
 
     /**
@@ -209,11 +185,37 @@ public class ReleaseListAdapter extends SectionAdapter {
     /**
      *
      * @param comics se specificato aggiorna i dati con i soli
+     * @param groupByMonth
+     * @param weekStartOnMonday
      * @return
      */
-    public int refresh(Comics comics) {
+    public int refresh(Comics comics, boolean groupByMonth, boolean weekStartOnMonday) {
         Utils.d("ReleaseListAdapter.refresh");
         clear();
+        //imposto le date
+        TimeZone timeZone = TimeZone.getDefault();
+        mGroupByMonth = groupByMonth;
+        mWeekStartOnMonday = weekStartOnMonday;
+        mToday = DateTime.today(timeZone).getStartOfDay();
+        //calcolo la data/ora di inizio/fine periodo
+        if (groupByMonth) {
+            mPeriodStart = mToday.getStartOfMonth();
+            mPeriodEnd = mToday.getEndOfMonth();
+            mNextPeriodStart = mPeriodStart.plus(0, 1, 0, 0, 0, 0, 0, DateTime.DayOverflow.Spillover);
+            mNextPeriodEnd = mNextPeriodStart.getEndOfMonth();
+        } else {
+            mPeriodStart = Utils.getStartOfWeek(mToday, mWeekStartOnMonday).getStartOfDay();
+            mPeriodEnd = mPeriodStart.plusDays(6).getEndOfDay();
+            mNextPeriodStart = mPeriodStart.plusDays(7);
+            mNextPeriodEnd = mPeriodEnd.plusDays(7);
+        }
+        //converto in ms per una comparazione più rapida
+        mTodayMs = mToday.getMilliseconds(timeZone);
+        mPeriodStartMs = mPeriodStart.getMilliseconds(timeZone);
+        mPeriodEndMs = mPeriodEnd.getMilliseconds(timeZone);
+        mNextPeriodStartMs = mNextPeriodStart.getMilliseconds(timeZone);
+        mNextPeriodEndMs = mNextPeriodEnd.getMilliseconds(timeZone);
+        //
         int tot = 0;
         if (comics == null) {
             //estraggo le release da tutti i comics

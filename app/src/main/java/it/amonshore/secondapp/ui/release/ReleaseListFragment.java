@@ -1,8 +1,10 @@
 package it.amonshore.secondapp.ui.release;
 
 import android.content.Intent;
+import android.content.SharedPreferences;
 import android.os.AsyncTask;
 import android.os.Bundle;
+import android.preference.PreferenceManager;
 import android.support.v4.app.Fragment;
 import android.view.ActionMode;
 import android.view.LayoutInflater;
@@ -25,6 +27,7 @@ import it.amonshore.secondapp.data.Release;
 import it.amonshore.secondapp.data.ReleaseId;
 import it.amonshore.secondapp.Utils;
 import it.amonshore.secondapp.ui.OnChangePageListener;
+import it.amonshore.secondapp.ui.SettingsActivity;
 
 /**
  * Created by Calgia on 15/05/2015.
@@ -33,8 +36,6 @@ public class ReleaseListFragment extends Fragment implements OnChangePageListene
 
     public final static String ARG_MODE = "arg_mode";
     public final static String ARG_COMICS_ID = "arg_comics_id";
-    public final static String ARG_GROUP_BY_MONTH = "arg_group_by_month";
-    public final static String ARG_WEEK_START_ON_MONDAY = "arg_week_start_monday";
 
     private AbsListView mListView;
     private ReleaseListAdapter mAdapter;
@@ -42,6 +43,8 @@ public class ReleaseListFragment extends Fragment implements OnChangePageListene
     private DataManager mDataManager;
     //TODO deve essere passato in qualche modo, può essere null
     private Comics mComics;
+    private boolean mGroupByMonth;
+    private boolean mWeekStartOnMonday;
 
     @Override
     public void onCreate(Bundle savedInstanceState) {
@@ -53,14 +56,11 @@ public class ReleaseListFragment extends Fragment implements OnChangePageListene
         Bundle args = getArguments();
         long comicsId = args.getLong(ARG_COMICS_ID);
         int mode = args.getInt(ARG_MODE, ReleaseListAdapter.MODE_SHOPPING);
-        boolean groupByMonth = args.getBoolean(ARG_GROUP_BY_MONTH, false);
-        boolean weekStartOnMonday = args.getBoolean(ARG_WEEK_START_ON_MONDAY, true);
         if (comicsId != 0) {
             mComics = mDataManager.getComics(comicsId);
         }
         //
-        mAdapter = new ReleaseListAdapter(getActivity().getApplicationContext(),
-                mode, groupByMonth, weekStartOnMonday);
+        mAdapter = new ReleaseListAdapter(getActivity().getApplicationContext(), mode);
         //leggo i dati in modalità asincrona
         refreshData();
     }
@@ -164,6 +164,11 @@ public class ReleaseListFragment extends Fragment implements OnChangePageListene
 
     public void refreshData() {
         //TODO indicare per quali fumetti leggere i dati
+        //recupero le preferenze
+        SharedPreferences sharedPref = PreferenceManager.getDefaultSharedPreferences(getActivity());
+        mGroupByMonth = sharedPref.getBoolean(SettingsActivity.KEY_PREF_GROUP_BY_MONTH, false);
+        mWeekStartOnMonday = sharedPref.getBoolean(SettingsActivity.KEY_PREF_WEEK_START_ON_MONDAY, false);
+        //
         new ReadReleasesAsyncTask().execute();
     }
 
@@ -200,7 +205,8 @@ public class ReleaseListFragment extends Fragment implements OnChangePageListene
     private class ReadReleasesAsyncTask extends AsyncTask<Void, Release, Integer> {
         @Override
         protected Integer doInBackground(Void... params) {
-            ReleaseListFragment.this.mAdapter.refresh(ReleaseListFragment.this.mComics);
+            ReleaseListFragment.this.mAdapter.refresh(ReleaseListFragment.this.mComics,
+                    ReleaseListFragment.this.mGroupByMonth, ReleaseListFragment.this.mWeekStartOnMonday);
             return 0;
         }
 

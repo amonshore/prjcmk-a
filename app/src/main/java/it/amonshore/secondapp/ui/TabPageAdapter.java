@@ -37,8 +37,6 @@ public class TabPageAdapter extends FragmentStatePagerAdapter {
         //
         args = new Bundle();
         args.putInt(ReleaseListFragment.ARG_MODE, ReleaseListAdapter.MODE_SHOPPING);
-        //TODO args.putBoolean(ReleaseListFragment.ARG_GROUP_BY_MONTH, true);
-        //TODO args.putBoolean(ReleaseListFragment.ARG_WEEK_START_ON_MONDAY, false);
         frg = new ReleaseListFragment();
         frg.setArguments(args);
         mPages.add(frg);
