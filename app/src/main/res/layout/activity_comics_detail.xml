@@ -4,24 +4,24 @@
     android:layout_width="match_parent"
     android:layout_height="match_parent">
 
-    <TextView
-        android:layout_width="wrap_content"
-        android:textSize="25sp"
-        android:layout_height="wrap_content"
-        android:id="@+id/text1"/>
+    <!--<TextView-->
+        <!--android:layout_width="wrap_content"-->
+        <!--android:textSize="25sp"-->
+        <!--android:layout_height="wrap_content"-->
+        <!--android:id="@+id/txt_detail_comics_name"/>-->
 
-    <fragment
+
+    <view
         android:layout_width="match_parent"
         android:layout_height="match_parent"
-        android:name="it.amonshore.secondapp.ui.release.ReleaseListFragment"
-        android:id="@+id/fragment" />
+        class="com.poliveira.apps.parallaxlistview.ParallaxScrollView"
+        android:id="@+id/parallax">
 
-    <!--<view-->
-        <!--android:layout_width="match_parent"-->
-        <!--android:layout_height="match_parent"-->
-        <!--class="com.poliveira.apps.parallaxlistview.ParallaxScrollView"-->
-        <!--android:id="@+id/parallax">-->
+        <se.emilsjolander.stickylistheaders.StickyListHeadersListView
+            android:id="@+id/lst_detail_comics"
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"/>
 
-    <!--</view>-->
+    </view>
 
 </LinearLayout>
