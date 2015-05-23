@@ -1,9 +1,17 @@
 <?xml version="1.0" encoding="utf-8"?>
 <PreferenceScreen xmlns:android="http://schemas.android.com/apk/res/android">
     <CheckBoxPreference
-        android:key="pref_key_test1"
-        android:title="@string/pref_title_test1"
-        android:summaryOn="this option is checked"
-        android:summaryOff="this option isn't checked"
+        android:key="pref_group_by_month"
+        android:title="@string/pref_group_by_month_title"
+        android:summaryOn="@string/pref_group_by_month_on"
+        android:summaryOff="@string/pref_group_by_month_off"
         android:defaultValue="false" />
+
+    <CheckBoxPreference
+        android:key="pref_week_start_on_monday"
+        android:title="@string/pref_week_start_on_monday_title"
+        android:summaryOn="@string/pref_week_start_on_monday_on"
+        android:summaryOff="@string/pref_week_start_on_monday_off"
+        android:defaultValue="true" />
+
 </PreferenceScreen>

@@ -18,7 +18,7 @@ import it.amonshore.secondapp.R;
  * Use the {@link FakeBlankFragment#newInstance} factory method to
  * create an instance of this fragment.
  */
-public class FakeBlankFragment extends Fragment implements OnChangePageListener {
+public class FakeBlankFragment extends AFragment  {
 
     private static final String ARG_MESSAGE = "message";
 
@@ -65,4 +65,8 @@ public class FakeBlankFragment extends Fragment implements OnChangePageListener 
         //
     }
 
+    @Override
+    public void needDataRefresh(int cause) {
+        //
+    }
 }

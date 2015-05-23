@@ -1,4 +1,4 @@
-package it.amonshore.secondapp.ui;
+package it.amonshore.secondapp.ui.comics;
 
 import android.app.Activity;
 import android.content.Intent;
@@ -6,26 +6,20 @@ import android.support.v7.app.ActionBarActivity;
 import android.os.Bundle;
 import android.text.Editable;
 import android.text.TextUtils;
-import android.util.Log;
 import android.view.Menu;
 import android.view.MenuItem;
 import android.widget.ArrayAdapter;
 import android.widget.AutoCompleteTextView;
 import android.widget.EditText;
 import android.widget.Spinner;
-import android.widget.TextView;
-
-import java.text.NumberFormat;
-import java.util.Arrays;
 
 import it.amonshore.secondapp.R;
 import it.amonshore.secondapp.data.Comics;
 import it.amonshore.secondapp.data.DataManager;
-import it.amonshore.secondapp.data.Utils;
+import it.amonshore.secondapp.Utils;
+import it.amonshore.secondapp.ui.SimpleTextWatcher;
 
 public class ComicsEditorActivity extends ActionBarActivity {
-
-    private final static String LOG_TAG = "CEA";
 
     public final static int EDIT_COMICS_REQUEST = 1001;
 

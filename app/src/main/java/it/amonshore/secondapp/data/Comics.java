@@ -179,4 +179,16 @@ public class Comics implements Serializable {
     public Release[] getReleases() {
         return releases.toArray(new Release[releases.size()]);
     }
+
+    /**
+     *
+     * @param number
+     * @return
+     */
+    public Release getRelease(int number) {
+        for (Release release : releases) {
+            if (release.getNumber() == number) return release;
+        }
+        return  null;
+    }
 }

@@ -8,6 +8,9 @@ import it.amonshore.secondapp.R;
 
 public class SettingsActivity extends ActionBarActivity {
 
+    public static final String KEY_PREF_GROUP_BY_MONTH = "pref_group_by_month";
+    public static final String KEY_PREF_WEEK_START_ON_MONDAY = "pref_week_start_on_monday";
+
     @Override
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
