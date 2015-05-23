@@ -30,16 +30,17 @@
     <string name="title_page_wishlist">Wishlist</string>
 
     <!-- release section titles -->
-    <string name="title_release_section_lost">Lost</string>
-    <string name="title_release_section_wishlist">Wishlist</string>
-    <string name="title_release_section_current_week">This week</string>
-    <string name="title_release_section_current_month">This month</string>
-    <string name="title_release_section_next_week">Next week</string>
-    <string name="title_release_section_next_month">Next month</string>
-    <string name="title_release_section_future">In the future</string>
-    <string name="title_release_section_expired">Expired</string>
-    <string name="title_release_section_to_purchase">To purchase</string>
-    <string name="title_release_section_purchased">Purchased</string>
+    <string name="title_release_group_lost">Lost</string>
+    <string name="title_release_group_wishlist">Wishlist</string>
+    <string name="title_release_group_current_week">This week</string>
+    <string name="title_release_group_current_month">This month</string>
+    <string name="title_release_group_next_week">Next week</string>
+    <string name="title_release_group_next_month">Next month</string>
+    <string name="title_release_group_future">In the future</string>
+    <string name="title_release_group_expired">Expired</string>
+    <string name="title_release_group_to_purchase">To purchase</string>
+    <string name="title_release_group_purchased">Purchased</string>
+    <string name="title_release_group_unknown">Unknown %1</string>
 
     <!-- periodicity -->
     <string-array name="periodicity_key_array">

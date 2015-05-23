@@ -10,6 +10,7 @@ import android.view.ViewGroup;
 import java.util.ArrayList;
 
 import it.amonshore.secondapp.R;
+import it.amonshore.secondapp.data.ReleaseGroupHelper;
 import it.amonshore.secondapp.ui.comics.ComicsListFragment;
 import it.amonshore.secondapp.ui.release.ReleaseListAdapter;
 import it.amonshore.secondapp.ui.release.ReleaseListFragment;
@@ -37,13 +38,13 @@ public class TabPageAdapter extends FragmentStatePagerAdapter {
         AFragment frg;
         //
         args = new Bundle();
-        args.putInt(ReleaseListFragment.ARG_MODE, ReleaseListAdapter.MODE_SHOPPING);
+        args.putInt(ReleaseListFragment.ARG_MODE, ReleaseGroupHelper.MODE_SHOPPING);
         frg = new ReleaseListFragment();
         frg.setArguments(args);
         mPages.add(frg);
         //
         args = new Bundle();
-        args.putInt(ReleaseListFragment.ARG_MODE, ReleaseListAdapter.MODE_LAW);
+        args.putInt(ReleaseListFragment.ARG_MODE, ReleaseGroupHelper.MODE_LAW);
         frg = new ReleaseListFragment();
         frg.setArguments(args);
         mPages.add(frg);

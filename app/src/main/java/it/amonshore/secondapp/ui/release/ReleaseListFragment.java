@@ -5,7 +5,6 @@ import android.content.SharedPreferences;
 import android.os.AsyncTask;
 import android.os.Bundle;
 import android.preference.PreferenceManager;
-import android.support.v4.app.Fragment;
 import android.view.ActionMode;
 import android.view.LayoutInflater;
 import android.view.Menu;
@@ -18,16 +17,16 @@ import android.widget.AdapterView;
 import android.widget.ListView;
 import android.widget.TextView;
 
-import com.applidium.headerlistview.HeaderListView;
-
 import it.amonshore.secondapp.R;
 import it.amonshore.secondapp.data.Comics;
 import it.amonshore.secondapp.data.DataManager;
 import it.amonshore.secondapp.data.Release;
-import it.amonshore.secondapp.data.ReleaseId;
+import it.amonshore.secondapp.data.ReleaseGroupHelper;
 import it.amonshore.secondapp.Utils;
+import it.amonshore.secondapp.data.ReleaseInfo;
 import it.amonshore.secondapp.ui.AFragment;
 import it.amonshore.secondapp.ui.SettingsActivity;
+import se.emilsjolander.stickylistheaders.StickyListHeadersListView;
 
 /**
  * Created by Calgia on 15/05/2015.
@@ -41,8 +40,8 @@ public class ReleaseListFragment extends AFragment {
     private ReleaseListAdapter mAdapter;
     private ActionMode mActionMode;
     private DataManager mDataManager;
-    //TODO deve essere passato in qualche modo, può essere null
     private Comics mComics;
+    private int mGroupMode;
     private boolean mGroupByMonth;
     private boolean mWeekStartOnMonday;
     private boolean mNeedUpdateOnResume;
@@ -54,35 +53,33 @@ public class ReleaseListFragment extends AFragment {
         setHasOptionsMenu(true);
         mDataManager = DataManager.getDataManager(getActivity().getApplicationContext());
         //recupero i parametri
-        int mode = ReleaseListAdapter.MODE_SHOPPING;
+        int mode = ReleaseGroupHelper.MODE_SHOPPING;
         Bundle args = getArguments();
         if (args != null) {
             long comicsId = args.getLong(ARG_COMICS_ID);
-            mode = args.getInt(ARG_MODE, ReleaseListAdapter.MODE_SHOPPING);
+            mGroupMode = args.getInt(ARG_MODE, ReleaseGroupHelper.MODE_SHOPPING);
             if (comicsId != 0) {
                 mComics = mDataManager.getComics(comicsId);
             }
         }
         //
-        mAdapter = new ReleaseListAdapter(getActivity().getApplicationContext(), mode);
+        mAdapter = new ReleaseListAdapter(getActivity().getApplicationContext());
     }
 
     @Override
     public View onCreateView(LayoutInflater inflater, ViewGroup container,
                              Bundle savedInstanceState) {
         View view = inflater.inflate(R.layout.fragment_releases, container, false);
-        HeaderListView list = (HeaderListView)view.findViewById(android.R.id.list);
+        StickyListHeadersListView list = (StickyListHeadersListView)view.findViewById(R.id.lst_releases);
         //
         list.setAdapter(mAdapter);
         //questa è la vera lista
-        mListView = list.getListView();
-        //fix per crash -> http://stackoverflow.com/questions/25807332/crash-when-returning-to-fragment-as-a-tab-view-with-same-id
-        mListView.setId(View.NO_ID);
+        mListView = list.getWrappedList();
         mListView.setChoiceMode(ListView.CHOICE_MODE_MULTIPLE_MODAL);
         mListView.setOnItemClickListener(new AdapterView.OnItemClickListener() {
             @Override
             public void onItemClick(AdapterView<?> parent, View view, int position, long id) {
-                //Utils.d("onItemClick " + ((Comics) mAdapter.getItem(position)).getName());
+                Utils.d("onItemClick " + ((ReleaseInfo) mAdapter.getItem(position)).getRelease().getNumber());
                 //TODO showReleaseEditor((ReleaseId) mAdapter.getItem(position), false);
             }
         });
@@ -134,11 +131,6 @@ public class ReleaseListFragment extends AFragment {
         });
 
         return  view;
-    }
-
-    public void setComics(Comics comics, int mode) {
-        mComics = comics;
-        mAdapter.setMode(mode);
     }
 
     @Override
@@ -214,7 +206,7 @@ public class ReleaseListFragment extends AFragment {
         }
     }
 
-    private void showReleaseEditor(ReleaseId releaseId, boolean isNew) {
+    private void showReleaseEditor(ReleaseInfo releaseInfo, boolean isNew) {
         //TODO apri editor release
 //        Intent intent = new Intent(getActivity(), ComicsEditorActivity.class);
 //        intent.putExtra(ComicsEditorActivity.EXTRA_ENTRY, comics);
@@ -234,7 +226,9 @@ public class ReleaseListFragment extends AFragment {
             mWeekStartOnMonday = sharedPref.getBoolean(SettingsActivity.KEY_PREF_WEEK_START_ON_MONDAY, false);
 
             return ReleaseListFragment.this.mAdapter.refresh(ReleaseListFragment.this.mComics,
-                    ReleaseListFragment.this.mGroupByMonth, ReleaseListFragment.this.mWeekStartOnMonday);
+                    ReleaseListFragment.this.mGroupMode,
+                    ReleaseListFragment.this.mGroupByMonth,
+                    ReleaseListFragment.this.mWeekStartOnMonday);
         }
 
         @Override
