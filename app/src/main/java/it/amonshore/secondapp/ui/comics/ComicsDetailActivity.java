@@ -1,5 +1,6 @@
 package it.amonshore.secondapp.ui.comics;
 
+import android.app.Activity;
 import android.content.Context;
 import android.content.Intent;
 import android.content.SharedPreferences;
@@ -11,6 +12,10 @@ import android.view.View;
 import android.view.ViewGroup;
 import android.widget.BaseAdapter;
 import android.widget.TextView;
+
+import com.github.clans.fab.FloatingActionButton;
+
+import org.w3c.dom.Text;
 
 import java.text.SimpleDateFormat;
 import java.util.Locale;
@@ -35,6 +40,7 @@ public class ComicsDetailActivity extends ActionBarActivity {
 
     private Comics mComics;
     private DataManager mDataManager;
+    private TextView mTxtName;
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
@@ -46,10 +52,40 @@ public class ComicsDetailActivity extends ActionBarActivity {
         Intent intent = getIntent();
         mComics = (Comics)intent.getSerializableExtra(EXTRA_ENTRY);
         //
-        ((TextView)findViewById(R.id.txt_detail_comics_name)).setText(mComics.getName());
+        mTxtName = ((TextView)findViewById(R.id.txt_detail_comics_name));
+        updateHeader();
+        //
+        ((FloatingActionButton)findViewById(R.id.fab_comics_edit)).setOnClickListener(new View.OnClickListener() {
+            @Override
+            public void onClick(View v) {
+                showComicsEditor(mComics, false);
+            }
+        });
         //
         StickyListHeadersListView stickyList = (StickyListHeadersListView) findViewById(R.id.lst_detail_comics);
         stickyList.setAdapter(new ReleasesAdapter(this, mComics));
+    }
+
+    @Override
+    protected void onActivityResult(int requestCode, int resultCode, Intent data) {
+        if (resultCode == Activity.RESULT_OK && requestCode == ComicsEditorActivity.EDIT_COMICS_REQUEST) {
+            //l'istanza di comics ritornata dall'activity è "nuova", copio le proprietà
+            //TODO non va bene... sto aggiornando l'istanza serializzata di mComics, la lista nella main non viene aggiornata
+            Comics comics = (Comics)data.getSerializableExtra(ComicsEditorActivity.EXTRA_ENTRY);
+            mComics.copyFrom(comics);
+            updateHeader();
+        }
+    }
+
+    private void updateHeader() {
+        mTxtName.setText(mComics.getName() + " " + mComics.getPublisher());
+    }
+
+    private void showComicsEditor(Comics comics, boolean isNew) {
+        Intent intent = new Intent(this, ComicsEditorActivity.class);
+        intent.putExtra(ComicsEditorActivity.EXTRA_ENTRY, comics);
+        intent.putExtra(ComicsEditorActivity.EXTRA_IS_NEW, isNew);
+        startActivityForResult(intent, ComicsEditorActivity.EDIT_COMICS_REQUEST);
     }
 
     final class ReleasesAdapter extends BaseAdapter implements StickyListHeadersAdapter {

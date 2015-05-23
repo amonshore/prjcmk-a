@@ -18,6 +18,8 @@ import android.widget.ListAdapter;
 import android.widget.ListView;
 import android.widget.TextView;
 
+import com.github.clans.fab.FloatingActionButton;
+
 import it.amonshore.secondapp.R;
 import it.amonshore.secondapp.data.Comics;
 import it.amonshore.secondapp.Utils;
@@ -140,6 +142,14 @@ public class ComicsListFragment extends AFragment {
             @Override
             public void onDestroyActionMode(ActionMode mode) {
                 mActionMode = null;
+            }
+        });
+
+        //listener fab
+        ((FloatingActionButton)view.findViewById(R.id.fab_comics_add)).setOnClickListener(new View.OnClickListener() {
+            @Override
+            public void onClick(View v) {
+                showComicsEditor(mAdapter.createNewComics(), true);
             }
         });
 

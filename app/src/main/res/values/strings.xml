@@ -67,6 +67,7 @@
     <!-- comics editor -->
     <string name="editor_comics_name">Name</string>
     <string name="editor_comics_name_empty">Name can not be empty</string>
+    <string name="editor_comics_name_duplicate">Name must be unique</string>
     <string name="editor_comics_publisher">Publisher</string>
     <string name="editor_comics_series">Series</string>
     <string name="editor_comics_authors">Authors</string>
