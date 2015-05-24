@@ -49,8 +49,8 @@ public class ReleaseListFragment extends AFragment {
     @Override
     public void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
-        //deve essere chiamato in onCreate
-        setHasOptionsMenu(true);
+        ////deve essere chiamato in onCreate
+        //setHasOptionsMenu(true);
         mDataManager = DataManager.getDataManager(getActivity().getApplicationContext());
         //recupero i parametri
         int mode = ReleaseGroupHelper.MODE_SHOPPING;
@@ -131,29 +131,6 @@ public class ReleaseListFragment extends AFragment {
         });
 
         return  view;
-    }
-
-    @Override
-    public void onPrepareOptionsMenu(Menu menu) {
-        //TODO prepara il menu in base a cosa è stato selezionato
-        super.onPrepareOptionsMenu(menu);
-    }
-
-    @Override
-    public void onCreateOptionsMenu(Menu menu, MenuInflater inflater) {
-        inflater.inflate(R.menu.menu_releases, menu);
-    }
-
-    @Override
-    public boolean onOptionsItemSelected(MenuItem item) {
-        int id = item.getItemId();
-        Utils.d("onOptionsItemSelected " + item.getTitle());
-        if (id == R.id.action_release_add) {
-            //TODO apri l'editor showComicsEditor(..., true);
-            return true;
-        } else {
-            return false;
-        }
     }
 
     @Override

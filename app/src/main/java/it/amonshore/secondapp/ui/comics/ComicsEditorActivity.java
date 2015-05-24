@@ -1,6 +1,7 @@
 package it.amonshore.secondapp.ui.comics;
 
 import android.app.Activity;
+import android.app.AlertDialog;
 import android.content.Intent;
 import android.support.v7.app.ActionBarActivity;
 import android.os.Bundle;
@@ -144,6 +145,8 @@ public class ComicsEditorActivity extends ActionBarActivity implements ItemPicke
         return true;
     }
 
+    private AlertDialog mAlertDialog;
+
     @Override
     public boolean onOptionsItemSelected(MenuItem item) {
         // Handle action bar item clicks here. The action bar will
@@ -153,30 +156,40 @@ public class ComicsEditorActivity extends ActionBarActivity implements ItemPicke
 
         //noinspection SimplifiableIfStatement
         if (id == R.id.action_save) {
-            //TODO eseguire i controlli sui dati
-            //preparo i dati per la risposta
-            mComics.setName(getViewText(mTxtName.getInputWidget()));
-            mComics.setPublisher(getViewText(mTxtPublisher.getInputWidget()));
-            mComics.setSeries(getViewText(mTxtSeries.getInputWidget()));
-            mComics.setAuthors(getViewText(mTxtAuthors.getInputWidget()));
-            mComics.setPrice(getViewDouble(mTxtPrice.getInputWidget()));
+            if (isComicsNameValid()) {
+                //TODO eseguire i controlli sui dati
+                //preparo i dati per la risposta
+                mComics.setName(getViewText(mTxtName.getInputWidget()));
+                mComics.setPublisher(getViewText(mTxtPublisher.getInputWidget()));
+                mComics.setSeries(getViewText(mTxtSeries.getInputWidget()));
+                mComics.setAuthors(getViewText(mTxtAuthors.getInputWidget()));
+                mComics.setPrice(getViewDouble(mTxtPrice.getInputWidget()));
 
-            int[] selPer = mSpPeriodicity.getSelectedIndices();
-            if (selPer != null && selPer.length > 0) {
-                mComics.setPeriodicity(mPeriodicityKeys[selPer[0]]);
-            }
-
-            if (mIsNew) {
-                if (!mDataManager.put(mComics)) {
-                    Utils.w("Comics editor: comics wasn't new");
+                int[] selPer = mSpPeriodicity.getSelectedIndices();
+                if (selPer != null && selPer.length > 0) {
+                    mComics.setPeriodicity(mPeriodicityKeys[selPer[0]]);
                 }
-            }
 
-            //
-            Intent intent = new Intent();
-            intent.putExtra(EXTRA_COMICS_ID, mComics.getId());
-            setResult(Activity.RESULT_OK, intent);
-            finish();
+                if (mIsNew) {
+                    if (!mDataManager.put(mComics)) {
+                        Utils.w("Comics editor: comics wasn't new");
+                    }
+                }
+
+                //
+                Intent intent = new Intent();
+                intent.putExtra(EXTRA_COMICS_ID, mComics.getId());
+                setResult(Activity.RESULT_OK, intent);
+                finish();
+            } else {
+                if (mAlertDialog == null) {
+                    AlertDialog.Builder builder = new AlertDialog.Builder(this);
+                    builder.setPositiveButton(android.R.string.ok, null);
+                    builder.setMessage(R.string.editor_comics_name_duplicate);
+                    mAlertDialog = builder.create();
+                }
+                mAlertDialog.show();
+            }
 
             return true;
         }
@@ -197,30 +210,26 @@ public class ComicsEditorActivity extends ActionBarActivity implements ItemPicke
     }
 
     private void checkComicsName() {
-        bCanSave = true;
         //TODO rivedere i controlli, soprattutto unique che sempra lento
         if (TextUtils.getTrimmedLength(mTxtName.getInputWidgetText()) == 0) {
             mTxtName.getInputWidget().setError(getString(R.string.editor_comics_name_empty));
             bCanSave = false;
-        } else if (mIsNew) {
-            if (mDataManager.getComicsByName(mTxtName.getInputWidgetText().toString()) != null) {
-                mTxtName.getInputWidget().setError(getString(R.string.editor_comics_name_duplicate));
-                bCanSave = false;
-            }
-        } else if (!mIsNew) {
-            //se non è nuovo, può essere uguale a quello attuale
-            //controllo l'id perché l'istanza di mComics è "nuova"
-            Comics comics = mDataManager.getComicsByName(mTxtName.getInputWidgetText().toString());
-            if (comics != null && comics.getId() != mComics.getId()) {
-                mTxtName.getInputWidget().setError(getString(R.string.editor_comics_name_duplicate));
-                bCanSave = false;
-            }
-        }
-
-        if (bCanSave) {
+        } else {
             mTxtName.getInputWidget().setError(null);
+            bCanSave = true;
         }
 
         invalidateOptionsMenu();
     }
+
+    private boolean isComicsNameValid() {
+        if (mIsNew) {
+            return (mDataManager.getComicsByName(mTxtName.getInputWidgetText().toString()) == null);
+        } else {
+            //se non è nuovo, può essere uguale a quello attuale
+            Comics comics = mDataManager.getComicsByName(mTxtName.getInputWidgetText().toString());
+            return (comics == null || comics.getId() == mComics.getId());
+        }
+    }
+
 }
