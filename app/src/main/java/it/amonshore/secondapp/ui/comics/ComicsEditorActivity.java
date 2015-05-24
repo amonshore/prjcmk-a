@@ -8,10 +8,20 @@ import android.text.Editable;
 import android.text.TextUtils;
 import android.view.Menu;
 import android.view.MenuItem;
+import android.view.inputmethod.EditorInfo;
 import android.widget.ArrayAdapter;
-import android.widget.AutoCompleteTextView;
 import android.widget.EditText;
 import android.widget.Spinner;
+
+import com.marvinlabs.widget.floatinglabel.autocomplete.FloatingLabelAutoCompleteTextView;
+import com.marvinlabs.widget.floatinglabel.edittext.FloatingLabelEditText;
+import com.marvinlabs.widget.floatinglabel.itempicker.FloatingLabelItemPicker;
+import com.marvinlabs.widget.floatinglabel.itempicker.ItemPickerListener;
+import com.marvinlabs.widget.floatinglabel.itempicker.StringPickerDialogFragment;
+
+import java.util.ArrayList;
+import java.util.Arrays;
+import java.util.Collection;
 
 import it.amonshore.secondapp.R;
 import it.amonshore.secondapp.data.Comics;
@@ -19,12 +29,12 @@ import it.amonshore.secondapp.data.DataManager;
 import it.amonshore.secondapp.Utils;
 import it.amonshore.secondapp.ui.SimpleTextWatcher;
 
-public class ComicsEditorActivity extends ActionBarActivity {
+public class ComicsEditorActivity extends ActionBarActivity implements ItemPickerListener<String> {
 
     public final static int EDIT_COMICS_REQUEST = 1001;
 
-    public final static String EXTRA_ENTRY = "entry";
-    public final static String EXTRA_IS_NEW = "isnew";
+    public final static String EXTRA_COMICS_ID = "entry";
+    public final static long COMICS_ID_NEW = 0;
 
     private Comics mComics;
     private boolean mIsNew;
@@ -32,9 +42,9 @@ public class ComicsEditorActivity extends ActionBarActivity {
     private boolean bCanSave;
     private String[] mPeriodicityKeys;
 
-    private EditText mTxtName, mTxtSeries, mTxtAuthors, mTxtPrice;
-    private AutoCompleteTextView mTxtPublisher;
-    private Spinner mSpPeriodicity;
+    private FloatingLabelEditText mTxtName, mTxtSeries, mTxtAuthors, mTxtPrice;
+    private FloatingLabelAutoCompleteTextView mTxtPublisher;
+    private FloatingLabelItemPicker<String> mSpPeriodicity;
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
@@ -44,47 +54,81 @@ public class ComicsEditorActivity extends ActionBarActivity {
         mDataManager = DataManager.getDataManager(getApplicationContext());
         //leggo i parametri
         Intent intent = getIntent();
-        mComics = (Comics)intent.getSerializableExtra(EXTRA_ENTRY);
-        mIsNew = intent.getBooleanExtra(EXTRA_IS_NEW, true);
-        if (mIsNew) {
+        long comicsId = intent.getLongExtra(EXTRA_COMICS_ID, COMICS_ID_NEW);
+        if (comicsId == COMICS_ID_NEW) {
+            mIsNew = true;
+            mComics = new Comics(mDataManager.getSafeNewComicsId());
             setTitle(R.string.title_activity_comics_editor);
         } else {
+            mIsNew = false;
+            mComics = mDataManager.getComics(comicsId);
             setTitle(mComics.getName());
         }
+        //
+        mPeriodicityKeys = new String[] { Comics.PERIODICITY_UNKNOWN, Comics.PERIODICITY_WEEKLY,
+                Comics.PERIODICITY_MONTHLY, Comics.PERIODICITY_MONTHLY_X2, Comics.PERIODICITY_MONTHLY_X3,
+                Comics.PERIODICITY_MONTHLY_X4, Comics.PERIODICITY_MONTHLY_X6, Comics.PERIODICITY_YEARLY };
         //imposto i valori e creo i listener
-        mTxtName = (EditText)findViewById(R.id.txt_editor_comics_name);
-        mTxtName.setText(mComics.getName());
-        mTxtName.addTextChangedListener(new SimpleTextWatcher() {
+        mTxtName = (FloatingLabelEditText)findViewById(R.id.txt_editor_comics_name);
+        mTxtName.setInputWidgetText(mComics.getName());
+        mTxtName.addInputWidgetTextChangedListener(new SimpleTextWatcher() {
             @Override
             public void afterTextChanged(Editable s) {
                 checkComicsName();
             }
         });
         //
-        mTxtPublisher = (AutoCompleteTextView)findViewById(R.id.txt_editor_comics_publisher);
-        mTxtPublisher.setText(mComics.getPublisher());
-        mTxtPublisher.setAdapter(new ArrayAdapter<String>(this,
+        mTxtPublisher = (FloatingLabelAutoCompleteTextView)findViewById(R.id.txt_editor_comics_publisher);
+        mTxtPublisher.setInputWidgetText(mComics.getPublisher());
+        mTxtPublisher.setInputWidgetAdapter(new ArrayAdapter<String>(this,
                 android.R.layout.simple_list_item_1,
                 mDataManager.getPublishers()));
         //
-        mTxtSeries = (EditText)findViewById(R.id.txt_editor_comics_series);
-        mTxtSeries.setText(mComics.getSeries());
+        mTxtSeries = (FloatingLabelEditText)findViewById(R.id.txt_editor_comics_series);
+        mTxtSeries.setInputWidgetText(mComics.getSeries());
         //
-        mTxtAuthors = (EditText)findViewById(R.id.txt_editor_comics_authors);
-        mTxtAuthors.setText(mComics.getAuthors());
+        mTxtAuthors = (FloatingLabelEditText)findViewById(R.id.txt_editor_comics_authors);
+        mTxtAuthors.setInputWidgetText(mComics.getAuthors());
         //
-        mTxtPrice = (EditText)findViewById(R.id.txt_editor_comics_price);
-        mTxtPrice.setText(Double.toString(mComics.getPrice()));
+        mTxtPrice = (FloatingLabelEditText)findViewById(R.id.txt_editor_comics_price);
+        mTxtPrice.setInputWidgetText(Double.toString(mComics.getPrice()));
         //
-        mSpPeriodicity = (Spinner)findViewById(R.id.txt_editor_comics_periodicity);
-        ArrayAdapter<CharSequence> adapter = ArrayAdapter.createFromResource(this,
-                R.array.periodicity_value_array, android.R.layout.simple_spinner_item);
-        adapter.setDropDownViewResource(android.R.layout.simple_spinner_dropdown_item);
-        mSpPeriodicity.setAdapter(adapter);
-        mPeriodicityKeys = getResources().getStringArray(R.array.periodicity_key_array);
-        mSpPeriodicity.setSelection(Utils.indexOf(mPeriodicityKeys, mComics.getPeriodicity(), 0));
+        mSpPeriodicity = (FloatingLabelItemPicker<String>)findViewById(R.id.txt_editor_comics_periodicity);
+        mSpPeriodicity.setAvailableItems(Arrays.asList(getResources().getStringArray(R.array.periodicity_value_array)));
+        mSpPeriodicity.setWidgetListener(new FloatingLabelItemPicker.OnWidgetEventListener<String>() {
+            @Override
+            public void onShowItemPickerDialog(FloatingLabelItemPicker<String> source) {
+                // We use fragments because we'll be safe in edge cases like screen orientation
+                // change. You could use a simple AlertDialog but really, no, you don't want to.
+                StringPickerDialogFragment itemPicker = StringPickerDialogFragment.newInstance(
+                        source.getId(),
+                        getString(R.string.editor_comics_periodicity),
+                        getString(android.R.string.ok),
+                        getString(android.R.string.cancel),
+                        false,
+                        source.getSelectedIndices(),
+                        new ArrayList<String>((Collection<String>) source.getAvailableItems()));
+
+                // Optionally, you can set a target fragment to get the notifications
+                // pickerFragment.setTargetFragment(MyFragment.this, 0);
+
+                itemPicker.show(getSupportFragmentManager(), "ItemPicker");
+            }
+        });
+        mSpPeriodicity.setSelectedIndices(new int[] { Utils.indexOf(mPeriodicityKeys, mComics.getPeriodicity(), 0) });
         //
         checkComicsName();
+    }
+
+    @Override
+    public void onCancelled(int i) {
+        //chiamato da FloatingLabelItemPicker
+    }
+
+    @Override
+    public void onItemsSelected(int i, int[] ints) {
+        //chiamato da FloatingLabelItemPicker
+        mSpPeriodicity.setSelectedIndices(ints);
     }
 
     @Override
@@ -111,16 +155,26 @@ public class ComicsEditorActivity extends ActionBarActivity {
         if (id == R.id.action_save) {
             //TODO eseguire i controlli sui dati
             //preparo i dati per la risposta
-            mComics.setName(getViewText(mTxtName));
-            mComics.setPublisher(getViewText(mTxtPublisher));
-            mComics.setSeries(getViewText(mTxtSeries));
-            mComics.setAuthors(getViewText(mTxtAuthors));
-            mComics.setPrice(getViewDouble(mTxtPrice));
-            mComics.setPeriodicity(mPeriodicityKeys[mSpPeriodicity.getSelectedItemPosition()]);
+            mComics.setName(getViewText(mTxtName.getInputWidget()));
+            mComics.setPublisher(getViewText(mTxtPublisher.getInputWidget()));
+            mComics.setSeries(getViewText(mTxtSeries.getInputWidget()));
+            mComics.setAuthors(getViewText(mTxtAuthors.getInputWidget()));
+            mComics.setPrice(getViewDouble(mTxtPrice.getInputWidget()));
+
+            int[] selPer = mSpPeriodicity.getSelectedIndices();
+            if (selPer != null && selPer.length > 0) {
+                mComics.setPeriodicity(mPeriodicityKeys[selPer[0]]);
+            }
+
+            if (mIsNew) {
+                if (!mDataManager.put(mComics)) {
+                    Utils.w("Comics editor: comics wasn't new");
+                }
+            }
+
             //
             Intent intent = new Intent();
-            intent.putExtra(EXTRA_ENTRY, mComics);
-            intent.putExtra(EXTRA_IS_NEW, mIsNew);
+            intent.putExtra(EXTRA_COMICS_ID, mComics.getId());
             setResult(Activity.RESULT_OK, intent);
             finish();
 
@@ -143,13 +197,30 @@ public class ComicsEditorActivity extends ActionBarActivity {
     }
 
     private void checkComicsName() {
-        if (TextUtils.getTrimmedLength(mTxtName.getText()) == 0) {
-            mTxtName.setError(getString(R.string.editor_comics_name_empty));
+        bCanSave = true;
+        //TODO rivedere i controlli, soprattutto unique che sempra lento
+        if (TextUtils.getTrimmedLength(mTxtName.getInputWidgetText()) == 0) {
+            mTxtName.getInputWidget().setError(getString(R.string.editor_comics_name_empty));
             bCanSave = false;
-        } else {
-            mTxtName.setError(null);
-            bCanSave = true;
+        } else if (mIsNew) {
+            if (mDataManager.getComicsByName(mTxtName.getInputWidgetText().toString()) != null) {
+                mTxtName.getInputWidget().setError(getString(R.string.editor_comics_name_duplicate));
+                bCanSave = false;
+            }
+        } else if (!mIsNew) {
+            //se non è nuovo, può essere uguale a quello attuale
+            //controllo l'id perché l'istanza di mComics è "nuova"
+            Comics comics = mDataManager.getComicsByName(mTxtName.getInputWidgetText().toString());
+            if (comics != null && comics.getId() != mComics.getId()) {
+                mTxtName.getInputWidget().setError(getString(R.string.editor_comics_name_duplicate));
+                bCanSave = false;
+            }
         }
+
+        if (bCanSave) {
+            mTxtName.getInputWidget().setError(null);
+        }
+
         invalidateOptionsMenu();
     }
 }

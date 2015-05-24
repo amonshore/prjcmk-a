@@ -1,18 +1,33 @@
 <?xml version="1.0" encoding="utf-8"?>
-<LinearLayout xmlns:android="http://schemas.android.com/apk/res/android"
+<RelativeLayout xmlns:android="http://schemas.android.com/apk/res/android"
+    xmlns:app="http://schemas.android.com/apk/res-auto"
     android:orientation="vertical"
     android:layout_width="match_parent"
     android:layout_height="match_parent">
 
     <TextView
-        android:layout_width="wrap_content"
+        android:layout_width="match_parent"
+        android:layout_height="102dp"
         android:textSize="25sp"
-        android:layout_height="wrap_content"
+        android:background="@color/material_blue_grey_800"
+        android:textColor="@color/abc_primary_text_material_dark"
         android:id="@+id/txt_detail_comics_name"/>
+
+    <com.github.clans.fab.FloatingActionButton
+        android:id="@+id/fab_comics_edit"
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:src="@android:drawable/ic_menu_edit"
+        app:fab_size="mini"
+        app:fab_elevationCompat="4dp"
+        android:layout_marginTop="75dp"
+        android:layout_marginLeft="10dp"
+        />
 
     <se.emilsjolander.stickylistheaders.StickyListHeadersListView
         android:id="@+id/lst_detail_comics"
+        android:layout_below="@id/txt_detail_comics_name"
         android:layout_width="wrap_content"
         android:layout_height="wrap_content"/>
 
-</LinearLayout>
+</RelativeLayout>

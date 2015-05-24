@@ -7,7 +7,16 @@ import java.util.Date;
 /**
  * Created by Calgia on 07/05/2015.
  */
-public class Comics implements Serializable {
+public class Comics {
+
+    public final static String PERIODICITY_UNKNOWN = "";
+    public final static String PERIODICITY_WEEKLY = "W1";
+    public final static String PERIODICITY_MONTHLY = "M1";
+    public final static String PERIODICITY_MONTHLY_X2 = "M2";
+    public final static String PERIODICITY_MONTHLY_X3 = "M3";
+    public final static String PERIODICITY_MONTHLY_X4 = "M4";
+    public final static String PERIODICITY_MONTHLY_X6 = "M6";
+    public final static String PERIODICITY_YEARLY = "Y1";
 
     private long id;
     private String name;
@@ -18,7 +27,6 @@ public class Comics implements Serializable {
     private String periodicity;
     private boolean reserved;
     private String notes;
-    //TODO releases
     private ArrayList<Release> releases;
 
     protected Comics() {
@@ -190,5 +198,16 @@ public class Comics implements Serializable {
             if (release.getNumber() == number) return release;
         }
         return  null;
+    }
+
+    public void copyFrom(Comics comics) {
+        setName(comics.getName());
+        setPeriodicity(comics.getPeriodicity());
+        setPublisher(comics.getPublisher());
+        setAuthors(comics.getAuthors());
+        setNotes(comics.getNotes());
+        setPrice(comics.getPrice());
+        setReserved(comics.isReserved());
+        setSeries(comics.getSeries());
     }
 }

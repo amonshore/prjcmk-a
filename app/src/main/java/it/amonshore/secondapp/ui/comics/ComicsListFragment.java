@@ -18,9 +18,12 @@ import android.widget.ListAdapter;
 import android.widget.ListView;
 import android.widget.TextView;
 
+import com.github.clans.fab.FloatingActionButton;
+
 import it.amonshore.secondapp.R;
 import it.amonshore.secondapp.data.Comics;
 import it.amonshore.secondapp.Utils;
+import it.amonshore.secondapp.data.DataManager;
 import it.amonshore.secondapp.ui.AFragment;
 import it.amonshore.secondapp.ui.MainActivity;
 
@@ -38,6 +41,7 @@ public class ComicsListFragment extends AFragment {
     private AbsListView mListView;
     private ComicsListAdapter mAdapter;
     private ActionMode mActionMode;
+    private DataManager mDataManager;
     private boolean mNeedUpdateOnResume;
 
     @Override
@@ -56,6 +60,7 @@ public class ComicsListFragment extends AFragment {
             order = settings.getInt(STATE_ORDER, ComicsListAdapter.ORDER_BY_NAME);
         }
         //
+        mDataManager = DataManager.getDataManager(getActivity().getApplicationContext());
         mAdapter = new ComicsListAdapter(getActivity().getApplicationContext(), order);
     }
 
@@ -92,9 +97,7 @@ public class ComicsListFragment extends AFragment {
         mListView.setOnItemClickListener(new AdapterView.OnItemClickListener() {
             @Override
             public void onItemClick(AdapterView<?> parent, View view, int position, long id) {
-                //Utils.d("onItemClick " + ((Comics) mAdapter.getItem(position)).getName());
-                //showComicsEditor((Comics) mAdapter.getItem(position), false);
-                showComicsDetail((Comics) mAdapter.getItem(position));
+                showComicsDetail(((Comics) mAdapter.getItem(position)).getId());
             }
         });
         mListView.setMultiChoiceModeListener(new AbsListView.MultiChoiceModeListener() {
@@ -143,6 +146,14 @@ public class ComicsListFragment extends AFragment {
             }
         });
 
+        //listener fab
+        ((FloatingActionButton)view.findViewById(R.id.fab_comics_add)).setOnClickListener(new View.OnClickListener() {
+            @Override
+            public void onClick(View v) {
+                showComicsEditor(0);
+            }
+        });
+
         return view;
     }
 
@@ -167,10 +178,7 @@ public class ComicsListFragment extends AFragment {
         int id = item.getItemId();
         Utils.d("onOptionsItemSelected " + item.getTitle());
 
-        if (id == R.id.action_comics_add) {
-            showComicsEditor(mAdapter.createNewComics(), true);
-            return true;
-        } else if (id == R.id.action_comics_sort_by_name) {
+        if (id == R.id.action_comics_sort_by_name) {
             //TODO sort by name
             ////invalido il menu in modo che venga ricreato, così da poter nascondere le voci che non interessano
             //getActivity().invalidateOptionsMenu();
@@ -194,9 +202,8 @@ public class ComicsListFragment extends AFragment {
     @Override
     public void onActivityResult(int requestCode, int resultCode, Intent data) {
         if (resultCode == Activity.RESULT_OK && requestCode == ComicsEditorActivity.EDIT_COMICS_REQUEST) {
-            Comics comics = (Comics)data.getSerializableExtra(ComicsEditorActivity.EXTRA_ENTRY);
-            boolean isnew = data.getBooleanExtra(ComicsEditorActivity.EXTRA_IS_NEW, true);
-            //TODO aggiungere alla lista e posizionarsi sull'elemento
+            long comicsId = data.getLongExtra(ComicsEditorActivity.EXTRA_COMICS_ID, 0);
+            Comics comics = mDataManager.getComics(comicsId);
             int position = mAdapter.insertOrUpdate(comics);
             //Utils.d("onActivityResult @" + index + " id " + comics.getId() + " " + comics.getName());
             mAdapter.notifyDataSetChanged();
@@ -245,17 +252,17 @@ public class ComicsListFragment extends AFragment {
         }
     }
 
-    private void showComicsEditor(Comics comics, boolean isNew) {
+    private void showComicsEditor(long comicsId) {
         Intent intent = new Intent(getActivity(), ComicsEditorActivity.class);
-        intent.putExtra(ComicsEditorActivity.EXTRA_ENTRY, comics);
-        intent.putExtra(ComicsEditorActivity.EXTRA_IS_NEW, isNew);
+        intent.putExtra(ComicsEditorActivity.EXTRA_COMICS_ID, comicsId);
         startActivityForResult(intent, ComicsEditorActivity.EDIT_COMICS_REQUEST);
     }
 
-    private void showComicsDetail(Comics comics) {
+    private void showComicsDetail(long comicsId) {
         Intent intent = new Intent(getActivity(), ComicsDetailActivity.class);
-        intent.putExtra(ComicsDetailActivity.EXTRA_ENTRY, comics);
+        intent.putExtra(ComicsDetailActivity.EXTRA_COMICS_ID, comicsId);
         startActivity(intent);
+        //TODO attendere un risultato e aggiornare l'istanza "vera" di comics con quello restituito dall'activity detail
     }
 
     /**

@@ -226,6 +226,22 @@ public class DataManager {
 
     /**
      *
+     * @param name
+     * @return
+     */
+    public Comics getComicsByName(String name) {
+        if (name == null) return null;
+
+        for (Comics comics : mComicsCache.values()) {
+            if (comics.getName().trim().equalsIgnoreCase(name.trim())) {
+                return comics;
+            }
+        }
+        return null;
+    }
+
+    /**
+     *
      * @param comics
      * @return  true se è stato aggiunto, false se ha sostituito un elemento esistente
      */

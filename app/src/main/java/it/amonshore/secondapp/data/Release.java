@@ -8,7 +8,7 @@ import java.util.Date;
  *
  * Per creare una nuova istanza usare Comics.createRelease()
  */
-public class Release implements Serializable {
+public class Release {
 
     private long comicsId;
     private int number;

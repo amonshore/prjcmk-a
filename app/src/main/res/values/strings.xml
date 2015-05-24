@@ -43,16 +43,6 @@
     <string name="title_release_group_unknown">Unknown %1</string>
 
     <!-- periodicity -->
-    <string-array name="periodicity_key_array">
-        <item></item>
-        <item>w1</item>
-        <item>M1</item>
-        <item>M2</item>
-        <item>M3</item>
-        <item>M4</item>
-        <item>M6</item>
-        <item>Y1</item>
-    </string-array>
     <string-array name="periodicity_value_array">
         <item>Unknown</item>
         <item>Weekly</item>
@@ -67,6 +57,7 @@
     <!-- comics editor -->
     <string name="editor_comics_name">Name</string>
     <string name="editor_comics_name_empty">Name can not be empty</string>
+    <string name="editor_comics_name_duplicate">Name must be unique</string>
     <string name="editor_comics_publisher">Publisher</string>
     <string name="editor_comics_series">Series</string>
     <string name="editor_comics_authors">Authors</string>

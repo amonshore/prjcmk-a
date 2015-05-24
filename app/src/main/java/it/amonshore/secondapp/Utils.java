@@ -38,6 +38,15 @@ public class Utils {
     }
 
     /**
+     * Log.w(LOG_TAG, msg)
+     *
+     * @param msg
+     */
+    public static void w(String msg) {
+        Log.w(LOG_TAG, msg);
+    }
+
+    /**
      * Log.e(LOG_TAG, msg, err)
      *
      * @param msg
