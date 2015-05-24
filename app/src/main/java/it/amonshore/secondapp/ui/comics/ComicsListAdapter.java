@@ -26,8 +26,6 @@ import it.amonshore.secondapp.data.Release;
  */
 public class ComicsListAdapter extends BaseAdapter {
 
-    public final static int ORDER_ASC = 0;
-    public final static int ORDER_DESC = 1;
     public final static int ORDER_BY_NAME = 2;
     public final static int ORDER_BY_BEST_RELEASE = 4;
 
@@ -62,10 +60,10 @@ public class ComicsListAdapter extends BaseAdapter {
         if (order != mOrder) {
             mOrder = order;
             //TODO impostare il mComparator in base all'ordine
-            if ((order & ORDER_BY_NAME) == ORDER_BY_NAME) {
-                mComparator = new NameComparator((order & ORDER_DESC) == ORDER_DESC);
+            if (order == ORDER_BY_NAME) {
+                mComparator = new NameComparator();
             } else {
-                mComparator = new ReleaseComparator((order & ORDER_DESC) == ORDER_DESC);
+                mComparator = new ReleaseComparator();
             }
             Collections.sort(mSortedIds, mComparator);
         }
@@ -175,41 +173,44 @@ public class ComicsListAdapter extends BaseAdapter {
 
     private class NameComparator implements Comparator<Long> {
 
-        private boolean desc;
-        public NameComparator(boolean desc) {
-            this.desc = desc;
-        }
-
         @Override
         public int compare(Long lhs, Long rhs) {
             //recupero gli elementi in modo da comparare il nome
             Comics lco = ComicsListAdapter.this.mDataManager.getComics(lhs);
             Comics rco = ComicsListAdapter.this.mDataManager.getComics(rhs);
-            if (desc) {
-                return rco.getName().compareToIgnoreCase(lco.getName());
-            } else {
-                return lco.getName().compareToIgnoreCase(rco.getName());
-            }
+            return lco.getName().compareToIgnoreCase(rco.getName());
         }
     }
 
-    private class ReleaseComparator implements Comparator<Long> {
-
-        private boolean desc;
-        public ReleaseComparator(boolean desc) {
-            this.desc = desc;
+    private final static Release emptyRelease = new Release(0) {
+        @Override
+        public int getNumber() {
+            return Integer.MAX_VALUE;
         }
+    };
+
+    private class ReleaseComparator implements Comparator<Long> {
 
         @Override
         public int compare(Long lhs, Long rhs) {
-            //recupero gli elementi in modo da comparare il nome
             Comics lco = ComicsListAdapter.this.mDataManager.getComics(lhs);
             Comics rco = ComicsListAdapter.this.mDataManager.getComics(rhs);
-            //TODO ordinare per release
-            if (!desc) {
-                return rco.getName().compareToIgnoreCase(lco.getName());
-            } else {
+            Release lre = mDataManager.getBestRelease(lco.getId());
+            Release rre = mDataManager.getBestRelease(rco.getId());
+
+            if (lre == null) lre = emptyRelease;
+            if (rre == null) rre = emptyRelease;
+
+            if (lre.getDate() != null && rre.getDate() != null) {
+                return lre.getDate().compareTo(rre.getDate());
+            } else if (lre.getDate() != null && rre.getDate() == null) {
+                return -1;
+            } else if (lre.getDate() == null && rre.getDate() != null) {
+                return 1;
+            } else if (lre.getNumber() == rre.getNumber()) {
                 return lco.getName().compareToIgnoreCase(rco.getName());
+            } else {
+                return lre.getNumber() - rre.getNumber();
             }
         }
     }
