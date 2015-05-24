@@ -86,14 +86,6 @@ public class ComicsListAdapter extends BaseAdapter {
 
     /**
      *
-     * @return
-     */
-    public Comics createNewComics() {
-        return new Comics(mDataManager.getSafeNewComicsId());
-    }
-
-    /**
-     *
      * @param comics
      * @return
      */

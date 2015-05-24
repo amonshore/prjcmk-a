@@ -15,8 +15,6 @@ import android.widget.TextView;
 
 import com.github.clans.fab.FloatingActionButton;
 
-import org.w3c.dom.Text;
-
 import java.text.SimpleDateFormat;
 import java.util.Locale;
 
@@ -36,7 +34,7 @@ import se.emilsjolander.stickylistheaders.StickyListHeadersListView;
  */
 public class ComicsDetailActivity extends ActionBarActivity {
 
-    public final static String EXTRA_ENTRY = "entry";
+    public final static String EXTRA_COMICS_ID = "comicsId";
 
     private Comics mComics;
     private DataManager mDataManager;
@@ -47,10 +45,12 @@ public class ComicsDetailActivity extends ActionBarActivity {
         super.onCreate(savedInstanceState);
         setContentView(R.layout.activity_comics_detail);
         //uso il contesto dell'applicazione, usato anche nell'Activity principale
+        //uso il contesto dell'applicazione, usato anche nell'Activity principale
         mDataManager = DataManager.getDataManager(getApplicationContext());
         //leggo i parametri
         Intent intent = getIntent();
-        mComics = (Comics)intent.getSerializableExtra(EXTRA_ENTRY);
+        //presumo che l'id sia valido
+        mComics = mDataManager.getComics(intent.getLongExtra(EXTRA_COMICS_ID, 0));
         //
         mTxtName = ((TextView)findViewById(R.id.txt_detail_comics_name));
         updateHeader();
@@ -71,8 +71,8 @@ public class ComicsDetailActivity extends ActionBarActivity {
         if (resultCode == Activity.RESULT_OK && requestCode == ComicsEditorActivity.EDIT_COMICS_REQUEST) {
             //l'istanza di comics ritornata dall'activity è "nuova", copio le proprietà
             //TODO non va bene... sto aggiornando l'istanza serializzata di mComics, la lista nella main non viene aggiornata
-            Comics comics = (Comics)data.getSerializableExtra(ComicsEditorActivity.EXTRA_ENTRY);
-            mComics.copyFrom(comics);
+            //long comicsId = data.getLongExtra(ComicsEditorActivity.EXTRA_COMICS_ID, 0);
+            //
             updateHeader();
         }
     }
@@ -83,8 +83,7 @@ public class ComicsDetailActivity extends ActionBarActivity {
 
     private void showComicsEditor(Comics comics, boolean isNew) {
         Intent intent = new Intent(this, ComicsEditorActivity.class);
-        intent.putExtra(ComicsEditorActivity.EXTRA_ENTRY, comics);
-        intent.putExtra(ComicsEditorActivity.EXTRA_IS_NEW, isNew);
+        intent.putExtra(ComicsEditorActivity.EXTRA_COMICS_ID, comics.getId());
         startActivityForResult(intent, ComicsEditorActivity.EDIT_COMICS_REQUEST);
     }
 

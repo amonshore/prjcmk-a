@@ -33,8 +33,8 @@ public class ComicsEditorActivity extends ActionBarActivity implements ItemPicke
 
     public final static int EDIT_COMICS_REQUEST = 1001;
 
-    public final static String EXTRA_ENTRY = "entry";
-    public final static String EXTRA_IS_NEW = "isnew";
+    public final static String EXTRA_COMICS_ID = "entry";
+    public final static long COMICS_ID_NEW = 0;
 
     private Comics mComics;
     private boolean mIsNew;
@@ -54,13 +54,20 @@ public class ComicsEditorActivity extends ActionBarActivity implements ItemPicke
         mDataManager = DataManager.getDataManager(getApplicationContext());
         //leggo i parametri
         Intent intent = getIntent();
-        mComics = (Comics)intent.getSerializableExtra(EXTRA_ENTRY);
-        mIsNew = intent.getBooleanExtra(EXTRA_IS_NEW, true);
-        if (mIsNew) {
+        long comicsId = intent.getLongExtra(EXTRA_COMICS_ID, COMICS_ID_NEW);
+        if (comicsId == COMICS_ID_NEW) {
+            mIsNew = true;
+            mComics = new Comics(mDataManager.getSafeNewComicsId());
             setTitle(R.string.title_activity_comics_editor);
         } else {
+            mIsNew = false;
+            mComics = mDataManager.getComics(comicsId);
             setTitle(mComics.getName());
         }
+        //
+        mPeriodicityKeys = new String[] { Comics.PERIODICITY_UNKNOWN, Comics.PERIODICITY_WEEKLY,
+                Comics.PERIODICITY_MONTHLY, Comics.PERIODICITY_MONTHLY_X2, Comics.PERIODICITY_MONTHLY_X3,
+                Comics.PERIODICITY_MONTHLY_X4, Comics.PERIODICITY_MONTHLY_X6, Comics.PERIODICITY_YEARLY };
         //imposto i valori e creo i listener
         mTxtName = (FloatingLabelEditText)findViewById(R.id.txt_editor_comics_name);
         mTxtName.setInputWidgetText(mComics.getName());
@@ -108,13 +115,7 @@ public class ComicsEditorActivity extends ActionBarActivity implements ItemPicke
                 itemPicker.show(getSupportFragmentManager(), "ItemPicker");
             }
         });
-
-//        ArrayAdapter<CharSequence> adapter = ArrayAdapter.createFromResource(this,
-//                R.array.periodicity_value_array, android.R.layout.simple_spinner_item);
-//        adapter.setDropDownViewResource(android.R.layout.simple_spinner_dropdown_item);
-//        mSpPeriodicity.setAdapter(adapter);
-//        mPeriodicityKeys = getResources().getStringArray(R.array.periodicity_key_array);
-//        mSpPeriodicity.setSelection(Utils.indexOf(mPeriodicityKeys, mComics.getPeriodicity(), 0));
+        mSpPeriodicity.setSelectedIndices(new int[] { Utils.indexOf(mPeriodicityKeys, mComics.getPeriodicity(), 0) });
         //
         checkComicsName();
     }
@@ -165,10 +166,15 @@ public class ComicsEditorActivity extends ActionBarActivity implements ItemPicke
                 mComics.setPeriodicity(mPeriodicityKeys[selPer[0]]);
             }
 
+            if (mIsNew) {
+                if (!mDataManager.put(mComics)) {
+                    Utils.w("Comics editor: comics wasn't new");
+                }
+            }
+
             //
             Intent intent = new Intent();
-            intent.putExtra(EXTRA_ENTRY, mComics);
-            intent.putExtra(EXTRA_IS_NEW, mIsNew);
+            intent.putExtra(EXTRA_COMICS_ID, mComics.getId());
             setResult(Activity.RESULT_OK, intent);
             finish();
 
