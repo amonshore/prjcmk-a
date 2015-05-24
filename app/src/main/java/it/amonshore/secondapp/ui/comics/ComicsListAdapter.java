@@ -7,14 +7,17 @@ import android.view.ViewGroup;
 import android.widget.BaseAdapter;
 import android.widget.TextView;
 
+import java.text.SimpleDateFormat;
 import java.util.ArrayList;
 import java.util.Collections;
 import java.util.Comparator;
+import java.util.Locale;
 
 import it.amonshore.secondapp.R;
 import it.amonshore.secondapp.data.Comics;
 import it.amonshore.secondapp.data.DataManager;
 import it.amonshore.secondapp.Utils;
+import it.amonshore.secondapp.data.Release;
 
 /**
  * Created by Calgia on 07/05/2015.
@@ -33,11 +36,13 @@ public class ComicsListAdapter extends BaseAdapter {
     private ArrayList<Long> mSortedIds;
     private Comparator<Long> mComparator;
     private int mOrder;
+    private SimpleDateFormat mDateFormat;
 
     public ComicsListAdapter(Context context, int order) {
         mContext = context;
         mDataManager = DataManager.getDataManager(context);
         mSortedIds = new ArrayList<>();
+        mDateFormat = new SimpleDateFormat("c dd MMM", Locale.getDefault());
         setOrder(order);
     }
 
@@ -133,19 +138,26 @@ public class ComicsListAdapter extends BaseAdapter {
 
     @Override
     public View getView(int position, View convertView, ViewGroup parent) {
+        //TODO usare un view holder
         if (convertView == null) {
             convertView = LayoutInflater.from(mContext).inflate(R.layout.list_comics_item, null);
             //convertView = LayoutInflater.from(mContext).inflate(android.R.layout.simple_list_item_activated_2, null);
         }
 
         Comics comics = (Comics)getItem(position);
-        //Utils.d("getView @" + position + " id " + comics.getId() + " " + comics.getName());
-        //((TextView)convertView.findViewById(android.R.id.text1)).setText(comics.getName());
-        //((TextView)convertView.findViewById(android.R.id.text2)).setText(comics.getPublisher());
+        Release bestRelease = mDataManager.getBestRelease(comics.getId());
+        if (bestRelease != null) {
+            String relDate = "";
+            if (bestRelease.getDate() != null) {
+                relDate = mDateFormat.format(bestRelease.getDate());
+            }
+            ((TextView) convertView.findViewById(R.id.txt_list_comics_best_release))
+                    .setText(String.format("#%s - %s - p %s", bestRelease.getNumber(), relDate, bestRelease.isPurchased()));
+        } else {
+            ((TextView) convertView.findViewById(R.id.txt_list_comics_best_release)).setText("");
+        }
         ((TextView)convertView.findViewById(R.id.txt_list_comics_name)).setText(comics.getName());
         ((TextView)convertView.findViewById(R.id.txt_list_comics_publisher)).setText(comics.getPublisher());
-        //TODO best release
-        ((TextView)convertView.findViewById(R.id.txt_list_comics_number)).setText(Integer.toString(comics.getReleaseCount()));
 
         return convertView;
     }

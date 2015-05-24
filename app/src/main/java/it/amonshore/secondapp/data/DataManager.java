@@ -69,9 +69,10 @@ public class DataManager {
     private boolean mDataLoaded;
     //
     private TreeMap<Long, Comics> mComicsCache;
-//    private ReleasesTreeMap mReleasesCache;
     //contiene un elenco di tutti gli editori
     private HashSet<String> mPublishers;
+    //contiene la best release per ogni comics
+    private TreeMap<Long, Release> mBestReleases;
     private SimpleDateFormat mDateFormat;
 
     private DataManager(Context context) {
@@ -109,6 +110,7 @@ public class DataManager {
                 Comics comics = json2comics(obj);
                 mComicsCache.put(comics.getId(), comics);
                 putPublisher(comics.getPublisher());
+                updateBestRelease(comics.getId());
             }
             //TODO parse json
         } catch (JSONException jsonex) {
@@ -118,7 +120,6 @@ public class DataManager {
 
     private Comics json2comics(JSONObject obj) throws JSONException {
         Comics comics = new Comics();
-        //{"id":"94225d77-377c-11e4-8352-bb818c016cd9","name":"Saint Young Men","series":null,"publisher":"J-Pop","authors":null,"price":5.9,"periodicity":"","reserved":"F","notes":"Gesù e Buddha","releases":[{"comicsId":"94225d77-377c-11e4-8352-bb818c016cd9","number":5,"date":null,"price":null,"reminder":null,"purchased":"T","_kk":345},{"comicsId":"94225d77-377c-11e4-8352-bb818c016cd9","number":4,"date":null,"price":null,"reminder":null,"purchased":"T","_kk":344},{"comicsId":"94225d77-377c-11e4-8352-bb818c016cd9","number":3,"date":null,"price":null,"reminder":null,"purchased":"T","_kk":343},{"comicsId":"94225d77-377c-11e4-8352-bb818c016cd9","number":2,"date":null,"price":null,"reminder":null,"purchased":"T","_kk":342},{"comicsId":"94225d77-377c-11e4-8352-bb818c016cd9","number":1,"date":null,"price":null,"reminder":null,"purchased":"T","_kk":341},{"comicsId":"94225d77-377c-11e4-8352-bb818c016cd9","number":6,"date":"2014-12-26","price":5.9,"reminder":null,"ordererd":"F","notes":"","purchased":"T","_kk":9805,"ordered":"F"}],"bestRelease":{"comicsId":"94225d77-377c-11e4-8352-bb818c016cd9","number":6,"date":"2014-12-26","price":5.9,"reminder":null,"ordererd":"F","notes":"","purchased":"T","_kk":9805,"ordered":"F"},"lastUpdate":1425505796979}
         //nella versione ionic l'id è una stringa, devo convertirla in long
         comics.setId(tryGetId(obj));
         comics.setName(obj.getString(FIELD_NAME));
@@ -139,7 +140,6 @@ public class DataManager {
     }
 
     private Release json2release(Release release, JSONObject obj) throws JSONException {
-        //{"comicsId":"94225d77-377c-11e4-8352-bb818c016cd9","number":5,"date":null,"price":null,"reminder":null,"purchased":"T","_kk":345}
         release.setNumber(obj.getInt(FIELD_NUMBER));
         release.setDate(tryGetDate(obj, FIELD_DATE));
         release.setPrice(tryGetDouble(obj, FIELD_PRICE));
@@ -268,41 +268,34 @@ public class DataManager {
         return (mComicsCache.remove(id) != null);
     }
 
-//    /**
-//     *
-//     * @param comicsId  id del comics, ALL_COMICS per tutti
-//     * @return
-//     */
-//    public Set<ReleaseId> getReleases(long comicsId) {
-//        //se la cache è vuota oppura contiene dati di un altro comics la rigenero
-//        if (mReleasesCache == null || mReleasesCache.currentComicsId != comicsId) {
-//            mReleasesCache = new ReleasesTreeMap();
-//            mReleasesCache.currentComicsId = comicsId;
-//            Release[] rels;
-//            if (comicsId == ALL_COMICS) {
-//                for (long id : getComics()) {
-//                    rels = getComics(id).getReleases();
-//                    for (Release rel : rels) {
-//                        mReleasesCache.put(new ReleaseId(id, rel.getNumber()), rel);
-//                    }
-//                }
-//            } else {
-//                rels = getComics(comicsId).getReleases();
-//                for (Release rel : rels) {
-//                    mReleasesCache.put(new ReleaseId(comicsId, rel.getNumber()), rel);
-//                }
-//            }
-//        }
-//
-//        return mReleasesCache.keySet();
-//    }
-
     /**
      *
      * @return
      */
     public String[] getPublishers() {
         return mPublishers.toArray(new String[mPublishers.size()]);
+    }
+
+    /**
+     *
+     * @param id
+     * @return
+     */
+    public Release updateBestRelease(long id) {
+        Comics comics = getComics(id);
+        Release release = ComicsBestReleaseHelper.getComicsBestRelease(comics);
+        mBestReleases.put(comics.getId(), release);
+        return release;
+    }
+
+    /**
+     *
+     * @param id
+     * @return
+     */
+    public Release getBestRelease(long id) {
+        Release release = mBestReleases.get(id);
+        return release;
     }
 
     /**
@@ -315,6 +308,7 @@ public class DataManager {
             File file = getDataFile();
             mComicsCache = new TreeMap<>();
             mPublishers = new HashSet<>();
+            mBestReleases = new TreeMap<>();
             Utils.d("readComics " + file.getAbsolutePath());
             if (file.exists()) {
                 try {

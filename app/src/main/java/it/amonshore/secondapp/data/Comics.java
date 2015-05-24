@@ -200,14 +200,4 @@ public class Comics {
         return  null;
     }
 
-    public void copyFrom(Comics comics) {
-        setName(comics.getName());
-        setPeriodicity(comics.getPeriodicity());
-        setPublisher(comics.getPublisher());
-        setAuthors(comics.getAuthors());
-        setNotes(comics.getNotes());
-        setPrice(comics.getPrice());
-        setReserved(comics.isReserved());
-        setSeries(comics.getSeries());
-    }
 }
