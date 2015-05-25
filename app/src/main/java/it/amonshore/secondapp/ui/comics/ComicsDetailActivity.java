@@ -44,6 +44,7 @@ public class ComicsDetailActivity extends ActionBarActivity {
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
         setContentView(R.layout.activity_comics_detail);
+        getSupportActionBar().setDisplayHomeAsUpEnabled(true);
         //uso il contesto dell'applicazione, usato anche nell'Activity principale
         //uso il contesto dell'applicazione, usato anche nell'Activity principale
         mDataManager = DataManager.getDataManager(getApplicationContext());

@@ -9,10 +9,8 @@ import android.text.Editable;
 import android.text.TextUtils;
 import android.view.Menu;
 import android.view.MenuItem;
-import android.view.inputmethod.EditorInfo;
 import android.widget.ArrayAdapter;
 import android.widget.EditText;
-import android.widget.Spinner;
 
 import com.marvinlabs.widget.floatinglabel.autocomplete.FloatingLabelAutoCompleteTextView;
 import com.marvinlabs.widget.floatinglabel.edittext.FloatingLabelEditText;
@@ -50,7 +48,7 @@ public class ComicsEditorActivity extends ActionBarActivity implements ItemPicke
     @Override
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
-        setContentView(R.layout.activity_comics_editor2);
+        setContentView(R.layout.activity_comics_editor);
         //uso il contesto dell'applicazione, usato anche nell'Activity principale
         mDataManager = DataManager.getDataManager(getApplicationContext());
         //leggo i parametri

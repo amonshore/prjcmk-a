@@ -2,28 +2,21 @@
 
     <!-- Base application theme. -->
     <style name="AppTheme" parent="Theme.AppCompat.Light.DarkActionBar">
-        <item name="android:actionBarStyle">@style/YellowActionBarStyle</item>
+        <item name="android:actionBarStyle">@style/AppActionBarStyle</item>
+        <item name="android:windowContentOverlay">@null</item>
 
         <!-- Support library compatibility -->
-        <item name="actionBarStyle">@style/YellowActionBarStyle</item>
+        <item name="actionBarStyle">@style/AppActionBarStyle</item>
     </style>
 
     <!-- ActionBar styles -->
-    <style name="OrangeActionBarStyle"
-        parent="@style/Widget.AppCompat.Light.ActionBar.Solid.Inverse">
-        <item name="android:background">@android:color/holo_orange_dark</item>
+    <style name="AppActionBarStyle"
+        parent="@style/Widget.AppCompat.Light.ActionBar.Solid">
+        <item name="android:background">@color/comikku_primary_color</item>
 
         <!-- Support library compatibility -->
-        <item name="background">@android:color/holo_orange_dark</item>
-    </style>
-
-    <!-- ActionBar styles -->
-    <style name="YellowActionBarStyle"
-        parent="@style/Widget.AppCompat.Light.ActionBar.Solid.Inverse">
-        <item name="android:background">@color/comikku_yellow_light</item>
-
-        <!-- Support library compatibility -->
-        <item name="background">@color/comikku_yellow_light</item>
+        <item name="background">@color/comikku_primary_color</item>
+        <item name="elevation">0dp</item>"
     </style>
 
 </resources>

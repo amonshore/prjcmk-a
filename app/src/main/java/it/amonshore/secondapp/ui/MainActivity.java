@@ -60,14 +60,14 @@ public class MainActivity extends ActionBarActivity implements SharedPreferences
         // Give the SlidingTabLayout the ViewPager
         SlidingTabLayout slidingTabLayout = (SlidingTabLayout) findViewById(R.id.sliding_tabs);
         // Set custom tab layout
-        slidingTabLayout.setCustomTabView(R.layout.custom_tab, 0);
+        slidingTabLayout.setCustomTabView(R.layout.activity_main_tab, 0);
         // Center the tabs in the layout
         slidingTabLayout.setDistributeEvenly(true);
         // Customize tab color
         slidingTabLayout.setCustomTabColorizer(new SlidingTabLayout.TabColorizer() {
             @Override
             public int getIndicatorColor(int position) {
-                return getResources().getColor(R.color.comikku_yellow_light);
+                return getResources().getColor(R.color.comikku_primary_color_900);
             }
         });
         slidingTabLayout.setOnPageChangeListener(new ViewPager.SimpleOnPageChangeListener() {

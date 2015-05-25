@@ -1,4 +1,6 @@
 <?xml version="1.0" encoding="utf-8"?>
 <resources>
-    <color name="comikku_yellow_light">#ffc900</color>
+    <color name="comikku_primary_color">#FBC02D</color>
+    <color name="comikku_primary_color_500">#FFEB3B</color>
+    <color name="comikku_primary_color_900">#F57F17</color>
 </resources>
