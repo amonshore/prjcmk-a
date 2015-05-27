@@ -5,5 +5,5 @@
     android:textSize="14sp"
     android:textStyle="bold"
     android:padding="16dp"
-    android:textColor="@android:color/primary_text_dark"
+    android:textColor="@drawable/color_main_tab"
     android:gravity="center" />

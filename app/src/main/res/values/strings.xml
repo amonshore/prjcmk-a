@@ -24,9 +24,9 @@
     <string name="pref_week_start_on_monday_off">Sunday is the first day of week</string>
 
     <!-- page captions -->
-    <string name="title_page_comics">Comics</string>
-    <string name="title_page_shopping">Releases</string>
-    <string name="title_page_wishlist">Wishlist</string>
+    <string name="title_page_comics">COMICS</string>
+    <string name="title_page_shopping">RELEASES</string>
+    <string name="title_page_wishlist">WISHLIST</string>
 
     <!-- release section titles -->
     <string name="title_release_group_lost">Lost</string>

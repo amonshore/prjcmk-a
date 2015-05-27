@@ -1,0 +1,8 @@
+<?xml version="1.0" encoding="utf-8"?>
+<!-- specifica il colore del test delle tab -->
+<selector xmlns:android="http://schemas.android.com/apk/res/android">
+    <item android:state_selected="true" android:color="@color/comikku_selected_tab_color" />
+    <item android:state_focused="true" android:color="@color/comikku_selected_tab_color" />
+    <item android:state_pressed="true" android:color="@color/comikku_selected_tab_color" />
+    <item android:color="@color/comikku_primary_color_200" />
+</selector> 

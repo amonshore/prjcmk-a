@@ -1,5 +1,6 @@
 package it.amonshore.secondapp;
 
+import android.text.TextUtils;
 import android.text.format.Time;
 import android.util.Log;
 
@@ -17,6 +18,39 @@ public class Utils {
             if (array[ii].equals(value)) return ii;
         }
         return def;
+    }
+
+    /**
+     *
+     * @param str
+     * @return
+     */
+    public final static boolean isNullOrEmpty(CharSequence str) {
+        return (str == null || TextUtils.getTrimmedLength(str) == 0);
+    }
+
+    /**
+     *
+     * @param delimiter
+     * @param excludeEmpty
+     * @param texts
+     * @return
+     */
+    public final static String join(String delimiter, boolean excludeEmpty, CharSequence... texts) {
+        if (texts.length == 0) return "";
+        StringBuilder sb = new StringBuilder();
+        boolean firstTime = true;
+        for (CharSequence text: texts) {
+            if (excludeEmpty && isNullOrEmpty(text)) continue;
+
+            if (firstTime) {
+                firstTime = false;
+            } else {
+                sb.append(delimiter);
+            }
+            sb.append(text);
+        }
+        return sb.toString();
     }
 
     /**
