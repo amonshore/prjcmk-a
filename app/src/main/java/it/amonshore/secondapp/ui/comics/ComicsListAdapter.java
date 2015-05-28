@@ -1,6 +1,7 @@
 package it.amonshore.secondapp.ui.comics;
 
 import android.content.Context;
+import android.text.TextUtils;
 import android.view.LayoutInflater;
 import android.view.View;
 import android.view.ViewGroup;
@@ -138,8 +139,8 @@ public class ComicsListAdapter extends BaseAdapter {
     public View getView(int position, View convertView, ViewGroup parent) {
         //TODO usare un view holder
         if (convertView == null) {
-            convertView = LayoutInflater.from(mContext).inflate(R.layout.list_comics_item, null);
-            //convertView = LayoutInflater.from(mContext).inflate(android.R.layout.simple_list_item_activated_2, null);
+            //convertView = LayoutInflater.from(mContext).inflate(R.layout.list_comics_item, null);
+            convertView = LayoutInflater.from(mContext).inflate(R.layout.list_comics_item2, null);
         }
 
         Comics comics = (Comics)getItem(position);
@@ -149,14 +150,19 @@ public class ComicsListAdapter extends BaseAdapter {
             if (bestRelease.getDate() != null) {
                 relDate = mDateFormat.format(bestRelease.getDate());
             }
-            ((TextView) convertView.findViewById(R.id.txt_list_comics_best_release))
-                    .setText(String.format("#%s - %s - p %s", bestRelease.getNumber(), relDate, bestRelease.isPurchased()));
+//            ((TextView) convertView.findViewById(R.id.txt_list_comics_best_release))
+//                    .setText(String.format("#%s - %s - p %s", bestRelease.getNumber(), relDate, bestRelease.isPurchased()));
+            ((TextView) convertView.findViewById(R.id.txt_list_comics_number)).setText(Integer.toString(bestRelease.getNumber()));
+            ((TextView) convertView.findViewById(R.id.txt_list_comics_date)).setText(relDate);
         } else {
-            ((TextView) convertView.findViewById(R.id.txt_list_comics_best_release)).setText("");
+            //((TextView) convertView.findViewById(R.id.txt_list_comics_best_release)).setText("");
+            ((TextView) convertView.findViewById(R.id.txt_list_comics_number)).setText("");
+            ((TextView) convertView.findViewById(R.id.txt_list_comics_date)).setText("");
         }
         ((TextView)convertView.findViewById(R.id.txt_list_comics_name)).setText(comics.getName());
         ((TextView)convertView.findViewById(R.id.txt_list_comics_publisher)).setText(comics.getPublisher());
-
+        ((TextView)convertView.findViewById(R.id.txt_list_comics_notes))
+                .setText(Utils.join(" - ", true, comics.getAuthors(), comics.getNotes()));
         return convertView;
     }
 

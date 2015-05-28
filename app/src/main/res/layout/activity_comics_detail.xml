@@ -9,15 +9,18 @@
         android:layout_width="match_parent"
         android:layout_height="102dp"
         android:textSize="25sp"
-        android:background="@color/material_blue_grey_800"
-        android:textColor="@color/abc_primary_text_material_dark"
-        android:id="@+id/txt_detail_comics_name"/>
+        android:background="@color/comikku_primary_color"
+        android:textColor="@color/material_blue_grey_800"
+        android:id="@+id/txt_detail_comics_name"
+        android:paddingTop="8dp"
+        android:paddingRight="8dp"
+        android:paddingLeft="60dp"/>
 
     <com.github.clans.fab.FloatingActionButton
         android:id="@+id/fab_comics_edit"
         android:layout_width="wrap_content"
         android:layout_height="wrap_content"
-        android:src="@android:drawable/ic_menu_edit"
+        android:src="@drawable/ic_edit"
         app:fab_size="mini"
         app:fab_elevationCompat="4dp"
         android:layout_marginTop="75dp"

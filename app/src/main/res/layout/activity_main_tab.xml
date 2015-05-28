@@ -4,6 +4,6 @@
     android:layout_height="wrap_content"
     android:textSize="14sp"
     android:textStyle="bold"
-    android:background="?android:selectableItemBackground"
     android:padding="16dp"
+    android:textColor="@drawable/color_main_tab"
     android:gravity="center" />

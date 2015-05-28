@@ -1,4 +1,27 @@
 <?xml version="1.0" encoding="utf-8"?>
 <resources>
-    <color name="comikku_yellow_light">#ffc900</color>
+    <color name="comikku_primary_color">#FBC02D</color>
+    <color name="comikku_primary_color_50">#FFFDE7</color>
+    <color name="comikku_primary_color_100">#FFF9C4</color>
+    <color name="comikku_primary_color_200">#FFF59D</color>
+    <color name="comikku_primary_color_300">#FFF176</color>
+    <color name="comikku_primary_color_400">#FFEE58</color>
+    <color name="comikku_primary_color_500">#FFEB3B</color>
+    <color name="comikku_primary_color_600">#FDD835</color>
+    <color name="comikku_primary_color_700">#FBC02D</color>
+    <color name="comikku_primary_color_800">#F9A825</color>
+    <color name="comikku_primary_color_900">#F57F17</color>
+
+    <color name="comikku_selected_tab_color">#FFFFFF</color>
+
+    <color name="comikku_primary_text">#263238</color>
+    <color name="comikku_secondary_text">#607D8B</color>
+    <color name="comikku_tertiary_text">#CFD8DC</color>
+
+    <color name="comikku_valid_background_color">#CDDC39</color>
+    <color name="comikku_valid_primary_color">#FFFFFF</color>
+
+    <drawable name="comikku_list_item_pressed">#ECEFF1</drawable>
+    <drawable name="comikku_list_item_selected">#CFD8DC</drawable>
+    <drawable name="comikku_list_item">#FFFFFF</drawable>
 </resources>
