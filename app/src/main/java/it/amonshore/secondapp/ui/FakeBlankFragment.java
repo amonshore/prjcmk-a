@@ -69,4 +69,5 @@ public class FakeBlankFragment extends AFragment  {
     public void needDataRefresh(int cause) {
         //
     }
+
 }

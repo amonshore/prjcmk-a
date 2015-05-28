@@ -25,8 +25,11 @@
 
     <!-- page captions -->
     <string name="title_page_comics">COMICS</string>
+    <string name="title_page_releases">RELEASES</string>
+    <string name="title_page_calendar">CALENDAR</string>
     <string name="title_page_shopping">RELEASES</string>
     <string name="title_page_wishlist">WISHLIST</string>
+    <string name="title_page_detail">COMICS</string>
 
     <!-- release section titles -->
     <string name="title_release_group_lost">Lost</string>

@@ -46,6 +46,14 @@ public class ReleaseListFragment extends AFragment {
     private boolean mWeekStartOnMonday;
     private boolean mNeedUpdateOnResume;
 
+    /**
+     *
+     * @return
+     */
+    public int getGroupMode() {
+        return mGroupMode;
+    }
+
     @Override
     public void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);

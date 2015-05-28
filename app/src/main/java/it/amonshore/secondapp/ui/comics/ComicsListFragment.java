@@ -36,6 +36,7 @@ import it.amonshore.secondapp.ui.MainActivity;
  */
 public class ComicsListFragment extends AFragment {
 
+    //usato per lo stato dell'istanza
     private final static String STATE_ORDER = " stateOrder";
 
     private AbsListView mListView;

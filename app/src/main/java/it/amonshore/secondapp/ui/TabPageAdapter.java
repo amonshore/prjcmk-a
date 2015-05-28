@@ -38,7 +38,7 @@ public class TabPageAdapter extends FragmentStatePagerAdapter {
         AFragment frg;
         //
         args = new Bundle();
-        args.putInt(ReleaseListFragment.ARG_MODE, ReleaseGroupHelper.MODE_SHOPPING);
+        args.putInt(ReleaseListFragment.ARG_MODE, ReleaseGroupHelper.MODE_CALENDAR);
         frg = new ReleaseListFragment();
         frg.setArguments(args);
         mPages.add(frg);
@@ -73,14 +73,12 @@ public class TabPageAdapter extends FragmentStatePagerAdapter {
 
     @Override
     public CharSequence getPageTitle(int position) {
-        if (position == PAGE_COMICS) {
+        if (position == 0) {
             return mContext.getString(R.string.title_page_comics);
-        } else if (position == PAGE_SHOPPING) {
-            return mContext.getString(R.string.title_page_shopping);
-        } else if (position == PAGE_LAW) {
-            return mContext.getString(R.string.title_page_wishlist);
+        } else if (position == 1) {
+            return mContext.getString(R.string.title_page_calendar);
         } else {
-            return "Page " + (position + 1);
+            return mContext.getString(R.string.title_page_wishlist);
         }
     }
 
