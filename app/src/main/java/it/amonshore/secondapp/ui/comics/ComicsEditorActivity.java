@@ -32,7 +32,7 @@ public class ComicsEditorActivity extends ActionBarActivity implements ItemPicke
 
     public final static int EDIT_COMICS_REQUEST = 1001;
 
-    public final static String EXTRA_COMICS_ID = "entry";
+    public final static String EXTRA_COMICS_ID = "comicsId";
     public final static long COMICS_ID_NEW = 0;
 
     private Comics mComics;
@@ -41,7 +41,7 @@ public class ComicsEditorActivity extends ActionBarActivity implements ItemPicke
     private boolean bCanSave;
     private String[] mPeriodicityKeys;
 
-    private FloatingLabelEditText mTxtName, mTxtSeries, mTxtAuthors, mTxtPrice;
+    private FloatingLabelEditText mTxtName, mTxtSeries, mTxtAuthors, mTxtPrice, mTxtNotes;
     private FloatingLabelAutoCompleteTextView mTxtPublisher;
     private FloatingLabelItemPicker<String> mSpPeriodicity;
 
@@ -91,6 +91,9 @@ public class ComicsEditorActivity extends ActionBarActivity implements ItemPicke
         //
         mTxtPrice = (FloatingLabelEditText)findViewById(R.id.txt_editor_comics_price);
         mTxtPrice.setInputWidgetText(Double.toString(mComics.getPrice()));
+        //
+        mTxtNotes = (FloatingLabelEditText)findViewById(R.id.txt_editor_comics_notes);
+        mTxtNotes.setInputWidgetText(mComics.getNotes());
         //
         mSpPeriodicity = (FloatingLabelItemPicker<String>)findViewById(R.id.txt_editor_comics_periodicity);
         mSpPeriodicity.setAvailableItems(Arrays.asList(getResources().getStringArray(R.array.periodicity_value_array)));
@@ -162,6 +165,7 @@ public class ComicsEditorActivity extends ActionBarActivity implements ItemPicke
                 mComics.setSeries(getViewText(mTxtSeries.getInputWidget()));
                 mComics.setAuthors(getViewText(mTxtAuthors.getInputWidget()));
                 mComics.setPrice(getViewDouble(mTxtPrice.getInputWidget()));
+                mComics.setNotes(getViewText(mTxtNotes.getInputWidget()));
 
                 int[] selPer = mSpPeriodicity.getSelectedIndices();
                 if (selPer != null && selPer.length > 0) {

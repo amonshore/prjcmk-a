@@ -1,6 +1,7 @@
 <?xml version="1.0" encoding="utf-8"?>
 <RelativeLayout xmlns:android="http://schemas.android.com/apk/res/android"
     xmlns:app="http://schemas.android.com/apk/res-auto"
+    xmlns:tools="http://schemas.android.com/tools"
     android:orientation="vertical"
     android:layout_width="match_parent"
     android:layout_height="match_parent">
@@ -27,10 +28,26 @@
         android:layout_marginLeft="10dp"
         />
 
-    <se.emilsjolander.stickylistheaders.StickyListHeadersListView
-        android:id="@+id/lst_detail_comics"
-        android:layout_below="@id/txt_detail_comics_name"
+    <fragment
         android:layout_width="wrap_content"
-        android:layout_height="wrap_content"/>
+        android:layout_height="wrap_content"
+        android:name="it.amonshore.secondapp.ui.release.ReleaseListFragment"
+        android:id="@+id/frg_release_list"
+        tools:layout="@layout/fragment_releases_list"
+        android:layout_alignParentStart="true"
+        android:layout_below="@+id/txt_detail_comics_name"
+        android:layout_alignParentBottom="true" />
+
+    <com.github.clans.fab.FloatingActionButton
+        android:id="@+id/fab_release_add"
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:layout_gravity="bottom|right"
+        android:layout_marginBottom="@dimen/floating_action_margin_bottom"
+        android:layout_marginRight="@dimen/floating_action_margin_right"
+        android:src="@drawable/ic_plus"
+        app:fab_elevationCompat="@dimen/floating_action_elevation"
+        android:layout_alignBottom="@+id/frg_release_list"
+        android:layout_alignRight="@+id/frg_release_list" />
 
 </RelativeLayout>

@@ -16,6 +16,7 @@ public class Release {
     private double price;
     private boolean reminder;
     private boolean purchased;
+    private String notes;
 
     protected Release(long comicsId) {
         this.comicsId = comicsId;
@@ -63,6 +64,14 @@ public class Release {
 
     public void setPurchased(boolean purchased) {
         this.purchased = purchased;
+    }
+
+    public String getNotes() {
+        return notes;
+    }
+
+    public void setNotes(String notes) {
+        this.notes = notes;
     }
 
     public boolean isWishlist() {

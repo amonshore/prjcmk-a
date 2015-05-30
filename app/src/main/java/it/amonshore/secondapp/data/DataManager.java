@@ -145,6 +145,7 @@ public class DataManager {
         release.setPrice(tryGetDouble(obj, FIELD_PRICE));
         release.setReminder(tryGetBoolean(obj, FIELD_REMINDER));
         release.setPurchased(tryGetBoolean(obj, FIELD_PURCHASED));
+        release.setNotes(tryGetString(obj, FIELD_NOTES));
         return release;
     }
 

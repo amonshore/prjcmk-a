@@ -87,7 +87,7 @@ public class ComicsListFragment extends AFragment {
     @Override
     public View onCreateView(LayoutInflater inflater, ViewGroup container,
                              Bundle savedInstanceState) {
-        View view = inflater.inflate(R.layout.fragment_comics, container, false);
+        View view = inflater.inflate(R.layout.fragment_comics_list, container, false);
 
         // Set the adapter
         mListView = (AbsListView) view.findViewById(android.R.id.list);

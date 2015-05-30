@@ -12,6 +12,7 @@
 
     <string name="selected_items">%1d selected</string>
     <string name="title_activity_comics_editor">New comics</string>
+    <string name="title_activity_release_editor">New release</string>
     <string name="title_activity_comics_detail">Comics detail</string>
 
     <!-- settings -->
@@ -65,4 +66,13 @@
     <string name="editor_comics_authors">Authors</string>
     <string name="editor_comics_price">Price</string>
     <string name="editor_comics_periodicity">Periodicity</string>
+    <string name="editor_comics_notes">Notes</string>
+
+    <!-- release editor -->
+    <string name="editor_release_number">Number</string>
+    <string name="editor_release_number_empty">Number can not be empty</string>
+    <string name="editor_release_number_duplicate">Number must be unique</string>
+    <string name="editor_release_date">Date</string>
+    <string name="editor_release_price">Price</string>
+    <string name="editor_release_notes">Notes</string>
 </resources>

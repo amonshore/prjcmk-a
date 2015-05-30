@@ -54,6 +54,16 @@ public class ReleaseListFragment extends AFragment {
         return mGroupMode;
     }
 
+    /**
+     *
+     * @param comics
+     * @param groupMode
+     */
+    public void setComics(Comics comics, int groupMode) {
+        mComics = comics;
+        mGroupMode = groupMode;
+    }
+
     @Override
     public void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
@@ -77,7 +87,7 @@ public class ReleaseListFragment extends AFragment {
     @Override
     public View onCreateView(LayoutInflater inflater, ViewGroup container,
                              Bundle savedInstanceState) {
-        View view = inflater.inflate(R.layout.fragment_releases, container, false);
+        View view = inflater.inflate(R.layout.fragment_releases_list, container, false);
         StickyListHeadersListView list = (StickyListHeadersListView)view.findViewById(R.id.lst_releases);
         //
         list.setAdapter(mAdapter);

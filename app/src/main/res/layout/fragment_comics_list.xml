@@ -18,9 +18,9 @@
         android:layout_width="wrap_content"
         android:layout_height="wrap_content"
         android:layout_gravity="bottom|right"
-        android:layout_marginBottom="12dp"
-        android:layout_marginRight="16dp"
+        android:layout_marginBottom="@dimen/floating_action_margin_bottom"
+        android:layout_marginRight="@dimen/floating_action_margin_right"
         android:src="@drawable/ic_plus"
-        app:fab_elevationCompat="4dp"/>
+        app:fab_elevationCompat="@dimen/floating_action_elevation"/>
 
 </FrameLayout>
