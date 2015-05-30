@@ -1,36 +1,21 @@
 package it.amonshore.secondapp.ui.comics;
 
 import android.app.Activity;
-import android.content.Context;
 import android.content.Intent;
-import android.content.SharedPreferences;
 import android.os.Bundle;
-import android.preference.PreferenceManager;
 import android.support.v7.app.ActionBarActivity;
-import android.view.LayoutInflater;
 import android.view.View;
-import android.view.ViewGroup;
-import android.widget.BaseAdapter;
 import android.widget.TextView;
 
 import com.github.clans.fab.FloatingActionButton;
 
-import java.text.SimpleDateFormat;
-import java.util.Locale;
-
 import it.amonshore.secondapp.R;
-import it.amonshore.secondapp.Utils;
 import it.amonshore.secondapp.data.Comics;
 import it.amonshore.secondapp.data.DataManager;
-import it.amonshore.secondapp.data.Release;
 import it.amonshore.secondapp.data.ReleaseGroupHelper;
-import it.amonshore.secondapp.data.ReleaseInfo;
 import it.amonshore.secondapp.ui.AFragment;
-import it.amonshore.secondapp.ui.SettingsActivity;
 import it.amonshore.secondapp.ui.release.ReleaseEditorActivity;
 import it.amonshore.secondapp.ui.release.ReleaseListFragment;
-import se.emilsjolander.stickylistheaders.StickyListHeadersAdapter;
-import se.emilsjolander.stickylistheaders.StickyListHeadersListView;
 
 /**
  * Created by Narsenico on 20/05/2015.
@@ -41,6 +26,7 @@ public class ComicsDetailActivity extends ActionBarActivity {
 
     private Comics mComics;
     private DataManager mDataManager;
+    private ReleaseListFragment mReleaseListFragment;
     private TextView mTxtName;
 
     @Override
@@ -73,22 +59,18 @@ public class ComicsDetailActivity extends ActionBarActivity {
             }
         });
         //
-        ReleaseListFragment fragment = ((ReleaseListFragment)getSupportFragmentManager().findFragmentById(R.id.frg_release_list));
-        fragment.setComics(mComics, ReleaseGroupHelper.MODE_COMICS);
-        fragment.needDataRefresh(AFragment.CAUSE_LOADING);
+        mReleaseListFragment = ((ReleaseListFragment)getSupportFragmentManager().findFragmentById(R.id.frg_release_list));
+        mReleaseListFragment.setComics(mComics, ReleaseGroupHelper.MODE_COMICS);
+        mReleaseListFragment.needDataRefresh(AFragment.CAUSE_LOADING);
     }
 
     @Override
     protected void onActivityResult(int requestCode, int resultCode, Intent data) {
         if (resultCode == Activity.RESULT_OK) {
             if (requestCode == ComicsEditorActivity.EDIT_COMICS_REQUEST) {
-                //l'istanza di comics ritornata dall'activity è "nuova", copio le proprietà
-                //TODO non va bene... sto aggiornando l'istanza serializzata di mComics, la lista nella main non viene aggiornata
-                //long comicsId = data.getLongExtra(ComicsEditorActivity.EXTRA_COMICS_ID, 0);
-                //
                 updateHeader();
             } else if (requestCode == ReleaseEditorActivity.EDIT_RELEASE_REQUEST) {
-                //TODO aggiorna lista
+                mReleaseListFragment.needDataRefresh(AFragment.CAUSE_DATA_CHANGED);
             }
         }
     }

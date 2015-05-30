@@ -71,6 +71,7 @@
     <!-- release editor -->
     <string name="editor_release_number">Number</string>
     <string name="editor_release_number_empty">Number can not be empty</string>
+    <string name="editor_release_number_negative">Number can not be negative</string>
     <string name="editor_release_number_duplicate">Number must be unique</string>
     <string name="editor_release_date">Date</string>
     <string name="editor_release_price">Price</string>

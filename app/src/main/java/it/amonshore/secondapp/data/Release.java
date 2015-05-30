@@ -20,6 +20,7 @@ public class Release {
 
     protected Release(long comicsId) {
         this.comicsId = comicsId;
+        this.number = -1;
     }
 
     public long getComicsId() {

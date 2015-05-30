@@ -133,7 +133,7 @@ public class DataManager {
         //prelevo le release
         JSONArray arrReleases = obj.getJSONArray(FIELD_RELEASES);
         for (int ii = 0; ii < arrReleases.length(); ii++) {
-            comics.putRelease(json2release(comics.createRelease(), arrReleases.getJSONObject(ii)));
+            comics.putRelease(json2release(comics.createRelease(false), arrReleases.getJSONObject(ii)));
         }
 
         return comics;

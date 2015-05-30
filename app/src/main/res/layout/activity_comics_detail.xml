@@ -24,9 +24,12 @@
         android:src="@drawable/ic_edit"
         app:fab_size="mini"
         app:fab_elevationCompat="4dp"
-        android:layout_marginTop="75dp"
-        android:layout_marginLeft="10dp"
-        />
+        app:fab_colorNormal="@color/comikku_primary_color"
+        app:fab_colorPressed="@color/comikku_primary_color_500"
+        android:layout_above="@+id/frg_release_list"
+        android:layout_alignParentStart="true"
+        android:layout_marginLeft="14dp"
+        android:layout_marginBottom="-14dp" />
 
     <fragment
         android:layout_width="wrap_content"

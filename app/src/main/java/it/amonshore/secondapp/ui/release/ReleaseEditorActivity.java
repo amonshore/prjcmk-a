@@ -11,8 +11,13 @@ import android.view.Menu;
 import android.view.MenuItem;
 import android.widget.EditText;
 
+import com.android.datetimepicker.date.DatePickerDialog;
 import com.marvinlabs.widget.floatinglabel.edittext.FloatingLabelEditText;
 import com.marvinlabs.widget.floatinglabel.instantpicker.FloatingLabelDatePicker;
+import com.marvinlabs.widget.floatinglabel.instantpicker.FloatingLabelInstantPicker;
+import com.marvinlabs.widget.floatinglabel.instantpicker.JavaDateInstant;
+
+import java.util.GregorianCalendar;
 
 import it.amonshore.secondapp.R;
 import it.amonshore.secondapp.Utils;
@@ -34,10 +39,9 @@ public class ReleaseEditorActivity extends ActionBarActivity {
     private Release mRelease;
     private boolean mIsNew;
     private DataManager mDataManager;
-    private boolean bCanSave;
 
     private FloatingLabelEditText mTxtNumber, mTxtPrice, mTxtNotes;
-    private FloatingLabelDatePicker mTxtDate;
+    private FloatingLabelDatePicker<JavaDateInstant> mTxtDate;
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
@@ -53,8 +57,7 @@ public class ReleaseEditorActivity extends ActionBarActivity {
         setTitle(mComics.getName());
         if (releaseNumber == RELEASE_NEW) {
             mIsNew = true;
-            //TODO imposta in automatico i valori di number e date
-            mRelease = mComics.createRelease();
+            mRelease = mComics.createRelease(true);
         } else {
             mIsNew = false;
             mRelease = mComics.getRelease(releaseNumber);
@@ -63,14 +66,34 @@ public class ReleaseEditorActivity extends ActionBarActivity {
         //imposto i valori e creo i listener
         mTxtNumber = (FloatingLabelEditText)findViewById(R.id.txt_editor_release_number);
         mTxtNumber.setInputWidgetText(Integer.toString(mRelease.getNumber()));
-        mTxtNumber.addInputWidgetTextChangedListener(new SimpleTextWatcher() {
+        //
+        //TODO come si fa ad annullare la data???
+        mTxtDate = (FloatingLabelDatePicker<JavaDateInstant>)findViewById(R.id.txt_editor_release_date);
+        final JavaDateInstant instant;
+        if (mRelease.getDate() == null) {
+            instant = new JavaDateInstant();
+            //non impostare setSelectedInstant
+        } else {
+            GregorianCalendar calendar = new GregorianCalendar();
+            calendar.setTime(mRelease.getDate());
+            instant = new JavaDateInstant(calendar);
+            mTxtDate.setSelectedInstant(instant);
+        }
+        mTxtDate.setWidgetListener(new FloatingLabelInstantPicker.OnWidgetEventListener() {
             @Override
-            public void afterTextChanged(Editable s) {
-                checkReleaseNumber();
+            public void onShowInstantPickerDialog(FloatingLabelInstantPicker floatingLabelInstantPicker) {
+                DatePickerDialog.newInstance(new DatePickerDialog.OnDateSetListener() {
+                    @Override
+                    public void onDateSet(DatePickerDialog datePickerDialog, int year, int monthOfYear, int dayOfMonth) {
+                        //
+                        instant.setYear(year);
+                        instant.setMonthOfYear(monthOfYear - 1);
+                        instant.setDayOfMonth(dayOfMonth);
+                        mTxtDate.setSelectedInstant(instant);
+                    }
+                }, instant.getYear(), instant.getMonthOfYear() + 1, instant.getDayOfMonth()).show(getFragmentManager(), "datePicker");
             }
         });
-        //
-        //TODO mTxtDate
         //
         mTxtPrice = (FloatingLabelEditText)findViewById(R.id.txt_editor_release_price);
         mTxtPrice.setInputWidgetText(Double.toString(mRelease.getPrice()));
@@ -78,7 +101,7 @@ public class ReleaseEditorActivity extends ActionBarActivity {
         mTxtNotes = (FloatingLabelEditText)findViewById(R.id.txt_editor_release_notes);
         mTxtNotes.setInputWidgetText(mRelease.getNotes());
         //
-        checkReleaseNumber();
+        //TODO purchased, etc
     }
 
     @Override
@@ -89,14 +112,6 @@ public class ReleaseEditorActivity extends ActionBarActivity {
     }
 
     @Override
-    public boolean onPrepareOptionsMenu(Menu menu) {
-        menu.findItem(R.id.action_save).setEnabled(bCanSave);
-        return true;
-    }
-
-    private AlertDialog mAlertDialog;
-
-    @Override
     public boolean onOptionsItemSelected(MenuItem item) {
         // Handle action bar item clicks here. The action bar will
         // automatically handle clicks on the Home/Up button, so long
@@ -105,12 +120,21 @@ public class ReleaseEditorActivity extends ActionBarActivity {
 
         //noinspection SimplifiableIfStatement
         if (id == R.id.action_save) {
-            if (isReleaseNumberValid()) {
+            if (validateAll()) {
                 //TODO eseguire i controlli sui dati
                 //preparo i dati per la risposta
-                mRelease.setNumber(getViewInt(mTxtNumber.getInputWidget()));
-                //TODO set date
-                mComics.setNotes(getViewText(mTxtNotes.getInputWidget()));
+                mRelease.setNumber(getViewInt(mTxtNumber.getInputWidget(),0));
+                mRelease.setPrice(getViewDouble(mTxtPrice.getInputWidget()));
+                mRelease.setNotes(getViewText(mTxtNotes.getInputWidget()));
+                JavaDateInstant instant = mTxtDate.getSelectedInstant();
+                if (instant == null) {
+                    mRelease.setDate(null);
+                } else {
+                    GregorianCalendar calendar = new GregorianCalendar(instant.getYear(),
+                            instant.getMonthOfYear() + 1, instant.getDayOfMonth());
+                    mRelease.setDate(calendar.getTime());
+                }
+                //TODO purchased, etc
 
                 if (mIsNew) {
                     if (!mComics.putRelease(mRelease)) {
@@ -123,16 +147,7 @@ public class ReleaseEditorActivity extends ActionBarActivity {
                 intent.putExtra(EXTRA_RELEASE_NUMBER, mRelease.getNumber());
                 setResult(Activity.RESULT_OK, intent);
                 finish();
-            } else {
-                if (mAlertDialog == null) {
-                    AlertDialog.Builder builder = new AlertDialog.Builder(this);
-                    builder.setPositiveButton(android.R.string.ok, null);
-                    builder.setMessage(R.string.editor_release_number_duplicate);
-                    mAlertDialog = builder.create();
-                }
-                mAlertDialog.show();
             }
-
             return true;
         }
 
@@ -143,11 +158,11 @@ public class ReleaseEditorActivity extends ActionBarActivity {
         return view.getText().toString().trim();
     }
 
-    private int getViewInt(EditText view) {
+    private int getViewInt(EditText view, int def) {
         try {
             return Integer.parseInt(view.getText().toString());
         } catch (NumberFormatException nfex) {
-            return 0;
+            return def;
         }
     }
 
@@ -159,26 +174,34 @@ public class ReleaseEditorActivity extends ActionBarActivity {
         }
     }
 
-    private void checkReleaseNumber() {
-        //TODO rivedere i controlli, soprattutto unique che sempra lento
+    private boolean validateAll() {
         if (TextUtils.getTrimmedLength(mTxtNumber.getInputWidgetText()) == 0) {
             mTxtNumber.getInputWidget().setError(getString(R.string.editor_release_number_empty));
-            bCanSave = false;
+            return false;
         } else {
-            mTxtNumber.getInputWidget().setError(null);
-            bCanSave = true;
-        }
-
-        invalidateOptionsMenu();
-    }
-
-    private boolean isReleaseNumberValid() {
-        if (mIsNew) {
-            return (mComics.getRelease(getViewInt(mTxtNumber.getInputWidget())) == null);
-        } else {
-            //se non è nuovo, può essere uguale a quello attuale
-            Release release = mComics.getRelease(getViewInt(mTxtNumber.getInputWidget()));
-            return (release == null || release.getNumber() == mRelease.getNumber());
+            int number = getViewInt(mTxtNumber.getInputWidget(), -1);
+            if (number < 0) {
+                mTxtNumber.getInputWidget().setError(getString(R.string.editor_release_number_negative));
+                return false;
+            }else if (mIsNew) {
+                if (mComics.getRelease(number) == null) {
+                    mTxtNumber.getInputWidget().setError(null);
+                    return true;
+                } else {
+                    mTxtNumber.getInputWidget().setError(getString(R.string.editor_release_number_duplicate));
+                    return false;
+                }
+            } else {
+                //se non è nuovo, può essere uguale a quello attuale
+                Release release = mComics.getRelease(number);
+                if (release == null || release.getNumber() == mRelease.getNumber()) {
+                    mTxtNumber.getInputWidget().setError(null);
+                    return true;
+                } else {
+                    mTxtNumber.getInputWidget().setError(getString(R.string.editor_release_number_duplicate));
+                    return false;
+                }
+            }
         }
     }
 
