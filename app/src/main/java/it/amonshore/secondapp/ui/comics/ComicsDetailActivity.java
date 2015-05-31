@@ -33,8 +33,6 @@ public class ComicsDetailActivity extends ActionBarActivity {
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
         setContentView(R.layout.activity_comics_detail);
-        getSupportActionBar().setDisplayHomeAsUpEnabled(true);
-        //uso il contesto dell'applicazione, usato anche nell'Activity principale
         //uso il contesto dell'applicazione, usato anche nell'Activity principale
         mDataManager = DataManager.getDataManager(getApplicationContext());
         //leggo i parametri
@@ -55,7 +53,7 @@ public class ComicsDetailActivity extends ActionBarActivity {
         ((FloatingActionButton)findViewById(R.id.fab_release_add)).setOnClickListener(new View.OnClickListener() {
             @Override
             public void onClick(View v) {
-                showReleaseEditor(mComics, -1);
+                showReleaseEditor(mComics.getId(), -1);
             }
         });
         //
@@ -66,6 +64,9 @@ public class ComicsDetailActivity extends ActionBarActivity {
 
     @Override
     protected void onActivityResult(int requestCode, int resultCode, Intent data) {
+        //devo richiamare super per far gestire il risultato dal fragment
+        super.onActivityResult(requestCode, resultCode, data);
+        //
         if (resultCode == Activity.RESULT_OK) {
             if (requestCode == ComicsEditorActivity.EDIT_COMICS_REQUEST) {
                 updateHeader();
@@ -85,103 +86,11 @@ public class ComicsDetailActivity extends ActionBarActivity {
         startActivityForResult(intent, ComicsEditorActivity.EDIT_COMICS_REQUEST);
     }
 
-    private void showReleaseEditor(Comics comics, int number) {
+    private void showReleaseEditor(long comicsId, int number) {
         Intent intent = new Intent(this, ReleaseEditorActivity.class);
-        intent.putExtra(ReleaseEditorActivity.EXTRA_COMICS_ID, mComics.getId());
+        intent.putExtra(ReleaseEditorActivity.EXTRA_COMICS_ID, comicsId);
         intent.putExtra(ReleaseEditorActivity.EXTRA_RELEASE_NUMBER, number);
         startActivityForResult(intent, ReleaseEditorActivity.EDIT_RELEASE_REQUEST);
     }
 
-//    final class ReleasesAdapter extends BaseAdapter implements StickyListHeadersAdapter {
-//
-//        private ReleaseInfo[] mReleaseInfos;
-//        private LayoutInflater mInflater;
-//        private SimpleDateFormat mDateFormat;
-//
-//        public ReleasesAdapter(Context context, Comics comics) {
-//            mInflater = LayoutInflater.from(context);
-//            mDateFormat = new SimpleDateFormat("c dd MMM", Locale.getDefault());
-//            //creo gli elementi per la lista
-//            SharedPreferences sharedPref = PreferenceManager.getDefaultSharedPreferences(context);
-//            boolean groupByMonth = sharedPref.getBoolean(SettingsActivity.KEY_PREF_GROUP_BY_MONTH, false);
-//            boolean weekStartOnMonday = sharedPref.getBoolean(SettingsActivity.KEY_PREF_WEEK_START_ON_MONDAY, false);
-//            ReleaseGroupHelper helper = new ReleaseGroupHelper(ReleaseGroupHelper.MODE_COMICS, groupByMonth, weekStartOnMonday);
-//            helper.addReleases(comics.getReleases());
-//            mReleaseInfos = helper.getReleaseInfos();
-//        }
-//
-//        @Override
-//        public int getCount() {
-//            return mReleaseInfos.length;
-//        }
-//
-//        @Override
-//        public Object getItem(int position) {
-//            return mReleaseInfos[position];
-//        }
-//
-//        @Override
-//        public long getItemId(int position) {
-//            return position;
-//        }
-//
-//        @Override
-//        public View getView(int position, View convertView, ViewGroup parent) {
-//            ViewHolder holder;
-//
-//            if (convertView == null) {
-//                holder = new ViewHolder();
-//                convertView = mInflater.inflate(R.layout.list_release_item, parent, false);
-//                holder.txtName = (TextView) convertView.findViewById(R.id.txt_list_release_name);
-//                holder.txtInfo = (TextView) convertView.findViewById(R.id.txt_list_release_info);
-//                convertView.setTag(holder);
-//            } else {
-//                holder = (ViewHolder) convertView.getTag();
-//            }
-//
-//            Release release = mReleaseInfos[position].getRelease();
-//            String relDate = "";
-//            if (release.getDate() != null) {
-//                relDate = mDateFormat.format(release.getDate());
-//            }
-//            holder.txtName.setText(Integer.toString(mReleaseInfos[position].getRelease().getNumber()));
-//            holder.txtInfo.setText(String.format("#%s - %s - p %s", release.getNumber(), relDate, release.isPurchased()));
-//
-//            return convertView;
-//        }
-//
-//        @Override
-//        public View getHeaderView(int position, View convertView, ViewGroup parent) {
-//            HeaderViewHolder holder;
-//            if (convertView == null) {
-//                Utils.d("getHeaderView " + position);
-//                holder = new HeaderViewHolder();
-//                convertView = mInflater.inflate(R.layout.list_release_header, parent, false);
-//                holder.text = (TextView) convertView.findViewById(R.id.txt_list_release_header);
-//                convertView.setTag(holder);
-//            } else {
-//                holder = (HeaderViewHolder) convertView.getTag();
-//            }
-//            //set header text as first char in name
-//            String headerText = "Group " + mReleaseInfos[position].getGroup();
-//            holder.text.setText(headerText);
-//            return convertView;
-//        }
-//
-//        @Override
-//        public long getHeaderId(int position) {
-//            //return the first character of the country as ID because this is what headers are based upon
-//            return mReleaseInfos[position].getGroup();
-//        }
-//
-//        class HeaderViewHolder {
-//            TextView text;
-//        }
-//
-//        class ViewHolder {
-//            TextView txtName;
-//            TextView txtInfo;
-//        }
-//
-//    }
 }

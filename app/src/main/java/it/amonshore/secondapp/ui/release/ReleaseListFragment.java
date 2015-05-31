@@ -1,5 +1,6 @@
 package it.amonshore.secondapp.ui.release;
 
+import android.app.Activity;
 import android.content.Intent;
 import android.content.SharedPreferences;
 import android.os.AsyncTask;
@@ -97,8 +98,8 @@ public class ReleaseListFragment extends AFragment {
         mListView.setOnItemClickListener(new AdapterView.OnItemClickListener() {
             @Override
             public void onItemClick(AdapterView<?> parent, View view, int position, long id) {
-                Utils.d("onItemClick " + ((ReleaseInfo) mAdapter.getItem(position)).getRelease().getNumber());
-                //TODO showReleaseEditor((ReleaseId) mAdapter.getItem(position), false);
+                Release release = ((ReleaseInfo) mAdapter.getItem(position)).getRelease();
+                showReleaseEditor(release.getComicsId(), release.getNumber());
             }
         });
         mListView.setMultiChoiceModeListener(new AbsListView.MultiChoiceModeListener() {
@@ -153,7 +154,11 @@ public class ReleaseListFragment extends AFragment {
 
     @Override
     public void onActivityResult(int requestCode, int resultCode, Intent data) {
-        //TODO risponde all'editor delle release
+        if (resultCode == Activity.RESULT_OK) {
+            if (requestCode == ReleaseEditorActivity.EDIT_RELEASE_REQUEST) {
+                needDataRefresh(AFragment.CAUSE_DATA_CHANGED);
+            }
+        }
     }
 
     /**
@@ -201,12 +206,11 @@ public class ReleaseListFragment extends AFragment {
         }
     }
 
-    private void showReleaseEditor(ReleaseInfo releaseInfo, boolean isNew) {
-        //TODO apri editor release
-//        Intent intent = new Intent(getActivity(), ComicsEditorActivity.class);
-//        intent.putExtra(ComicsEditorActivity.EXTRA_ENTRY, comics);
-//        intent.putExtra(ComicsEditorActivity.EXTRA_IS_NEW, isNew);
-//        startActivityForResult(intent, ComicsEditorActivity.EDIT_COMICS_REQUEST);
+    private void showReleaseEditor(long comicsId, int number) {
+        Intent intent = new Intent(getActivity(), ReleaseEditorActivity.class);
+        intent.putExtra(ReleaseEditorActivity.EXTRA_COMICS_ID, comicsId);
+        intent.putExtra(ReleaseEditorActivity.EXTRA_RELEASE_NUMBER, number);
+        startActivityForResult(intent, ReleaseEditorActivity.EDIT_RELEASE_REQUEST);
     }
 
     /**

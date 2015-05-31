@@ -133,6 +133,14 @@ public class ReleaseEditorActivity extends ActionBarActivity {
     }
 
     @Override
+    public Intent getSupportParentActivityIntent() {
+        //TODO creare l'intent che carica la corretta activity
+        //  se sono arrivato qua da comics detail ComicsDetailActivity
+        //  altrimenti MainActivity
+        return super.getSupportParentActivityIntent();
+    }
+
+    @Override
     public boolean onCreateOptionsMenu(Menu menu) {
         // Inflate the menu; this adds items to the action bar if it is present.
         getMenuInflater().inflate(R.menu.menu_release_editor, menu);

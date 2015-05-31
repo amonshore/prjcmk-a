@@ -94,11 +94,6 @@ public class MainActivity extends ActionBarActivity implements SharedPreferences
     }
 
     @Override
-    protected void onResume() {
-        super.onResume();
-    }
-
-    @Override
     protected void onPostResume() {
         super.onPostResume();
         new ReadDataAsyncTask().execute();
