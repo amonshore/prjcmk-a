@@ -45,6 +45,7 @@ public class DataManager {
     private final static String FIELD_DATE = "date";
     private final static String FIELD_REMINDER = "reminder";
     private final static String FIELD_PURCHASED = "purchased";
+    private final static String FIELD_ORDERED = "ordered";
 
     //
     private static DataManager instance;
@@ -133,7 +134,7 @@ public class DataManager {
         //prelevo le release
         JSONArray arrReleases = obj.getJSONArray(FIELD_RELEASES);
         for (int ii = 0; ii < arrReleases.length(); ii++) {
-            comics.putRelease(json2release(comics.createRelease(), arrReleases.getJSONObject(ii)));
+            comics.putRelease(json2release(comics.createRelease(false), arrReleases.getJSONObject(ii)));
         }
 
         return comics;
@@ -144,7 +145,9 @@ public class DataManager {
         release.setDate(tryGetDate(obj, FIELD_DATE));
         release.setPrice(tryGetDouble(obj, FIELD_PRICE));
         release.setReminder(tryGetBoolean(obj, FIELD_REMINDER));
+        release.setOrdered(tryGetBoolean(obj, FIELD_ORDERED));
         release.setPurchased(tryGetBoolean(obj, FIELD_PURCHASED));
+        release.setNotes(tryGetString(obj, FIELD_NOTES));
         return release;
     }
 

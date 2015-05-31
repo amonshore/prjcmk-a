@@ -73,7 +73,7 @@ public class ReleaseListAdapter extends BaseAdapter implements StickyListHeaders
      * @return
      */
     public Release createNewRelease(Comics comics) {
-        return comics.createRelease();
+        return comics.createRelease(true);
     }
 
     /**

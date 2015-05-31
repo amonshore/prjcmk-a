@@ -121,10 +121,24 @@ public class Comics {
 
     /**
      * Crea una nuova release associata a questo fumetto. La release non viene aggiunta all'elenco: usare addRelease().
+     * @param autoFill se true imposta in automatico numero, data e prezzo
      * @return  nuova release
      */
-    public Release createRelease() {
-        return new Release(this.getId());
+    public Release createRelease(boolean autoFill) {
+        Release newRelease = new Release(this.getId());
+        if (autoFill) {
+            //TODO calcolare numero e data
+            int number = 0;
+            for (Release release : releases) {
+                if (number <= release.getNumber()) {
+                    number = release.getNumber();
+                }
+            }
+            newRelease.setNumber(number+1);
+            //TODO newRelease.setDate();
+            newRelease.setPrice(this.getPrice());
+        }
+        return newRelease;
     }
 
     /**

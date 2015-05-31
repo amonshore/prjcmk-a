@@ -26,7 +26,7 @@ public class ReleaseGroupHelper {
      */
     public final static int MODE_CALENDAR = 2;
     /**
-     * Modalità persi & desiderati: persi, wishlist
+     * Modalità persi & desiderati: scaduti, wishlist
      */
     public final static int MODE_LAW = 3;
     /**

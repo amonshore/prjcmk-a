@@ -15,10 +15,13 @@ public class Release {
     private Date date;
     private double price;
     private boolean reminder;
+    private boolean ordered;
     private boolean purchased;
+    private String notes;
 
     protected Release(long comicsId) {
         this.comicsId = comicsId;
+        this.number = -1;
     }
 
     public long getComicsId() {
@@ -57,12 +60,28 @@ public class Release {
         this.reminder = reminder;
     }
 
+    public boolean isOrdered() {
+        return ordered;
+    }
+
+    public void setOrdered(boolean ordered) {
+        this.ordered = ordered;
+    }
+
     public boolean isPurchased() {
         return purchased;
     }
 
     public void setPurchased(boolean purchased) {
         this.purchased = purchased;
+    }
+
+    public String getNotes() {
+        return notes;
+    }
+
+    public void setNotes(String notes) {
+        this.notes = notes;
     }
 
     public boolean isWishlist() {

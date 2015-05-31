@@ -38,6 +38,14 @@
                 android:value="it.amonshore.secondapp.ui.MainActivity" />
         </activity>
         <activity
+            android:name=".ui.release.ReleaseEditorActivity"
+            android:label="@string/title_activity_release_editor"
+            android:parentActivityName=".ui.MainActivity" >
+            <meta-data
+                android:name="android.support.PARENT_ACTIVITY"
+                android:value="it.amonshore.secondapp.ui.MainActivity" />
+        </activity>
+        <activity
             android:name=".ui.comics.ComicsDetailActivity"
             android:label="@string/title_activity_comics_detail"
             android:parentActivityName=".ui.MainActivity" >
