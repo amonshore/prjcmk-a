@@ -32,7 +32,8 @@
         <activity
             android:name=".ui.comics.ComicsEditorActivity"
             android:label="@string/title_activity_comics_editor"
-            android:parentActivityName=".ui.MainActivity" >
+            android:parentActivityName=".ui.MainActivity"
+            android:windowSoftInputMode="stateUnchanged" >
             <meta-data
                 android:name="android.support.PARENT_ACTIVITY"
                 android:value="it.amonshore.secondapp.ui.MainActivity" />
@@ -40,7 +41,8 @@
         <activity
             android:name=".ui.release.ReleaseEditorActivity"
             android:label="@string/title_activity_release_editor"
-            android:parentActivityName=".ui.MainActivity" >
+            android:parentActivityName=".ui.MainActivity"
+            android:windowSoftInputMode="stateUnchanged" >
             <meta-data
                 android:name="android.support.PARENT_ACTIVITY"
                 android:value="it.amonshore.secondapp.ui.MainActivity" />
