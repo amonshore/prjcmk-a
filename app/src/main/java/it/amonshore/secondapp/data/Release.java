@@ -15,6 +15,7 @@ public class Release {
     private Date date;
     private double price;
     private boolean reminder;
+    private boolean ordered;
     private boolean purchased;
     private String notes;
 
@@ -57,6 +58,14 @@ public class Release {
 
     public void setReminder(boolean reminder) {
         this.reminder = reminder;
+    }
+
+    public boolean isOrdered() {
+        return ordered;
+    }
+
+    public void setOrdered(boolean ordered) {
+        this.ordered = ordered;
     }
 
     public boolean isPurchased() {

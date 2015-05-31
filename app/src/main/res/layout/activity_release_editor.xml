@@ -14,10 +14,9 @@
         android:layout_width="fill_parent"
         android:layout_height="wrap_content">
 
-            <LinearLayout
+            <RelativeLayout
                 android:layout_width="fill_parent"
-                android:layout_height="wrap_content"
-                android:orientation="vertical">
+                android:layout_height="wrap_content">
 
                 <com.marvinlabs.widget.floatinglabel.edittext.FloatingLabelEditText
                     android:id="@+id/txt_editor_release_number"
@@ -33,15 +32,18 @@
                     android:id="@+id/txt_editor_release_date"
                     android:inputType="date"
                     android:layout_marginBottom="10dp"
-                    app:flw_labelText="@string/editor_release_date" />
+                    app:flw_labelText="@string/editor_release_date"
+                    android:drawableRight="@drawable/ic_close_circle_16"
+                    android:layout_below="@+id/txt_editor_release_number" />
 
                 <com.marvinlabs.widget.floatinglabel.edittext.FloatingLabelEditText
                     android:layout_width="match_parent"
                     android:layout_height="wrap_content"
                     android:id="@+id/txt_editor_release_price"
                     android:inputType="numberDecimal"
-                    android:layout_marginBottom="10dp"
-                    app:flw_labelText="@string/editor_release_price" />
+                    android:layout_marginBottom="20dp"
+                    app:flw_labelText="@string/editor_release_price"
+                    android:layout_below="@+id/txt_editor_release_date" />
 
                 <com.marvinlabs.widget.floatinglabel.edittext.FloatingLabelEditText
                     android:id="@+id/txt_editor_release_notes"
@@ -49,9 +51,28 @@
                     android:layout_height="wrap_content"
                     android:inputType="text|textNoSuggestions|textCapSentences|textMultiLine"
                     android:layout_marginBottom="10dp"
-                    app:flw_labelText="@string/editor_release_notes" />
+                    app:flw_labelText="@string/editor_release_notes"
+                    android:layout_below="@+id/chk_editor_release_ordered" />
 
-            </LinearLayout>
+                <Switch
+                    android:layout_width="match_parent"
+                    android:layout_height="wrap_content"
+                    android:id="@+id/chk_editor_release_purchased"
+                    android:text="@string/editor_release_purchased"
+                    android:layout_marginBottom="20dp"
+                    android:layout_below="@+id/txt_editor_release_price"
+                    android:textColor="@android:color/tertiary_text_light" />
+
+                <Switch
+                    android:layout_width="match_parent"
+                    android:layout_height="wrap_content"
+                    android:id="@+id/chk_editor_release_ordered"
+                    android:text="@string/editor_release_ordered"
+                    android:layout_marginBottom="20dp"
+                    android:layout_below="@+id/chk_editor_release_purchased"
+                    android:textColor="@android:color/tertiary_text_light" />
+
+            </RelativeLayout>
     </ScrollView>
 
 </LinearLayout>

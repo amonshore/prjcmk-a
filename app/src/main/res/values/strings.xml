@@ -76,4 +76,6 @@
     <string name="editor_release_date">Date</string>
     <string name="editor_release_price">Price</string>
     <string name="editor_release_notes">Notes</string>
+    <string name="editor_release_purchased">Purchased</string>
+    <string name="editor_release_ordered">Ordered</string>
 </resources>

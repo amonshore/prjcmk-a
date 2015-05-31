@@ -9,7 +9,13 @@ import android.text.Editable;
 import android.text.TextUtils;
 import android.view.Menu;
 import android.view.MenuItem;
+import android.view.MotionEvent;
+import android.view.View;
+import android.widget.Button;
 import android.widget.EditText;
+import android.widget.ImageButton;
+import android.widget.Switch;
+import android.widget.TextView;
 
 import com.android.datetimepicker.date.DatePickerDialog;
 import com.marvinlabs.widget.floatinglabel.edittext.FloatingLabelEditText;
@@ -42,6 +48,7 @@ public class ReleaseEditorActivity extends ActionBarActivity {
 
     private FloatingLabelEditText mTxtNumber, mTxtPrice, mTxtNotes;
     private FloatingLabelDatePicker<JavaDateInstant> mTxtDate;
+    private Switch mChkPurchased, mChkOrdered;
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
@@ -94,6 +101,23 @@ public class ReleaseEditorActivity extends ActionBarActivity {
                 }, instant.getYear(), instant.getMonthOfYear() + 1, instant.getDayOfMonth()).show(getFragmentManager(), "datePicker");
             }
         });
+        //http://stackoverflow.com/questions/10666174/implement-onclick-only-for-a-textview-compound-drawable
+        //al touch sull'icona alla destra della textview, pulisco la data
+        //  l'icona è definita nel layout come drawableRight
+        mTxtDate.getInputWidget().setOnTouchListener(new View.OnTouchListener() {
+            @Override
+            public boolean onTouch(View v, MotionEvent event) {
+                if (event.getAction() == MotionEvent.ACTION_UP) {
+                    //if (event.getRawX() <= ((TextView) v).getTotalPaddingLeft()) {
+                    TextView tv = ((TextView) v);
+                    if (event.getRawX() >= tv.getRight() - tv.getTotalPaddingRight()) {
+                        mTxtDate.setSelectedInstant(null);
+                        return true;
+                    }
+                }
+                return false;
+            }
+        });
         //
         mTxtPrice = (FloatingLabelEditText)findViewById(R.id.txt_editor_release_price);
         mTxtPrice.setInputWidgetText(Double.toString(mRelease.getPrice()));
@@ -101,7 +125,11 @@ public class ReleaseEditorActivity extends ActionBarActivity {
         mTxtNotes = (FloatingLabelEditText)findViewById(R.id.txt_editor_release_notes);
         mTxtNotes.setInputWidgetText(mRelease.getNotes());
         //
-        //TODO purchased, etc
+        mChkPurchased = (Switch)findViewById(R.id.chk_editor_release_purchased);
+        mChkPurchased.setChecked(mRelease.isPurchased());
+        //
+        mChkOrdered = (Switch)findViewById(R.id.chk_editor_release_ordered);
+        mChkOrdered.setChecked(mRelease.isOrdered());
     }
 
     @Override
@@ -134,7 +162,8 @@ public class ReleaseEditorActivity extends ActionBarActivity {
                             instant.getMonthOfYear() + 1, instant.getDayOfMonth());
                     mRelease.setDate(calendar.getTime());
                 }
-                //TODO purchased, etc
+                mRelease.setPurchased(mChkPurchased.isChecked());
+                mRelease.setOrdered(mChkOrdered.isChecked());
 
                 if (mIsNew) {
                     if (!mComics.putRelease(mRelease)) {
