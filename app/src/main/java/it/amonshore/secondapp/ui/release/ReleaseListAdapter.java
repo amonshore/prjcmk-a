@@ -128,6 +128,8 @@ public class ReleaseListAdapter extends BaseAdapter implements StickyListHeaders
             convertView = mInflater.inflate(R.layout.list_release_item, parent, false);
             holder.txtName = (TextView) convertView.findViewById(R.id.txt_list_release_name);
             holder.txtInfo = (TextView) convertView.findViewById(R.id.txt_list_release_info);
+            holder.txtNumber = (TextView) convertView.findViewById(R.id.txt_list_release_number);
+            holder.txtDate = (TextView) convertView.findViewById(R.id.txt_list_release_date);
             convertView.setTag(holder);
         } else {
             holder = (ViewHolder) convertView.getTag();
@@ -140,7 +142,9 @@ public class ReleaseListAdapter extends BaseAdapter implements StickyListHeaders
             relDate = mDateFormat.format(release.getDate());
         }
         holder.txtName.setText(comics.getName());
-        holder.txtInfo.setText(String.format("#%s - %s - p %s", release.getNumber(), relDate, release.isPurchased()));
+        holder.txtNumber.setText(Integer.toString(release.getNumber()));
+        holder.txtDate.setText(relDate);
+        holder.txtInfo.setText(String.format("%s - p %s", release.getNotes(), release.isPurchased()));
 
         return convertView;
     }
@@ -200,6 +204,8 @@ public class ReleaseListAdapter extends BaseAdapter implements StickyListHeaders
     final class ViewHolder {
         TextView txtName;
         TextView txtInfo;
+        TextView txtNumber;
+        TextView txtDate;
     }
 
 }

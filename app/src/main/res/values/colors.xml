@@ -20,6 +20,7 @@
 
     <color name="comikku_valid_background_color">#CDDC39</color>
     <color name="comikku_valid_primary_color">#FFFFFF</color>
+    <color name="comikku_valid_background_border">#C0CA33</color>
 
     <drawable name="comikku_list_item_pressed">#ECEFF1</drawable>
     <drawable name="comikku_list_item_selected">#CFD8DC</drawable>

@@ -1,5 +1,7 @@
 <?xml version="1.0" encoding="utf-8"?>
-<LinearLayout xmlns:android="http://schemas.android.com/apk/res/android"
+<LinearLayout
+    xmlns:android="http://schemas.android.com/apk/res/android"
+    xmlns:tools="http://schemas.android.com/tools"
     android:layout_width="fill_parent"
     android:layout_height="?android:attr/listPreferredItemHeight"
     android:baselineAligned="false"
@@ -17,35 +19,33 @@
         android:layout_weight="3"
         android:orientation="vertical">
 
-        <TextView
+        <TextView android:id="@+id/txt_list_comics_name"
+            tools:text="Medium Text 3 23 23 23 2 2 333 3"
             android:layout_width="fill_parent"
             android:layout_height="wrap_content"
             android:textAppearance="?android:attr/textAppearanceMedium"
             android:textColor="@color/comikku_primary_text"
-            android:text="Medium Text 3 23 23 23 2 2 333 3"
-            android:id="@+id/txt_list_comics_name"
             android:singleLine="true"
             android:ellipsize="end" />
 
-        <TextView
+        <TextView android:id="@+id/txt_list_comics_publisher"
+            tools:text="Small Text"
             android:layout_width="fill_parent"
             android:layout_height="wrap_content"
             android:textAppearance="?android:attr/textAppearanceSmall"
             android:textColor="@color/comikku_secondary_text"
-            android:text="Small Text"
-            android:id="@+id/txt_list_comics_publisher"
             android:singleLine="true"
             android:ellipsize="end" />
 
-        <TextView
+        <TextView android:id="@+id/txt_list_comics_notes"
+            tools:text="Small Text"
             android:layout_width="fill_parent"
             android:layout_height="wrap_content"
             android:textAppearance="?android:attr/textAppearanceSmall"
             android:textColor="@color/comikku_tertiary_text"
-            android:text="Small Text"
-            android:id="@+id/txt_list_comics_notes"
             android:singleLine="true"
             android:ellipsize="end" />
+
     </LinearLayout>
 
     <LinearLayout
@@ -57,30 +57,28 @@
         android:id="@+id/lay_best_release"
         android:gravity="center_vertical">
 
-        <TextView
+        <TextView android:id="@+id/txt_list_comics_number"
+            tools:text="100"
             android:layout_width="fill_parent"
             android:layout_height="wrap_content"
             android:textAppearance="?android:attr/textAppearanceLarge"
             android:background="@color/comikku_valid_background_color"
             android:textColor="@color/comikku_valid_primary_color"
             android:textStyle="bold"
-            android:text="100"
             android:gravity="center"
-            android:id="@+id/txt_list_comics_number"
             android:ellipsize="end"
             android:elegantTextHeight="false"
             android:paddingTop="6dip"
             android:paddingBottom="6dip" />
 
-        <TextView
+        <TextView android:id="@+id/txt_list_comics_date"
+            tools:text="4 mag"
             android:layout_width="fill_parent"
             android:layout_height="wrap_content"
             android:textAppearance="?android:attr/textAppearanceSmall"
             android:textColor="@android:color/primary_text_light"
             android:background="@drawable/border_valid_releasedate"
-            android:text="4 mag"
             android:gravity="center"
-            android:id="@+id/txt_list_comics_date"
             android:paddingTop="2dip"
             android:paddingBottom="2dip" />
     </LinearLayout>
