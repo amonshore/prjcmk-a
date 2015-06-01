@@ -10,18 +10,22 @@ import android.support.v7.app.ActionBarActivity;
 import android.os.Bundle;
 import android.view.Menu;
 import android.view.MenuItem;
+import android.view.View;
 
 import com.google.samples.apps.iosched.ui.widget.SlidingTabLayout;
 
 import it.amonshore.secondapp.R;
 import it.amonshore.secondapp.Utils;
 import it.amonshore.secondapp.data.Comics;
+import it.amonshore.secondapp.data.ComicsObserver;
 import it.amonshore.secondapp.data.DataManager;
+import it.amonshore.secondapp.data.Release;
+import it.amonshore.secondapp.ui.release.ReleaseListFragment;
 
 /**
  * http://developer.android.com/training/implementing-navigation/lateral.html#tabs
  */
-public class MainActivity extends ActionBarActivity implements SharedPreferences.OnSharedPreferenceChangeListener {
+public class MainActivity extends ActionBarActivity implements SharedPreferences.OnSharedPreferenceChangeListener, ComicsObserver {
 
     public final static String PREFS_NAME = "ComikkuPrefs";
 
@@ -40,6 +44,7 @@ public class MainActivity extends ActionBarActivity implements SharedPreferences
         setContentView(R.layout.activity_main_sliding);
         //
         mDataManager = DataManager.getDataManager(this.getApplicationContext());
+        mDataManager.registerObserver(this);
         //impsota i valori di default, il parametro false assicura che questo venga fatto una sola volta
         //  indipendentemente da quante volte viene chiamato il metodo
         PreferenceManager.setDefaultValues(this, R.xml.preferences, false);
@@ -73,12 +78,14 @@ public class MainActivity extends ActionBarActivity implements SharedPreferences
         slidingTabLayout.setOnPageChangeListener(new ViewPager.SimpleOnPageChangeListener() {
             @Override
             public void onPageSelected(int position) {
-                //Utils.d("slidingTabLayout OnPageChangeListener " + mPreviousPage + " -> " + position);
-                //chiudo l'ActionBar contestuale del fragment precedente
-                ((AFragment) mTabPageAdapter.getItem(mPreviousPage)).finishActionMode();
-                //aggiorno i dati sulla page corrente causa cambio pagina (quindi se i dati ci sono non fa nulla)
-                ((AFragment) mTabPageAdapter.getItem(position)).needDataRefresh(AFragment.CAUSE_PAGE_CHANGED);
-                mPreviousPage = position;
+                Utils.d("slidingTabLayout OnPageChangeListener " + mPreviousPage + " -> " + position);
+                if (mPreviousPage != position) {
+                    //chiudo l'ActionBar contestuale del fragment precedente
+                    ((AFragment) mTabPageAdapter.getItem(mPreviousPage)).finishActionMode();
+                    //aggiorno i dati sulla page corrente causa cambio pagina (quindi se i dati ci sono non fa nulla)
+                    ((AFragment) mTabPageAdapter.getItem(position)).onDataChanged(DataManager.CAUSE_PAGE_CHANGED);
+                    mPreviousPage = position;
+                }
             }
         });
         slidingTabLayout.setViewPager(mViewPager);
@@ -123,24 +130,35 @@ public class MainActivity extends ActionBarActivity implements SharedPreferences
         return super.onOptionsItemSelected(item);
     }
 
+    @Override
+    public void onChanged(int cause) {
+        if (cause == DataManager.CAUSE_RELEASES_MODE_CHANGED) {
+            ReleaseListFragment fragment = (ReleaseListFragment)mTabPageAdapter.getItem(1);
+            SlidingTabLayout slidingTabLayout = (SlidingTabLayout) findViewById(R.id.sliding_tabs);
+            slidingTabLayout.setPageTitle(1, "MODE " + fragment.getGroupMode());
+        }
+        //TODO se sono stati modificati i dati potrei scatenare il salvataggio
+    }
+
     /**
      * Task asincrono per la lettura dei dati
      */
     private class ReadDataAsyncTask extends AsyncTask<Void, Comics, Integer> {
         @Override
         protected Integer doInBackground(Void... params) {
-            Utils.d("readComics");
+            Utils.d(this.getClass(), "readComics");
+            //TODO cambia qualcosa?
             if (MainActivity.this.mDataManager.isDataLoaded()) {
-                return AFragment.CAUSE_LOADING;
+                return DataManager.CAUSE_LOADING;
             } else {
                 MainActivity.this.mDataManager.readComics();
-                return AFragment.CAUSE_LOADING;
+                return DataManager.CAUSE_LOADING;
             }
         }
 
         @Override
         protected void onPostExecute(Integer result) {
-            MainActivity.this.mTabPageAdapter.refreshDataOnFragments(result);
+            MainActivity.this.mDataManager.notifyChanged(result);
         }
     }
 

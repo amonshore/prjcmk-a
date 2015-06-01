@@ -1,6 +1,7 @@
 package it.amonshore.secondapp.data;
 
 import android.content.Context;
+import android.database.Observable;
 import android.os.Environment;
 import android.text.TextUtils;
 
@@ -25,9 +26,20 @@ import it.amonshore.secondapp.Utils;
 /**
  * Created by Calgia on 07/05/2015.
  */
-public class DataManager {
+public class DataManager extends Observable<ComicsObserver> {
 
-//    public final static long ALL_COMICS = 0;
+    public static final int CAUSE_SAFE = 1;
+    public static final int CAUSE_LOADING = 1 << 1;
+    public static final int CAUSE_SETTINGS_CHANGED = 1 << 2;
+    public static final int CAUSE_ROTATION = 1 << 3;
+    public static final int CAUSE_PAGE_CHANGED = 1 << 4;
+    public static final int CAUSE_COMICS_ADDED = 1 << 5;
+    public static final int CAUSE_COMICS_CHANGED = 1 << 6;
+    public static final int CAUSE_COMICS_REMOVED = 1 << 7;
+    public static final int CAUSE_RELEASE_ADDED = 1 << 8;
+    public static final int CAUSE_RELEASE_CHANGED = 1 << 9;
+    public static final int CAUSE_RELEASE_REMOVED = 1 << 10;
+    public static final int CAUSE_RELEASES_MODE_CHANGED = 1 << 11;
 
     //private final static String FILE_NAME = "data.json";
     private final static String FILE_NAME = "USER_backup.json";
@@ -358,4 +370,20 @@ public class DataManager {
         return mDataLoaded;
     }
 
+    /**
+     *
+     * @param cause
+     */
+    public void notifyChanged(int cause) {
+        //see DataSetObservable.notifyChanged()
+        synchronized(mObservers) {
+            // since onChanged() is implemented by the app, it could do anything, including
+            // removing itself from {@link mObservers} - and that could cause problems if
+            // an iterator is used on the ArrayList {@link mObservers}.
+            // to avoid such problems, just march thru the list in the reverse order.
+            for (int i = mObservers.size() - 1; i >= 0; i--) {
+                mObservers.get(i).onChanged(cause);
+            }
+        }
+    }
 }

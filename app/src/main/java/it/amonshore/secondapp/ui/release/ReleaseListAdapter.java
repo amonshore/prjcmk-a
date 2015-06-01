@@ -8,6 +8,9 @@ import android.widget.BaseAdapter;
 import android.widget.TextView;
 
 import java.text.SimpleDateFormat;
+import java.util.ArrayList;
+import java.util.Arrays;
+import java.util.List;
 import java.util.Locale;
 
 import it.amonshore.secondapp.R;
@@ -28,11 +31,9 @@ public class ReleaseListAdapter extends BaseAdapter implements StickyListHeaders
 
     private Context mContext;
     private DataManager mDataManager;
-    private ReleaseInfo[] mReleaseInfos;
+    private List<ReleaseInfo> mReleaseInfos;
     private LayoutInflater mInflater;
     private SimpleDateFormat mDateFormat;
-    //modalità: indica cosa far vedere e come deve essere raggruppato
-    private int mMode;
     private boolean mGroupByMonth;
 
     /**
@@ -48,27 +49,6 @@ public class ReleaseListAdapter extends BaseAdapter implements StickyListHeaders
 
     /**
      *
-     * @param release
-     * @return  ritorna la posizione dell'elemento
-     */
-    public int insertOrUpdate(Release release) {
-        //TODO insertOrUpdate
-//        Comics comics = mDataManager.getComics(release.getComicsId());
-//        if (comics.putRelease(release)) {
-//            //è un nuovo elemento
-//            mSortedIds.add(new ReleaseId(comics.getId(), release.getNumber()));
-//            //TODO ordinare, raggruppare, etc.
-//            return mSortedIds.indexOf(release);
-//        } else {
-//            //è un elemento già esistente
-//            //TODO ordinare, raggruppare, etc.
-//            return mSortedIds.indexOf(release);
-//        }
-        return -1;
-    }
-
-    /**
-     *
      * @param comics
      * @return
      */
@@ -78,12 +58,19 @@ public class ReleaseListAdapter extends BaseAdapter implements StickyListHeaders
 
     /**
      *
-     * @param release
+     * @param position
      * @return
      */
-    public boolean remove(Release release) {
-        Comics comics = mDataManager.getComics(release.getComicsId());
-        return comics.removeRelease(release.getNumber());
+    public boolean remove(int position) {
+        ReleaseInfo ri = (ReleaseInfo)getItem(position);
+        Comics comics = mDataManager.getComics(ri.getRelease().getComicsId());
+        if (comics.removeRelease(ri.getRelease().getNumber())) {
+            mDataManager.updateBestRelease(comics.getId());
+            mReleaseInfos.remove(position);
+            return true;
+        } else {
+            return false;
+        }
     }
 
     /**
@@ -95,7 +82,6 @@ public class ReleaseListAdapter extends BaseAdapter implements StickyListHeaders
      * @return
      */
     public int refresh(Comics comics, int mode, boolean groupByMonth, boolean weekStartOnMonday) {
-        mMode = mode;
         mGroupByMonth = groupByMonth;
         //creo gli elementi per la lista
         ReleaseGroupHelper helper = new ReleaseGroupHelper(mode, groupByMonth, weekStartOnMonday);
@@ -106,8 +92,8 @@ public class ReleaseListAdapter extends BaseAdapter implements StickyListHeaders
         } else {
             helper.addReleases(comics.getReleases());
         }
-        mReleaseInfos = helper.getReleaseInfos();
-        return mReleaseInfos.length;
+        mReleaseInfos = new ArrayList<>(Arrays.asList(helper.getReleaseInfos()));
+        return mReleaseInfos.size();
     }
 
     @Override
@@ -120,12 +106,12 @@ public class ReleaseListAdapter extends BaseAdapter implements StickyListHeaders
 
     @Override
     public int getCount() {
-        return mReleaseInfos == null ? 0 : mReleaseInfos.length;
+        return mReleaseInfos == null ? 0 : mReleaseInfos.size();
     }
 
     @Override
     public Object getItem(int position) {
-        return mReleaseInfos[position];
+        return mReleaseInfos.get(position);
     }
 
     @Override
@@ -147,7 +133,7 @@ public class ReleaseListAdapter extends BaseAdapter implements StickyListHeaders
             holder = (ViewHolder) convertView.getTag();
         }
 
-        Release release = mReleaseInfos[position].getRelease();
+        Release release = mReleaseInfos.get(position).getRelease();
         Comics comics = mDataManager.getComics(release.getComicsId());
         String relDate = "";
         if (release.getDate() != null) {
@@ -172,14 +158,14 @@ public class ReleaseListAdapter extends BaseAdapter implements StickyListHeaders
             holder = (HeaderViewHolder) convertView.getTag();
         }
 
-        holder.text.setText(getGroupTitle(mReleaseInfos[position].getGroup()));
+        holder.text.setText(getGroupTitle(mReleaseInfos.get(position).getGroup()));
         return convertView;
     }
 
     @Override
     public long getHeaderId(int position) {
         //return the first character of the country as ID because this is what headers are based upon
-        return mReleaseInfos[position].getGroup();
+        return mReleaseInfos.get(position).getGroup();
     }
 
     public CharSequence getGroupTitle(int group) {

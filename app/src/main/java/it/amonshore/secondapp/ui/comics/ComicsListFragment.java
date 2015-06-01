@@ -42,8 +42,6 @@ public class ComicsListFragment extends AFragment {
     private AbsListView mListView;
     private ComicsListAdapter mAdapter;
     private ActionMode mActionMode;
-    private DataManager mDataManager;
-    private boolean mNeedUpdateOnResume;
 
     @Override
     public void onCreate(Bundle savedInstanceState) {
@@ -60,8 +58,6 @@ public class ComicsListFragment extends AFragment {
             SharedPreferences settings = getActivity().getSharedPreferences(MainActivity.PREFS_NAME, 0);
             order = settings.getInt(STATE_ORDER, ComicsListAdapter.ORDER_BY_NAME);
         }
-        //
-        mDataManager = DataManager.getDataManager(getActivity().getApplicationContext());
         mAdapter = new ComicsListAdapter(getActivity().getApplicationContext(), order);
     }
 
@@ -180,17 +176,11 @@ public class ComicsListFragment extends AFragment {
         Utils.d("onOptionsItemSelected " + item.getTitle());
 
         if (id == R.id.action_comics_sort_by_name) {
-            //TODO sort by name
-            ////invalido il menu in modo che venga ricreato, così da poter nascondere le voci che non interessano
-            //getActivity().invalidateOptionsMenu();
             mAdapter.setOrder(ComicsListAdapter.ORDER_BY_NAME);
             mAdapter.notifyDataSetChanged();
             getActivity().invalidateOptionsMenu();
             return true;
         }  else if (id == R.id.action_comics_sort_by_release) {
-            //TODO sort by release
-            ////invalido il menu in modo che venga ricreato, così da poter nascondere le voci che non interessano
-            //getActivity().invalidateOptionsMenu();
             mAdapter.setOrder(ComicsListAdapter.ORDER_BY_BEST_RELEASE);
             mAdapter.notifyDataSetChanged();
             getActivity().invalidateOptionsMenu();
@@ -204,9 +194,8 @@ public class ComicsListFragment extends AFragment {
     public void onActivityResult(int requestCode, int resultCode, Intent data) {
         if (resultCode == Activity.RESULT_OK && requestCode == ComicsEditorActivity.EDIT_COMICS_REQUEST) {
             long comicsId = data.getLongExtra(ComicsEditorActivity.EXTRA_COMICS_ID, 0);
-            Comics comics = mDataManager.getComics(comicsId);
+            Comics comics = getDataManager().getComics(comicsId);
             int position = mAdapter.insertOrUpdate(comics);
-            //Utils.d("onActivityResult @" + index + " id " + comics.getId() + " " + comics.getName());
             mAdapter.notifyDataSetChanged();
         }
     }
@@ -231,25 +220,14 @@ public class ComicsListFragment extends AFragment {
     }
 
     @Override
-    public void needDataRefresh(int cause) {
-        //leggo i dati in modalità asincrona, se il fragment non è ancora visisbile pospongo il caricamento
-        if (this.isResumed() || (cause & AFragment.CAUSE_SAFE) == AFragment.CAUSE_SAFE) {
-            //se la causa è il cambio pagina aggiorno i dati solose l'adapter è vuoto
-            if ((cause & AFragment.CAUSE_PAGE_CHANGED) != AFragment.CAUSE_PAGE_CHANGED || mAdapter.isEmpty()) {
-                mNeedUpdateOnResume = false;
+    public void onDataChanged(int cause) {
+        Utils.d(this.getClass(), "onDataChanged " + cause);
+        //se la causa è la modifica dela modalità di visualizzazione delle release non mi ineressa
+        if (cause != DataManager.CAUSE_RELEASES_MODE_CHANGED) {
+            //se la causa è il cambio pagina aggiorno i dati solo se l'adapter è vuoto
+            if ((cause & DataManager.CAUSE_PAGE_CHANGED) != DataManager.CAUSE_PAGE_CHANGED || mAdapter.isEmpty()) {
                 new UpdateListAsyncTask().execute();
             }
-        } else {
-            mNeedUpdateOnResume = true;
-        }
-    }
-
-    @Override
-    public void onResume() {
-        super.onResume();
-        if (mNeedUpdateOnResume) {
-            mNeedUpdateOnResume = false;
-            new UpdateListAsyncTask().execute();
         }
     }
 
@@ -263,7 +241,6 @@ public class ComicsListFragment extends AFragment {
         Intent intent = new Intent(getActivity(), ComicsDetailActivity.class);
         intent.putExtra(ComicsDetailActivity.EXTRA_COMICS_ID, comicsId);
         startActivity(intent);
-        //TODO attendere un risultato e aggiornare l'istanza "vera" di comics con quello restituito dall'activity detail
     }
 
     /**
@@ -282,31 +259,31 @@ public class ComicsListFragment extends AFragment {
         }
     }
 
-    /**
-     * Task asincrono per l'aggiornamento dei dati (nuovo, modifica)
-     * Il terzo parametro indica l'indice dell'elemento aggiunto/modificato
-     */
-    private class UpdateComicsAsyncTask extends AsyncTask<Comics, Comics, Integer> {
-        @Override
-        protected Integer doInBackground(Comics... params) {
-            for (Comics comics : params) {
-                publishProgress(comics);
-            }
-            //TODO salvare i dati con DataManager
-            return params.length;
-        }
-
-        @Override
-        protected void onProgressUpdate(Comics... values) {
-            int index = ComicsListFragment.this.mAdapter.insertOrUpdate(values[0]);
-            Utils.d("update comics " + index);
-            if (index < 0) {
-                ComicsListFragment.this.mAdapter.notifyDataSetChanged();
-            } else {
-                //TODO aggiorno solo la visa dell'elemento modificao
-            }
-        }
-    }
+//    /**
+//     * Task asincrono per l'aggiornamento dei dati (nuovo, modifica)
+//     * Il terzo parametro indica l'indice dell'elemento aggiunto/modificato
+//     */
+//    private class UpdateComicsAsyncTask extends AsyncTask<Comics, Comics, Integer> {
+//        @Override
+//        protected Integer doInBackground(Comics... params) {
+//            for (Comics comics : params) {
+//                publishProgress(comics);
+//            }
+//            //TODO salvare i dati con DataManager
+//            return params.length;
+//        }
+//
+//        @Override
+//        protected void onProgressUpdate(Comics... values) {
+//            int index = ComicsListFragment.this.mAdapter.insertOrUpdate(values[0]);
+//            Utils.d("update comics " + index);
+//            if (index < 0) {
+//                ComicsListFragment.this.mAdapter.notifyDataSetChanged();
+//            } else {
+//                //TODO aggiorno solo la visa dell'elemento modificao
+//            }
+//        }
+//    }
 
     /**
      * Task asincrono per la rimoazione dei dati
@@ -317,7 +294,6 @@ public class ComicsListFragment extends AFragment {
             for (Long id : params) {
                 publishProgress(id);
             }
-            //TODO salvare i dati con DataManager
             return params.length;
         }
 
@@ -329,7 +305,7 @@ public class ComicsListFragment extends AFragment {
 
         @Override
         protected void onPostExecute(Integer integer) {
-            ComicsListFragment.this.mAdapter.notifyDataSetChanged();
+            ComicsListFragment.this.getDataManager().notifyChanged(DataManager.CAUSE_COMICS_REMOVED);
         }
     }
 

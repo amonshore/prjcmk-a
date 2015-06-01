@@ -19,6 +19,8 @@ import android.widget.AdapterView;
 import android.widget.ListView;
 import android.widget.TextView;
 
+import java.util.Arrays;
+
 import it.amonshore.secondapp.R;
 import it.amonshore.secondapp.data.Comics;
 import it.amonshore.secondapp.data.DataManager;
@@ -45,12 +47,10 @@ public class ReleaseListFragment extends AFragment {
     private AbsListView mListView;
     private ReleaseListAdapter mAdapter;
     private ActionMode mActionMode;
-    private DataManager mDataManager;
     private Comics mComics;
     private int mGroupMode;
     private boolean mGroupByMonth;
     private boolean mWeekStartOnMonday;
-    private boolean mNeedUpdateOnResume;
 
     /**
      *
@@ -81,7 +81,6 @@ public class ReleaseListFragment extends AFragment {
         super.onCreate(savedInstanceState);
         //deve essere chiamato in onCreate
         setHasOptionsMenu(true);
-        mDataManager = DataManager.getDataManager(getActivity().getApplicationContext());
 //        //recupero i parametri
 //        int mode = ReleaseGroupHelper.MODE_SHOPPING;
 //        Bundle args = getArguments();
@@ -164,16 +163,14 @@ public class ReleaseListFragment extends AFragment {
                 //risponde alla selezione di una azione del menu_releases_cab
                 long menuId = item.getItemId();
                 if (menuId == R.id.action_release_delete) {
-                    //TODO delete
+                    //sono già ordinati in ordine crescente
                     long[] ags = mListView.getCheckedItemIds();
-                    Long[] lgs = new Long[ags.length];
-                    for (int ii = 0; ii < ags.length; ii++) {
-                        lgs[ii] = ags[ii];
+                    Integer[] igs = new Integer[ags.length];
+                    //ma ho bisogno di rimuoverli in ordine inverso
+                    for (int ii = ags.length-1, jj = 0; ii >=0; ii--, jj++) {
+                        igs[jj] = (int)ags[ii];
                     }
-
-                    Utils.d(TextUtils.join(", ", lgs));
-
-//                    new RemoveComicsAsyncTask().execute(lgs);
+                    new RemoveReleasesAsyncTask().execute(igs);
                     finishActionMode();
                     return true;
                 } else {
@@ -199,7 +196,12 @@ public class ReleaseListFragment extends AFragment {
     public void onActivityResult(int requestCode, int resultCode, Intent data) {
         if (resultCode == Activity.RESULT_OK) {
             if (requestCode == ReleaseEditorActivity.EDIT_RELEASE_REQUEST) {
-                needDataRefresh(AFragment.CAUSE_DATA_CHANGED);
+                long comicsId = data.getLongExtra(ReleaseEditorActivity.EXTRA_COMICS_ID,
+                        ReleaseEditorActivity.COMICS_ID_NONE);
+                if (comicsId != ReleaseEditorActivity.COMICS_ID_NONE) {
+                    getDataManager().updateBestRelease(comicsId);
+                    getDataManager().notifyChanged(DataManager.CAUSE_RELEASE_CHANGED);
+                }
             }
         }
     }
@@ -223,17 +225,17 @@ public class ReleaseListFragment extends AFragment {
         //
         if (id == R.id.action_releases_mode_calendar) {
             mGroupMode = ReleaseGroupHelper.MODE_CALENDAR;
-            needDataRefresh(AFragment.CAUSE_LOADING);
+            getDataManager().notifyChanged(DataManager.CAUSE_RELEASES_MODE_CHANGED);
             getActivity().invalidateOptionsMenu();
             return true;
         } else if (id == R.id.action_releases_mode_shopping) {
             mGroupMode = ReleaseGroupHelper.MODE_SHOPPING;
-            needDataRefresh(AFragment.CAUSE_LOADING);
+            getDataManager().notifyChanged(DataManager.CAUSE_RELEASES_MODE_CHANGED);
             getActivity().invalidateOptionsMenu();
             return true;
         } else if (id == R.id.action_releases_mode_law) {
             mGroupMode = ReleaseGroupHelper.MODE_LAW;
-            needDataRefresh(AFragment.CAUSE_LOADING);
+            getDataManager().notifyChanged(DataManager.CAUSE_RELEASES_MODE_CHANGED);
             getActivity().invalidateOptionsMenu();
             return true;
         }
@@ -261,28 +263,14 @@ public class ReleaseListFragment extends AFragment {
     }
 
     @Override
-    public void needDataRefresh(int cause) {
-        //leggo i dati in modalità asincrona, se il fragment non è ancora visisbile pospongo il caricamento
-        if (this.isResumed() || (cause & AFragment.CAUSE_SAFE) == AFragment.CAUSE_SAFE) {
-            //se la causa è il cambio pagina aggiorno i dati solose l'adapter è vuoto
-            if ((cause & AFragment.CAUSE_PAGE_CHANGED) != AFragment.CAUSE_PAGE_CHANGED || mAdapter.isEmpty()) {
-                mNeedUpdateOnResume = false;
+    public void onDataChanged(int cause) {
+        Utils.d(this.getClass(), "onDataChanged " + cause);
+        //se la causa è il cambio pagina aggiorno i dati solo se l'adapter è vuoto
+        if (mAdapter != null) {
+            if ((cause & DataManager.CAUSE_PAGE_CHANGED) != DataManager.CAUSE_PAGE_CHANGED || mAdapter.isEmpty()) {
                 Utils.d("needDataRefresh ok");
                 new ReadReleasesAsyncTask().execute();
             }
-        } else {
-            Utils.d("needDataRefresh posponed");
-            mNeedUpdateOnResume = true;
-        }
-    }
-
-    @Override
-    public void onResume() {
-        super.onResume();
-        if (mNeedUpdateOnResume) {
-            Utils.d("onResume refresh");
-            mNeedUpdateOnResume = false;
-            new ReadReleasesAsyncTask().execute();
         }
     }
 
@@ -318,7 +306,31 @@ public class ReleaseListFragment extends AFragment {
     }
 
     //TODO udpate task
-    //TODO remove task
+
+    /**
+     * Task asincrono per la rimoazione dei dati
+     */
+    private class RemoveReleasesAsyncTask extends AsyncTask<Integer, Integer, Integer> {
+        @Override
+        protected Integer doInBackground(Integer... params) {
+            for (Integer position : params) {
+                publishProgress(position);
+            }
+            return params.length;
+        }
+
+        @Override
+        protected void onProgressUpdate(Integer... values) {
+            boolean res = ReleaseListFragment.this.mAdapter.remove(values[0]);
+            Utils.d("delete release " + values[0] + " -> " + res);
+        }
+
+        @Override
+        protected void onPostExecute(Integer integer) {
+            ReleaseListFragment.this.getDataManager().notifyChanged(DataManager.CAUSE_RELEASE_REMOVED);
+        }
+    }
+
 
 
 }

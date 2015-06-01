@@ -187,6 +187,7 @@ public class ReleaseEditorActivity extends ActionBarActivity {
 
                 //
                 Intent intent = new Intent();
+                intent.putExtra(EXTRA_COMICS_ID, mRelease.getComicsId());
                 intent.putExtra(EXTRA_RELEASE_NUMBER, mRelease.getNumber());
                 setResult(Activity.RESULT_OK, intent);
                 finish();

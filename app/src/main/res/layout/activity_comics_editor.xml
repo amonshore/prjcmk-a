@@ -70,7 +70,7 @@
                     android:id="@+id/txt_editor_comics_notes"
                     android:layout_width="match_parent"
                     android:layout_height="wrap_content"
-                    android:inputType="text|textNoSuggestions|textCapSentences|textMultiLine"
+                    android:inputType="text|textCapSentences|textMultiLine"
                     android:layout_marginBottom="10dp"
                     app:flw_labelText="@string/editor_comics_notes" />
 

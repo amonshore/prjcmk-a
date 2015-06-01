@@ -59,7 +59,7 @@ public class ComicsDetailActivity extends ActionBarActivity {
         //
         mReleaseListFragment = ((ReleaseListFragment)getSupportFragmentManager().findFragmentById(R.id.frg_release_list));
         mReleaseListFragment.setComics(mComics, ReleaseGroupHelper.MODE_COMICS);
-        mReleaseListFragment.needDataRefresh(AFragment.CAUSE_LOADING);
+        mReleaseListFragment.onDataChanged(DataManager.CAUSE_LOADING);
     }
 
     @Override
@@ -70,8 +70,10 @@ public class ComicsDetailActivity extends ActionBarActivity {
         if (resultCode == Activity.RESULT_OK) {
             if (requestCode == ComicsEditorActivity.EDIT_COMICS_REQUEST) {
                 updateHeader();
+                mDataManager.notifyChanged(DataManager.CAUSE_COMICS_CHANGED);
             } else if (requestCode == ReleaseEditorActivity.EDIT_RELEASE_REQUEST) {
-                mReleaseListFragment.needDataRefresh(AFragment.CAUSE_DATA_CHANGED);
+                mDataManager.updateBestRelease(mComics.getId());
+                mDataManager.notifyChanged(DataManager.CAUSE_RELEASE_ADDED);
             }
         }
     }
