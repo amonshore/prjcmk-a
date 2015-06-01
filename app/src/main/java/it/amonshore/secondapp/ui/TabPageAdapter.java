@@ -20,10 +20,6 @@ import it.amonshore.secondapp.ui.release.ReleaseListFragment;
  */
 public class TabPageAdapter extends FragmentStatePagerAdapter {
 
-    public final static int PAGE_COMICS = 0;
-    public final static int PAGE_SHOPPING = 1;
-    public final static int PAGE_LAW = 2;
-    //
     private Context mContext;
     private ArrayList<AFragment> mPages;
 
@@ -38,16 +34,16 @@ public class TabPageAdapter extends FragmentStatePagerAdapter {
         AFragment frg;
         //
         args = new Bundle();
-        args.putInt(ReleaseListFragment.ARG_MODE, ReleaseGroupHelper.MODE_CALENDAR);
+//        args.putInt(ReleaseListFragment.ARG_MODE, ReleaseGroupHelper.MODE_CALENDAR);
         frg = new ReleaseListFragment();
         frg.setArguments(args);
         mPages.add(frg);
-        //
-        args = new Bundle();
-        args.putInt(ReleaseListFragment.ARG_MODE, ReleaseGroupHelper.MODE_LAW);
-        frg = new ReleaseListFragment();
-        frg.setArguments(args);
-        mPages.add(frg);
+//        //
+//        args = new Bundle();
+//        args.putInt(ReleaseListFragment.ARG_MODE, ReleaseGroupHelper.MODE_LAW);
+//        frg = new ReleaseListFragment();
+//        frg.setArguments(args);
+//        mPages.add(frg);
     }
 
     @Override
@@ -75,10 +71,13 @@ public class TabPageAdapter extends FragmentStatePagerAdapter {
     public CharSequence getPageTitle(int position) {
         if (position == 0) {
             return mContext.getString(R.string.title_page_comics);
-        } else if (position == 1) {
-            return mContext.getString(R.string.title_page_calendar);
+//        } else if (position == 1) {
+//            return mContext.getString(R.string.title_page_calendar);
+//        } else {
+//            return mContext.getString(R.string.title_page_wishlist);
+//        }
         } else {
-            return mContext.getString(R.string.title_page_wishlist);
+            return mContext.getString(R.string.title_page_releases);
         }
     }
 

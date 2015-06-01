@@ -6,6 +6,7 @@ import android.content.SharedPreferences;
 import android.os.AsyncTask;
 import android.os.Bundle;
 import android.preference.PreferenceManager;
+import android.text.TextUtils;
 import android.view.ActionMode;
 import android.view.LayoutInflater;
 import android.view.Menu;
@@ -26,7 +27,9 @@ import it.amonshore.secondapp.data.ReleaseGroupHelper;
 import it.amonshore.secondapp.Utils;
 import it.amonshore.secondapp.data.ReleaseInfo;
 import it.amonshore.secondapp.ui.AFragment;
+import it.amonshore.secondapp.ui.MainActivity;
 import it.amonshore.secondapp.ui.SettingsActivity;
+import it.amonshore.secondapp.ui.comics.ComicsListAdapter;
 import se.emilsjolander.stickylistheaders.StickyListHeadersListView;
 
 /**
@@ -34,8 +37,10 @@ import se.emilsjolander.stickylistheaders.StickyListHeadersListView;
  */
 public class ReleaseListFragment extends AFragment {
 
-    public final static String ARG_MODE = "arg_mode";
-    public final static String ARG_COMICS_ID = "arg_comics_id";
+    //usato per lo stato dell'istanza
+    private final static String STATE_MODE = " stateMode";
+    //public final static String ARG_MODE = "arg_mode";
+    //public final static String ARG_COMICS_ID = "arg_comics_id";
 
     private AbsListView mListView;
     private ReleaseListAdapter mAdapter;
@@ -63,26 +68,61 @@ public class ReleaseListFragment extends AFragment {
     public void setComics(Comics comics, int groupMode) {
         mComics = comics;
         mGroupMode = groupMode;
+        //se il fragment è caricato nel dettaglio non faccio vedere il menu
+        if (mComics != null) {
+            setHasOptionsMenu(false);
+        } else {
+            setHasOptionsMenu(true);
+        }
     }
 
     @Override
     public void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
-        ////deve essere chiamato in onCreate
-        //setHasOptionsMenu(true);
+        //deve essere chiamato in onCreate
+        setHasOptionsMenu(true);
         mDataManager = DataManager.getDataManager(getActivity().getApplicationContext());
-        //recupero i parametri
-        int mode = ReleaseGroupHelper.MODE_SHOPPING;
-        Bundle args = getArguments();
-        if (args != null) {
-            long comicsId = args.getLong(ARG_COMICS_ID);
-            mGroupMode = args.getInt(ARG_MODE, ReleaseGroupHelper.MODE_SHOPPING);
-            if (comicsId != 0) {
-                mComics = mDataManager.getComics(comicsId);
-            }
+//        //recupero i parametri
+//        int mode = ReleaseGroupHelper.MODE_SHOPPING;
+//        Bundle args = getArguments();
+//        if (args != null) {
+//            long comicsId = args.getLong(ARG_COMICS_ID);
+//            mGroupMode = args.getInt(ARG_MODE, ReleaseGroupHelper.MODE_SHOPPING);
+//            if (comicsId != 0) {
+//                mComics = mDataManager.getComics(comicsId);
+//            }
+//        }
+        if (savedInstanceState != null) {
+            //recupero la modalità in precedenza e salvato alla chiusura dell'activity
+            mGroupMode = savedInstanceState.getInt(STATE_MODE, ReleaseGroupHelper.MODE_CALENDAR);
+        } else {
+            //recupero la modalità dalle preferenze
+            SharedPreferences settings = getActivity().getSharedPreferences(MainActivity.PREFS_NAME, 0);
+            mGroupMode = settings.getInt(STATE_MODE, ReleaseGroupHelper.MODE_CALENDAR);
         }
         //
         mAdapter = new ReleaseListAdapter(getActivity().getApplicationContext());
+    }
+
+    @Override
+    public void onSaveInstanceState(Bundle savedInstanceState) {
+        //salvo la modalità
+        savedInstanceState.putInt(STATE_MODE, mGroupMode);
+        //
+        super.onSaveInstanceState(savedInstanceState);
+    }
+
+    @Override
+    public void onStop() {
+        super.onStop();
+
+        //salvo le preferenze (ma solo se il fragment non è caricato nel dettaglio)
+        if (mComics == null) {
+            SharedPreferences settings = getActivity().getSharedPreferences(MainActivity.PREFS_NAME, 0);
+            SharedPreferences.Editor editor = settings.edit();
+            editor.putInt(STATE_MODE, mGroupMode);
+            editor.commit();
+        }
     }
 
     @Override
@@ -125,11 +165,14 @@ public class ReleaseListFragment extends AFragment {
                 long menuId = item.getItemId();
                 if (menuId == R.id.action_release_delete) {
                     //TODO delete
-//                    long[] ags = mListView.getCheckedItemIds();
-//                    Long[] lgs = new Long[ags.length];
-//                    for (int ii = 0; ii < ags.length; ii++) {
-//                        lgs[ii] = ags[ii];
-//                    }
+                    long[] ags = mListView.getCheckedItemIds();
+                    Long[] lgs = new Long[ags.length];
+                    for (int ii = 0; ii < ags.length; ii++) {
+                        lgs[ii] = ags[ii];
+                    }
+
+                    Utils.d(TextUtils.join(", ", lgs));
+
 //                    new RemoveComicsAsyncTask().execute(lgs);
                     finishActionMode();
                     return true;
@@ -159,6 +202,43 @@ public class ReleaseListFragment extends AFragment {
                 needDataRefresh(AFragment.CAUSE_DATA_CHANGED);
             }
         }
+    }
+
+    @Override
+    public void onCreateOptionsMenu(Menu menu, MenuInflater inflater) {
+        inflater.inflate(R.menu.menu_releases, menu);
+    }
+
+    @Override
+    public void onPrepareOptionsMenu(Menu menu) {
+        menu.findItem(R.id.action_releases_mode_calendar).setVisible(mGroupMode != ReleaseGroupHelper.MODE_CALENDAR);
+        menu.findItem(R.id.action_releases_mode_shopping).setVisible(mGroupMode != ReleaseGroupHelper.MODE_SHOPPING);
+        menu.findItem(R.id.action_releases_mode_law).setVisible(mGroupMode != ReleaseGroupHelper.MODE_LAW);
+    }
+
+    @Override
+    public boolean onOptionsItemSelected(MenuItem item) {
+        int id = item.getItemId();
+        Utils.d("onOptionsItemSelected " + item.getTitle());
+        //
+        if (id == R.id.action_releases_mode_calendar) {
+            mGroupMode = ReleaseGroupHelper.MODE_CALENDAR;
+            needDataRefresh(AFragment.CAUSE_LOADING);
+            getActivity().invalidateOptionsMenu();
+            return true;
+        } else if (id == R.id.action_releases_mode_shopping) {
+            mGroupMode = ReleaseGroupHelper.MODE_SHOPPING;
+            needDataRefresh(AFragment.CAUSE_LOADING);
+            getActivity().invalidateOptionsMenu();
+            return true;
+        } else if (id == R.id.action_releases_mode_law) {
+            mGroupMode = ReleaseGroupHelper.MODE_LAW;
+            needDataRefresh(AFragment.CAUSE_LOADING);
+            getActivity().invalidateOptionsMenu();
+            return true;
+        }
+        //
+        return false;
     }
 
     /**

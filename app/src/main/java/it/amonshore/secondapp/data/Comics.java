@@ -1,8 +1,12 @@
 package it.amonshore.secondapp.data;
 
+import android.text.TextUtils;
+
 import java.io.Serializable;
 import java.util.ArrayList;
+import java.util.Calendar;
 import java.util.Date;
+import java.util.GregorianCalendar;
 
 /**
  * Created by Calgia on 07/05/2015.
@@ -127,15 +131,32 @@ public class Comics {
     public Release createRelease(boolean autoFill) {
         Release newRelease = new Release(this.getId());
         if (autoFill) {
-            //TODO calcolare numero e data
-            int number = 0;
+            //calcolo numero e data
+            Release maxRelease = null;
             for (Release release : releases) {
-                if (number <= release.getNumber()) {
-                    number = release.getNumber();
+                if (maxRelease == null || maxRelease.getNumber() < release.getNumber()) {
+                    maxRelease = release;
                 }
             }
-            newRelease.setNumber(number+1);
-            //TODO newRelease.setDate();
+            if (maxRelease == null) {
+                newRelease.setNumber(1);
+            } else {
+                newRelease.setNumber(maxRelease.getNumber() + 1);
+                if (maxRelease.getDate() != null && !TextUtils.isEmpty(this.getPeriodicity())) {
+                    GregorianCalendar calendar = new GregorianCalendar();
+                    calendar.setTime(maxRelease.getDate());
+                    char type = this.getPeriodicity().charAt(0);
+                    int amout = Integer.parseInt(this.getPeriodicity().substring(1));
+                    if (type == 'W') {
+                        calendar.add(Calendar.DAY_OF_MONTH, 7 * amout);
+                    } else if (type == 'M') {
+                        calendar.add(Calendar.MONTH, amout);
+                    } else if (type == 'Y') {
+                        calendar.add(Calendar.YEAR, amout);
+                    }
+                    newRelease.setDate(calendar.getTime());
+                }
+            }
             newRelease.setPrice(this.getPrice());
         }
         return newRelease;

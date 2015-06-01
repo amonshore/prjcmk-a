@@ -19,11 +19,17 @@ import android.widget.TextView;
 
 import com.android.datetimepicker.date.DatePickerDialog;
 import com.marvinlabs.widget.floatinglabel.edittext.FloatingLabelEditText;
+import com.marvinlabs.widget.floatinglabel.instantpicker.DateInstant;
+import com.marvinlabs.widget.floatinglabel.instantpicker.DatePrinter;
 import com.marvinlabs.widget.floatinglabel.instantpicker.FloatingLabelDatePicker;
 import com.marvinlabs.widget.floatinglabel.instantpicker.FloatingLabelInstantPicker;
 import com.marvinlabs.widget.floatinglabel.instantpicker.JavaDateInstant;
+import com.marvinlabs.widget.floatinglabel.instantpicker.JavaDatePrinter;
 
+import java.text.DateFormat;
+import java.text.SimpleDateFormat;
 import java.util.GregorianCalendar;
+import java.util.Locale;
 
 import it.amonshore.secondapp.R;
 import it.amonshore.secondapp.Utils;
@@ -72,10 +78,10 @@ public class ReleaseEditorActivity extends ActionBarActivity {
         //
         //imposto i valori e creo i listener
         mTxtNumber = (FloatingLabelEditText)findViewById(R.id.txt_editor_release_number);
-        mTxtNumber.setInputWidgetText(Integer.toString(mRelease.getNumber()));
+        mTxtNumber.setInputWidgetText(mRelease.getNumber() == 0 ? "" : Integer.toString(mRelease.getNumber()));
         //
-        //TODO come si fa ad annullare la data???
         mTxtDate = (FloatingLabelDatePicker<JavaDateInstant>)findViewById(R.id.txt_editor_release_date);
+        mTxtDate.setInstantPrinter(new ReleaseDatePrinter());
         final JavaDateInstant instant;
         if (mRelease.getDate() == null) {
             instant = new JavaDateInstant();
@@ -120,7 +126,7 @@ public class ReleaseEditorActivity extends ActionBarActivity {
         });
         //
         mTxtPrice = (FloatingLabelEditText)findViewById(R.id.txt_editor_release_price);
-        mTxtPrice.setInputWidgetText(Double.toString(mRelease.getPrice()));
+        mTxtPrice.setInputWidgetText(mRelease.getPrice() == 0d ? "" : Double.toString(mRelease.getPrice()));
         //
         mTxtNotes = (FloatingLabelEditText)findViewById(R.id.txt_editor_release_notes);
         mTxtNotes.setInputWidgetText(mRelease.getNotes());
@@ -242,4 +248,18 @@ public class ReleaseEditorActivity extends ActionBarActivity {
         }
     }
 
+    private final class ReleaseDatePrinter implements DatePrinter<JavaDateInstant> {
+        final SimpleDateFormat mDateFormat = new SimpleDateFormat("cccc, dd MMMM yyyy", Locale.getDefault());
+
+        @Override
+        public String print(JavaDateInstant dateInstant) {
+            if(dateInstant == null) {
+                return "";
+            } else {
+                GregorianCalendar cal = new GregorianCalendar(dateInstant.getYear(),
+                        dateInstant.getMonthOfYear() + 1, dateInstant.getDayOfMonth());
+                return mDateFormat.format(cal.getTime());
+            }
+        }
+    }
 }

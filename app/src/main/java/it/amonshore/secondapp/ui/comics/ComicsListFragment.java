@@ -159,6 +159,11 @@ public class ComicsListFragment extends AFragment {
     }
 
     @Override
+    public void onCreateOptionsMenu(Menu menu, MenuInflater inflater) {
+        inflater.inflate(R.menu.menu_comics, menu);
+    }
+
+    @Override
     public void onPrepareOptionsMenu(Menu menu) {
         if ((mAdapter.getOrder() & ComicsListAdapter.ORDER_BY_NAME) == ComicsListAdapter.ORDER_BY_NAME) {
             menu.findItem(R.id.action_comics_sort_by_name).setVisible(false);
@@ -167,11 +172,6 @@ public class ComicsListFragment extends AFragment {
             menu.findItem(R.id.action_comics_sort_by_name).setVisible(true);
             menu.findItem(R.id.action_comics_sort_by_release).setVisible(false);
         }
-    }
-
-    @Override
-    public void onCreateOptionsMenu(Menu menu, MenuInflater inflater) {
-        inflater.inflate(R.menu.menu_comics, menu);
     }
 
     @Override

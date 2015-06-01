@@ -85,7 +85,7 @@ public class ComicsEditorActivity extends ActionBarActivity implements ItemPicke
         mTxtAuthors.setInputWidgetText(mComics.getAuthors());
         //
         mTxtPrice = (FloatingLabelEditText)findViewById(R.id.txt_editor_comics_price);
-        mTxtPrice.setInputWidgetText(Double.toString(mComics.getPrice()));
+        mTxtPrice.setInputWidgetText(mComics.getPrice() == 0d ? "" : Double.toString(mComics.getPrice()));
         //
         mTxtNotes = (FloatingLabelEditText)findViewById(R.id.txt_editor_comics_notes);
         mTxtNotes.setInputWidgetText(mComics.getNotes());
