@@ -35,6 +35,7 @@ public class ReleaseListAdapter extends BaseAdapter implements StickyListHeaders
     private LayoutInflater mInflater;
     private SimpleDateFormat mDateFormat;
     private boolean mGroupByMonth;
+    private View.OnClickListener mOnNumberViewClickListener;
 
     /**
      *
@@ -96,6 +97,18 @@ public class ReleaseListAdapter extends BaseAdapter implements StickyListHeaders
         return mReleaseInfos.size();
     }
 
+    public View.OnClickListener getOnNumberViewClickListener() {
+        return mOnNumberViewClickListener;
+    }
+
+    /**
+     *
+     * @param onNumberViewClickListener
+     */
+    public void setOnNumberViewClickListener(View.OnClickListener onNumberViewClickListener) {
+        this.mOnNumberViewClickListener = onNumberViewClickListener;
+    }
+
     @Override
     public boolean hasStableIds() {
         //visto che tutti gli id degli elementi non possono cambiare nel tempo
@@ -121,21 +134,24 @@ public class ReleaseListAdapter extends BaseAdapter implements StickyListHeaders
 
     @Override
     public View getView(int position, View convertView, ViewGroup parent) {
-        ViewHolder holder;
+        ItemViewHolder holder;
 
         if (convertView == null) {
-            holder = new ViewHolder();
+            holder = new ItemViewHolder();
             convertView = mInflater.inflate(R.layout.list_release_item, parent, false);
             holder.txtName = (TextView) convertView.findViewById(R.id.txt_list_release_name);
-            holder.txtInfo = (TextView) convertView.findViewById(R.id.txt_list_release_info);
-            holder.txtNumber = (TextView) convertView.findViewById(R.id.txt_list_release_number);
+            holder.txtNotes = (TextView) convertView.findViewById(R.id.txt_list_release_notes);
             holder.txtDate = (TextView) convertView.findViewById(R.id.txt_list_release_date);
+            holder.txtNumber = (TextView) convertView.findViewById(R.id.txt_list_release_number);
+            //imposto il listener sul click
+            holder.txtNumber.setOnClickListener(mOnNumberViewClickListener);
             convertView.setTag(holder);
         } else {
-            holder = (ViewHolder) convertView.getTag();
+            holder = (ItemViewHolder) convertView.getTag();
         }
 
-        Release release = mReleaseInfos.get(position).getRelease();
+        ReleaseInfo ri = mReleaseInfos.get(position);
+        Release release = ri.getRelease();
         Comics comics = mDataManager.getComics(release.getComicsId());
         String relDate = "";
         if (release.getDate() != null) {
@@ -144,7 +160,42 @@ public class ReleaseListAdapter extends BaseAdapter implements StickyListHeaders
         holder.txtName.setText(comics.getName());
         holder.txtNumber.setText(Integer.toString(release.getNumber()));
         holder.txtDate.setText(relDate);
-        holder.txtInfo.setText(String.format("%s - p %s", release.getNotes(), release.isPurchased()));
+        holder.txtNotes.setText(Utils.nvl(release.getNotes(), comics.getNotes(), ""));
+
+        //se la release è stata prenotata inserisco una icona
+        if (release.isOrdered()) {
+            //TODO holder.txtNotes.setCompoundDrawablesRelativeWithIntrinsicBounds();
+        } else {
+            //TODO
+        }
+
+        //imposto background e colore del testo in base allo stato della release
+        //me ne frego del gruppo se è purchased, questo perché al click sul numero aggiorno solo questa vista, e non tutta la lista (vedi fragment)
+        //  di conseguenza posso trovarmi release purchased in qualsiasi gruppo
+        if (release.isPurchased()) {
+            holder.txtNumber.setBackgroundResource(R.drawable.background_oval_purchased);
+            holder.txtNumber.setTextColor(mContext.getResources().getColor(R.color.comikku_purchased_primary_color));
+        } else {
+            switch (ri.getGroup()) {
+                case ReleaseGroupHelper.GROUP_LOST:
+                case ReleaseGroupHelper.GROUP_EXPIRED:
+                    holder.txtNumber.setBackgroundResource(R.drawable.background_oval_expired);
+                    holder.txtNumber.setTextColor(mContext.getResources().getColor(R.color.comikku_expired_primary_color));
+                    break;
+                case ReleaseGroupHelper.GROUP_PERIOD:
+                case ReleaseGroupHelper.GROUP_PERIOD_NEXT:
+                case ReleaseGroupHelper.GROUP_PERIOD_OTHER:
+                case ReleaseGroupHelper.GROUP_TO_PURCHASE:
+                case ReleaseGroupHelper.GROUP_PURCHASED:
+                    holder.txtNumber.setBackgroundResource(R.drawable.background_oval_to_purchase);
+                    holder.txtNumber.setTextColor(mContext.getResources().getColor(R.color.comikku_to_purchase_primary_color));
+                    break;
+                case ReleaseGroupHelper.GROUP_WISHLIST:
+                    holder.txtNumber.setBackgroundResource(R.drawable.background_oval_wishlist);
+                    holder.txtNumber.setTextColor(mContext.getResources().getColor(R.color.comikku_wishlist_primary_color));
+                    break;
+            }
+        }
 
         return convertView;
     }
@@ -201,9 +252,9 @@ public class ReleaseListAdapter extends BaseAdapter implements StickyListHeaders
         TextView text;
     }
 
-    final class ViewHolder {
+    final class ItemViewHolder {
         TextView txtName;
-        TextView txtInfo;
+        TextView txtNotes;
         TextView txtNumber;
         TextView txtDate;
     }

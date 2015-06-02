@@ -76,6 +76,10 @@ public class Release {
         this.purchased = purchased;
     }
 
+    public boolean togglePurchased() {
+        return (this.purchased = !this.purchased);
+    }
+
     public String getNotes() {
         return notes;
     }

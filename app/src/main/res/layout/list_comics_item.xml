@@ -1,48 +1,86 @@
 <?xml version="1.0" encoding="utf-8"?>
-<RelativeLayout xmlns:android="http://schemas.android.com/apk/res/android"
+<LinearLayout
+    xmlns:android="http://schemas.android.com/apk/res/android"
+    xmlns:tools="http://schemas.android.com/tools"
+    android:layout_width="fill_parent"
+    android:layout_height="?android:attr/listPreferredItemHeight"
+    android:baselineAligned="false"
     android:orientation="horizontal"
-    android:layout_width="match_parent"
-    android:layout_height="match_parent"
-    android:paddingTop="2dip"
-    android:paddingBottom="2dip"
-    android:background="?android:attr/activatedBackgroundIndicator"
-    android:minHeight="?android:attr/listPreferredItemHeight">
+    android:paddingTop="4dip"
+    android:paddingBottom="4dip"
+    android:paddingLeft="?android:listPreferredItemPaddingLeft"
+    android:paddingRight="?android:listPreferredItemPaddingRight"
+    android:weightSum="4"
+    android:background="?android:attr/activatedBackgroundIndicator" > <!-- uso questo perché aggiungue l'effetto ripple -->
 
-    <TextView android:id="@+id/txt_list_comics_best_release"
-        android:layout_width="60dp"
-        android:layout_height="wrap_content"
-        android:textAppearance="?android:attr/textAppearanceSmall"
-        android:textColor="@android:color/secondary_text_dark"
-        android:layout_marginStart="?android:attr/listPreferredItemPaddingStart"
-        android:layout_marginTop="6dip"
-        android:layout_alignParentEnd="true"
-        android:layout_alignBottom="@+id/txt_list_comics_publisher" />
+    <LinearLayout
+        android:layout_width="0dip"
+        android:layout_height="fill_parent"
+        android:layout_weight="3"
+        android:orientation="vertical">
 
-    <TextView android:id="@+id/txt_list_comics_name"
-        android:layout_width="match_parent"
-        android:layout_height="wrap_content"
-        android:layout_marginStart="?android:attr/listPreferredItemPaddingStart"
-        android:layout_marginTop="6dip"
-        android:textAppearance="?android:attr/textAppearanceMedium"
-        android:textColor="@android:color/holo_blue_dark"
-        android:layout_toStartOf="@+id/txt_list_comics_best_release" />
+        <TextView android:id="@+id/txt_list_comics_name"
+            tools:text="Medium Text 3 23 23 23 2 2 333 3"
+            android:layout_width="fill_parent"
+            android:layout_height="wrap_content"
+            android:textAppearance="?android:attr/textAppearanceMedium"
+            android:textColor="@color/comikku_primary_text"
+            android:singleLine="true"
+            android:ellipsize="end" />
 
-    <TextView android:id="@+id/txt_list_comics_publisher"
-        android:layout_width="match_parent"
-        android:layout_height="wrap_content"
-        android:layout_below="@id/txt_list_comics_name"
-        android:layout_alignStart="@id/txt_list_comics_name"
-        android:textAppearance="?android:attr/textAppearanceSmall"
-        android:textColor="@android:color/secondary_text_dark"
-        android:layout_toStartOf="@+id/txt_list_comics_best_release" />
+        <TextView android:id="@+id/txt_list_comics_publisher"
+            tools:text="Small Text"
+            android:layout_width="fill_parent"
+            android:layout_height="wrap_content"
+            android:textAppearance="?android:attr/textAppearanceSmall"
+            android:textColor="@color/comikku_secondary_text"
+            android:singleLine="true"
+            android:ellipsize="end" />
 
-    <TextView android:id="@+id/txt_list_comics_notes"
-        android:layout_width="match_parent"
-        android:layout_height="wrap_content"
-        android:layout_below="@id/txt_list_comics_publisher"
-        android:layout_alignStart="@id/txt_list_comics_publisher"
-        android:textAppearance="?android:attr/textAppearanceSmall"
-        android:textColor="@android:color/secondary_text_dark"
-        android:layout_toStartOf="@+id/txt_list_comics_best_release" />
+        <TextView android:id="@+id/txt_list_comics_notes"
+            tools:text="Small Text"
+            android:layout_width="fill_parent"
+            android:layout_height="wrap_content"
+            android:textAppearance="?android:attr/textAppearanceSmall"
+            android:textColor="@color/comikku_tertiary_text"
+            android:singleLine="true"
+            android:ellipsize="end" />
 
-</RelativeLayout>
+    </LinearLayout>
+
+    <LinearLayout
+        android:layout_width="0dip"
+        android:layout_height="fill_parent"
+        android:layout_weight="1"
+        android:orientation="vertical"
+        android:weightSum="100"
+        android:id="@+id/lay_best_release"
+        android:gravity="center_vertical">
+
+        <TextView android:id="@+id/txt_list_comics_number"
+            tools:text="100"
+            android:layout_width="fill_parent"
+            android:layout_height="wrap_content"
+            android:textAppearance="?android:attr/textAppearanceLarge"
+            android:background="@color/comikku_to_purchase_background_color"
+            android:textColor="@color/comikku_to_purchase_primary_color"
+            android:textStyle="bold"
+            android:gravity="center"
+            android:ellipsize="end"
+            android:elegantTextHeight="false"
+            android:paddingTop="6dip"
+            android:paddingBottom="6dip" />
+
+        <TextView android:id="@+id/txt_list_comics_date"
+            tools:text="4 mag"
+            android:layout_width="fill_parent"
+            android:layout_height="wrap_content"
+            android:textAppearance="?android:attr/textAppearanceSmall"
+            android:textColor="@android:color/primary_text_light"
+            android:background="@drawable/border_valid_releasedate"
+            android:gravity="center"
+            android:paddingTop="2dip"
+            android:paddingBottom="2dip" />
+    </LinearLayout>
+
+</LinearLayout>

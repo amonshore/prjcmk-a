@@ -20,6 +20,7 @@ import it.amonshore.secondapp.data.Comics;
 import it.amonshore.secondapp.data.ComicsObserver;
 import it.amonshore.secondapp.data.DataManager;
 import it.amonshore.secondapp.data.Release;
+import it.amonshore.secondapp.data.ReleaseGroupHelper;
 import it.amonshore.secondapp.ui.release.ReleaseListFragment;
 
 /**
@@ -135,7 +136,21 @@ public class MainActivity extends ActionBarActivity implements SharedPreferences
         if (cause == DataManager.CAUSE_RELEASES_MODE_CHANGED) {
             ReleaseListFragment fragment = (ReleaseListFragment)mTabPageAdapter.getItem(1);
             SlidingTabLayout slidingTabLayout = (SlidingTabLayout) findViewById(R.id.sliding_tabs);
-            slidingTabLayout.setPageTitle(1, "MODE " + fragment.getGroupMode());
+            //slidingTabLayout.setPageTitle(1, "MODE " + fragment.getGroupMode());
+            switch (fragment.getGroupMode()) {
+                case ReleaseGroupHelper.MODE_LAW:
+                    slidingTabLayout.setPageTitle(1, getString(R.string.title_page_wishlist));
+                    break;
+                case ReleaseGroupHelper.MODE_CALENDAR:
+                    slidingTabLayout.setPageTitle(1, getString(R.string.title_page_calendar));
+                    break;
+                case ReleaseGroupHelper.MODE_SHOPPING:
+                    slidingTabLayout.setPageTitle(1, getString(R.string.title_page_shopping));
+                    break;
+                default:
+                    slidingTabLayout.setPageTitle(1, getString(R.string.title_page_releases));
+                    break;
+            }
         }
         //TODO se sono stati modificati i dati potrei scatenare il salvataggio
     }
@@ -147,17 +162,15 @@ public class MainActivity extends ActionBarActivity implements SharedPreferences
         @Override
         protected Integer doInBackground(Void... params) {
             Utils.d(this.getClass(), "readComics");
-            //TODO cambia qualcosa?
-            if (MainActivity.this.mDataManager.isDataLoaded()) {
-                return DataManager.CAUSE_LOADING;
-            } else {
-                MainActivity.this.mDataManager.readComics();
-                return DataManager.CAUSE_LOADING;
-            }
+            MainActivity.this.mDataManager.readComics();
+            return DataManager.CAUSE_LOADING;
         }
 
         @Override
         protected void onPostExecute(Integer result) {
+            //forzo l'aggiornamento del titolo della tab
+            MainActivity.this.onChanged(DataManager.CAUSE_RELEASES_MODE_CHANGED);
+            //
             MainActivity.this.mDataManager.notifyChanged(result);
         }
     }

@@ -25,8 +25,31 @@ public class Utils {
      * @param str
      * @return
      */
-    public final static boolean isNullOrEmpty(CharSequence str) {
+    public static boolean isNullOrEmpty(CharSequence str) {
         return (str == null || TextUtils.getTrimmedLength(str) == 0);
+    }
+
+    /**
+     *
+     * @param text
+     * @param def
+     * @return
+     */
+    public static String nvl(String text, String def) {
+        return isNullOrEmpty(text) ? def : text;
+    }
+
+    /**
+     * Restituisce la prima stringa non vuota
+     *
+     * @param texts
+     * @return
+     */
+    public static String nvl(String... texts) {
+        for (String text : texts) {
+            if (!isNullOrEmpty(text)) return text;
+        }
+        return null;
     }
 
     /**

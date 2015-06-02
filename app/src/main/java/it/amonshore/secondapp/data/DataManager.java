@@ -386,4 +386,18 @@ public class DataManager extends Observable<ComicsObserver> {
             }
         }
     }
+
+    /**
+     *
+     * @param cause
+     * @param source
+     */
+    public void notifyChangedButMe(int cause, ComicsObserver source) {
+        synchronized (mObservers) {
+            for (int i = mObservers.size() - 1; i >= 0; i--) {
+                if (source == mObservers.get(i)) continue;
+                mObservers.get(i).onChanged(cause);
+            }
+        }
+    }
 }

@@ -99,8 +99,6 @@ public class ReleaseListFragment extends AFragment {
             SharedPreferences settings = getActivity().getSharedPreferences(MainActivity.PREFS_NAME, 0);
             mGroupMode = settings.getInt(STATE_MODE, ReleaseGroupHelper.MODE_CALENDAR);
         }
-        //
-        mAdapter = new ReleaseListAdapter(getActivity().getApplicationContext());
     }
 
     @Override
@@ -128,7 +126,26 @@ public class ReleaseListFragment extends AFragment {
     public View onCreateView(LayoutInflater inflater, ViewGroup container,
                              Bundle savedInstanceState) {
         View view = inflater.inflate(R.layout.fragment_releases_list, container, false);
-        StickyListHeadersListView list = (StickyListHeadersListView)view.findViewById(R.id.lst_releases);
+        final StickyListHeadersListView list = (StickyListHeadersListView)view.findViewById(R.id.lst_releases);
+        //
+        mAdapter = new ReleaseListAdapter(getActivity().getApplicationContext());
+        mAdapter.setOnNumberViewClickListener(new View.OnClickListener() {
+            @Override
+            public void onClick(View v) {
+                int position = list.getPositionForView(v);
+                if (position != ListView.INVALID_POSITION) {
+                    //Utils.d(this.getClass(), "click number on " + position);
+                    Release release = ((ReleaseInfo) mAdapter.getItem(position)).getRelease();
+                    release.togglePurchased();
+                    getDataManager().updateBestRelease(release.getComicsId());
+                    //invece di aggionarnare tutta la lista, con conseguente scomparsa degli item (visto che possono cambiare gruppo)
+                    //  aggiorno solo l'elemento corrente, così rimarrà nel suo gruppo semplicemente con uno stato diverso
+                    getDataManager().notifyChangedButMe(DataManager.CAUSE_RELEASE_CHANGED, ReleaseListFragment.this);
+                    //per aggiornare solo questo item richiamo adapter.getView(...) -> http://stackoverflow.com/questions/4075975/redraw-a-single-row-in-a-listview
+                    mAdapter.getView(position, (View) v.getParent(), list);
+                }
+            }
+        });
         //
         list.setAdapter(mAdapter);
         //questa è la vera lista

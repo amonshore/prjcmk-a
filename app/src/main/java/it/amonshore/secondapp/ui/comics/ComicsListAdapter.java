@@ -1,7 +1,6 @@
 package it.amonshore.secondapp.ui.comics;
 
 import android.content.Context;
-import android.text.TextUtils;
 import android.view.LayoutInflater;
 import android.view.View;
 import android.view.ViewGroup;
@@ -140,7 +139,7 @@ public class ComicsListAdapter extends BaseAdapter {
         //TODO usare un view holder
         if (convertView == null) {
             //convertView = LayoutInflater.from(mContext).inflate(R.layout.list_comics_item, null);
-            convertView = LayoutInflater.from(mContext).inflate(R.layout.list_comics_item2, null);
+            convertView = LayoutInflater.from(mContext).inflate(R.layout.list_comics_item, null);
         }
 
         Comics comics = (Comics)getItem(position);
@@ -163,6 +162,7 @@ public class ComicsListAdapter extends BaseAdapter {
         ((TextView)convertView.findViewById(R.id.txt_list_comics_publisher)).setText(comics.getPublisher());
         ((TextView)convertView.findViewById(R.id.txt_list_comics_notes))
                 .setText(Utils.join(" - ", true, comics.getAuthors(), comics.getNotes()));
+        //TODO notes -> usare quello della release
         return convertView;
     }
 
