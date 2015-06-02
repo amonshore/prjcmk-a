@@ -19,7 +19,7 @@ public class ComicsBestReleaseHelper {
      * @param comics
      * @return
      */
-    public static Release getComicsBestRelease(Comics comics) {
+    public static ReleaseInfo getComicsBestRelease(Comics comics) {
         //imposto le date
         TimeZone timeZone = TimeZone.getDefault();
         long today = DateTime.today(timeZone).getStartOfDay().getMilliseconds(timeZone);;
@@ -42,11 +42,11 @@ public class ComicsBestReleaseHelper {
             }
         });
 
-        Release found = null;
+        ReleaseInfo found = null;
         //cerco la prima scaduta e non acquistata
         for (Release rel : releases) {
             if (!rel.isPurchased() && rel.getDate() != null && rel.getDate().getTime() < today) {
-                found = rel;
+                found = new ReleaseInfo(ReleaseGroupHelper.GROUP_EXPIRED, rel);
                 break;
             }
         }
@@ -54,7 +54,7 @@ public class ComicsBestReleaseHelper {
             //cerco la prima NON scaduta e non acquistata
             for (Release rel : releases) {
                 if (!rel.isPurchased() && rel.getDate() != null && rel.getDate().getTime() >= today) {
-                    found = rel;
+                    found = new ReleaseInfo(ReleaseGroupHelper.GROUP_TO_PURCHASE, rel);
                     break;
                 }
             }
@@ -62,7 +62,7 @@ public class ComicsBestReleaseHelper {
                 //cerco la prima senza data e non acquistata
                 for (Release rel : releases) {
                     if (!rel.isPurchased() && rel.getDate() == null) {
-                        found = rel;
+                        found = new ReleaseInfo(ReleaseGroupHelper.GROUP_WISHLIST, rel);
                         break;
                     }
                 }

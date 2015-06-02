@@ -85,7 +85,7 @@ public class DataManager extends Observable<ComicsObserver> {
     //contiene un elenco di tutti gli editori
     private HashSet<String> mPublishers;
     //contiene la best release per ogni comics
-    private TreeMap<Long, Release> mBestReleases;
+    private TreeMap<Long, ReleaseInfo> mBestReleases;
     private SimpleDateFormat mDateFormat;
 
     private DataManager(Context context) {
@@ -296,11 +296,11 @@ public class DataManager extends Observable<ComicsObserver> {
      * @param id
      * @return
      */
-    public Release updateBestRelease(long id) {
+    public ReleaseInfo updateBestRelease(long id) {
         Comics comics = getComics(id);
-        Release release = ComicsBestReleaseHelper.getComicsBestRelease(comics);
-        mBestReleases.put(comics.getId(), release);
-        return release;
+        ReleaseInfo ri = ComicsBestReleaseHelper.getComicsBestRelease(comics);
+        mBestReleases.put(comics.getId(), ri);
+        return ri;
     }
 
     /**
@@ -308,9 +308,8 @@ public class DataManager extends Observable<ComicsObserver> {
      * @param id
      * @return
      */
-    public Release getBestRelease(long id) {
-        Release release = mBestReleases.get(id);
-        return release;
+    public ReleaseInfo getBestRelease(long id) {
+        return mBestReleases.get(id);
     }
 
     /**

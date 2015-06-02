@@ -164,9 +164,9 @@ public class ReleaseListAdapter extends BaseAdapter implements StickyListHeaders
 
         //se la release è stata prenotata inserisco una icona
         if (release.isOrdered()) {
-            //TODO holder.txtNotes.setCompoundDrawablesRelativeWithIntrinsicBounds();
+            holder.txtNotes.setCompoundDrawablesRelativeWithIntrinsicBounds(0, 0, R.drawable.ic_archive_16, 0);
         } else {
-            //TODO
+            holder.txtNotes.setCompoundDrawablesRelativeWithIntrinsicBounds(0, 0, 0, 0);
         }
 
         //imposto background e colore del testo in base allo stato della release

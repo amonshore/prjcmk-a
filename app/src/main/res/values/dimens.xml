@@ -9,7 +9,8 @@
     <dimen name="floating_action_elevation">4dp</dimen>
 
     <!-- Dimensione testo -->
-    <dimen name="list_text_size_primary">16sp</dimen>
-    <dimen name="list_text_size_secondary">12sp</dimen>
-    <dimen name="list_text_size_smallest">10sp</dimen>
+    <dimen name="comikku_text_size_large">24sp</dimen>
+    <dimen name="comikku_text_size_primary">16sp</dimen>
+    <dimen name="comikku_text_size_secondary">12sp</dimen>
+    <dimen name="comikku_text_size_smallest">10sp</dimen>
 </resources>

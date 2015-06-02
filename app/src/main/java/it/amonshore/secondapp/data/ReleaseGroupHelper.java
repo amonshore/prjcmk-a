@@ -30,7 +30,7 @@ public class ReleaseGroupHelper {
      */
     public final static int MODE_LAW = 3;
     /**
-     * Modalità comics: da acquistare, acquistati, persi, wishlist
+     * Modalità comics: persi, da acquistare, acquistati
      */
     public final static int MODE_COMICS = 4;
 
@@ -204,7 +204,8 @@ public class ReleaseGroupHelper {
                 //else if (tryPutInLost(release)) return GROUP_LOST;
             else if (tryPutInWishlist(release)) return GROUP_WISHLIST;
         } else if (mMode == MODE_COMICS) {
-            if (tryPutInToPurchase(release)) return GROUP_TO_PURCHASE;
+            if (tryPutInExpired(release)) return GROUP_EXPIRED;
+            else if (tryPutInToPurchase(release)) return GROUP_TO_PURCHASE;
             else if (tryPutInPurchased(release)) return GROUP_PURCHASED;
         }
         return GROUP_UNKNOWN;

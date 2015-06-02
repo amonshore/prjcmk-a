@@ -18,6 +18,8 @@ import it.amonshore.secondapp.data.Comics;
 import it.amonshore.secondapp.data.DataManager;
 import it.amonshore.secondapp.Utils;
 import it.amonshore.secondapp.data.Release;
+import it.amonshore.secondapp.data.ReleaseGroupHelper;
+import it.amonshore.secondapp.data.ReleaseInfo;
 
 /**
  * Created by Calgia on 07/05/2015.
@@ -136,33 +138,69 @@ public class ComicsListAdapter extends BaseAdapter {
 
     @Override
     public View getView(int position, View convertView, ViewGroup parent) {
-        //TODO usare un view holder
+        ItemViewHolder holder;
+
         if (convertView == null) {
-            //convertView = LayoutInflater.from(mContext).inflate(R.layout.list_comics_item, null);
+            holder = new ItemViewHolder();
             convertView = LayoutInflater.from(mContext).inflate(R.layout.list_comics_item, null);
+            holder.txtName = (TextView) convertView.findViewById(R.id.txt_list_comics_name);
+            holder.txtPublisher = (TextView) convertView.findViewById(R.id.txt_list_comics_publisher);
+            holder.txtNotes = (TextView) convertView.findViewById(R.id.txt_list_comics_notes);
+            holder.txtDate = (TextView) convertView.findViewById(R.id.txt_list_comics_date);
+            holder.txtNumber = (TextView) convertView.findViewById(R.id.txt_list_comics_number);
+            convertView.setTag(holder);
+        } else {
+            holder = (ItemViewHolder) convertView.getTag();
         }
 
         Comics comics = (Comics)getItem(position);
-        Release bestRelease = mDataManager.getBestRelease(comics.getId());
-        if (bestRelease != null) {
-            String relDate = "";
+        ReleaseInfo bestReleaseInfo = mDataManager.getBestRelease(comics.getId());
+        String bestReleaseNotes = null;
+        if (bestReleaseInfo != null) {
+            Release bestRelease = bestReleaseInfo.getRelease();
+            String relDate = mContext.getString(R.string.placeholder_wishlist);
             if (bestRelease.getDate() != null) {
                 relDate = mDateFormat.format(bestRelease.getDate());
             }
-//            ((TextView) convertView.findViewById(R.id.txt_list_comics_best_release))
-//                    .setText(String.format("#%s - %s - p %s", bestRelease.getNumber(), relDate, bestRelease.isPurchased()));
-            ((TextView) convertView.findViewById(R.id.txt_list_comics_number)).setText(Integer.toString(bestRelease.getNumber()));
-            ((TextView) convertView.findViewById(R.id.txt_list_comics_date)).setText(relDate);
+            holder.txtNumber.setText(Integer.toString(bestRelease.getNumber()));
+            holder.txtDate.setText(relDate);
+
+            switch (bestReleaseInfo.getGroup()) {
+                case ReleaseGroupHelper.GROUP_LOST:
+                case ReleaseGroupHelper.GROUP_EXPIRED:
+                    holder.txtNumber.setBackgroundResource(R.color.comikku_expired_background_color);
+                    holder.txtNumber.setTextColor(mContext.getResources().getColor(R.color.comikku_expired_primary_color));
+                    holder.txtDate.setBackgroundResource(R.drawable.border_expired_releasedate);
+                    break;
+                case ReleaseGroupHelper.GROUP_PERIOD:
+                case ReleaseGroupHelper.GROUP_PERIOD_NEXT:
+                case ReleaseGroupHelper.GROUP_PERIOD_OTHER:
+                case ReleaseGroupHelper.GROUP_TO_PURCHASE:
+                case ReleaseGroupHelper.GROUP_PURCHASED:
+                    holder.txtNumber.setBackgroundResource(R.color.comikku_to_purchase_background_color);
+                    holder.txtNumber.setTextColor(mContext.getResources().getColor(R.color.comikku_to_purchase_primary_color));
+                    holder.txtDate.setBackgroundResource(R.drawable.border_to_purchase_releasedate);
+                    break;
+                case ReleaseGroupHelper.GROUP_WISHLIST:
+                    holder.txtNumber.setBackgroundResource(R.color.comikku_wishlist_background_color);
+                    holder.txtNumber.setTextColor(mContext.getResources().getColor(R.color.comikku_wishlist_primary_color));
+                    holder.txtDate.setBackgroundResource(R.drawable.border_wishlist_releasedate);
+                    break;
+            }
+
+            holder.txtNumber.setVisibility(View.VISIBLE);
+            holder.txtDate.setVisibility(View.VISIBLE);
+            bestReleaseNotes = bestRelease.getNotes();
         } else {
-            //((TextView) convertView.findViewById(R.id.txt_list_comics_best_release)).setText("");
-            ((TextView) convertView.findViewById(R.id.txt_list_comics_number)).setText("");
-            ((TextView) convertView.findViewById(R.id.txt_list_comics_date)).setText("");
+            holder.txtNumber.setText("");
+            holder.txtDate.setText("");
+            holder.txtNumber.setVisibility(View.INVISIBLE);
+            holder.txtDate.setVisibility(View.INVISIBLE);
         }
-        ((TextView)convertView.findViewById(R.id.txt_list_comics_name)).setText(comics.getName());
-        ((TextView)convertView.findViewById(R.id.txt_list_comics_publisher)).setText(comics.getPublisher());
-        ((TextView)convertView.findViewById(R.id.txt_list_comics_notes))
-                .setText(Utils.join(" - ", true, comics.getAuthors(), comics.getNotes()));
-        //TODO notes -> usare quello della release
+        holder.txtName.setText(comics.getName());
+        holder.txtPublisher.setText(comics.getPublisher());
+        holder.txtNotes.setText(Utils.join(" - ", true, comics.getAuthors(),
+                Utils.nvl(bestReleaseNotes, comics.getNotes())));
         return convertView;
     }
 
@@ -201,23 +239,33 @@ public class ComicsListAdapter extends BaseAdapter {
         public int compare(Long lhs, Long rhs) {
             Comics lco = ComicsListAdapter.this.mDataManager.getComics(lhs);
             Comics rco = ComicsListAdapter.this.mDataManager.getComics(rhs);
-            Release lre = mDataManager.getBestRelease(lco.getId());
-            Release rre = mDataManager.getBestRelease(rco.getId());
+            ReleaseInfo lre = mDataManager.getBestRelease(lco.getId());
+            ReleaseInfo rre = mDataManager.getBestRelease(rco.getId());
+            Release lrer, rrer;
 
-            if (lre == null) lre = emptyRelease;
-            if (rre == null) rre = emptyRelease;
+            if (lre == null) lrer = emptyRelease; else lrer = lre.getRelease();
+            if (rre == null) rrer = emptyRelease; else rrer = rre.getRelease();
 
-            if (lre.getDate() != null && rre.getDate() != null) {
-                return lre.getDate().compareTo(rre.getDate());
-            } else if (lre.getDate() != null && rre.getDate() == null) {
+            if (lrer.getDate() != null && rrer.getDate() != null) {
+                return lrer.getDate().compareTo(rrer.getDate());
+            } else if (lrer.getDate() != null && rrer.getDate() == null) {
                 return -1;
-            } else if (lre.getDate() == null && rre.getDate() != null) {
+            } else if (lrer.getDate() == null && rrer.getDate() != null) {
                 return 1;
-            } else if (lre.getNumber() == rre.getNumber()) {
+            } else if (lrer.getNumber() == rrer.getNumber()) {
                 return lco.getName().compareToIgnoreCase(rco.getName());
             } else {
-                return lre.getNumber() - rre.getNumber();
+                return lrer.getNumber() - rrer.getNumber();
             }
         }
     }
+
+    final class ItemViewHolder {
+        TextView txtName;
+        TextView txtPublisher;
+        TextView txtNotes;
+        TextView txtNumber;
+        TextView txtDate;
+    }
+
 }
