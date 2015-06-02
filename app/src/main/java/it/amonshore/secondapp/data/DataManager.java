@@ -40,6 +40,7 @@ public class DataManager extends Observable<ComicsObserver> {
     public static final int CAUSE_RELEASE_CHANGED = 1 << 9;
     public static final int CAUSE_RELEASE_REMOVED = 1 << 10;
     public static final int CAUSE_RELEASES_MODE_CHANGED = 1 << 11;
+    public static final int CAUSE_CREATED = 1 << 12;
 
     //private final static String FILE_NAME = "data.json";
     private final static String FILE_NAME = "USER_backup.json";
@@ -374,6 +375,8 @@ public class DataManager extends Observable<ComicsObserver> {
      * @param cause
      */
     public void notifyChanged(int cause) {
+        Utils.d(this.getClass(), "notifyChanged " + cause);
+
         //see DataSetObservable.notifyChanged()
         synchronized(mObservers) {
             // since onChanged() is implemented by the app, it could do anything, including
@@ -392,6 +395,8 @@ public class DataManager extends Observable<ComicsObserver> {
      * @param source
      */
     public void notifyChangedButMe(int cause, ComicsObserver source) {
+        Utils.d(this.getClass(), "notifyChangedButMe " + cause);
+
         synchronized (mObservers) {
             for (int i = mObservers.size() - 1; i >= 0; i--) {
                 if (source == mObservers.get(i)) continue;

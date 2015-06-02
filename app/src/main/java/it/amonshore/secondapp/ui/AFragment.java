@@ -64,13 +64,12 @@ public abstract class AFragment extends Fragment implements ComicsObserver {
         //  chiamando onChanged qua si risolve la cosa, ma viene chiamato due volte all'avvio dell'app
         //  nell' onChanged se la causa è CREATE si potrebbe consideare di chiamare onDataChanged (con LOADING)
         //      se veramente è cambiato qualcosa
-        // onChanged(DataManager.CAUSE_CREATE);
+        onChanged(DataManager.CAUSE_CREATED);
     }
 
     @Override
     public void onDestroy() {
         super.onDestroy();
-        //TODO non sono sicuro se farlo qua o in onDetach()
         Utils.d(this.getClass(), "onDestroy -> unregister observer");
         mDataManager.unregisterObserver(this);
     }
