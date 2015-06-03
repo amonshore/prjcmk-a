@@ -40,7 +40,7 @@ public class ComicsListAdapter extends BaseAdapter {
 
     public ComicsListAdapter(Context context, int order) {
         mContext = context;
-        mDataManager = DataManager.getDataManager(context);
+        mDataManager = DataManager.getDataManager();
         mSortedIds = new ArrayList<>();
         mDateFormat = new SimpleDateFormat("c dd MMM", Locale.getDefault());
         setOrder(order);

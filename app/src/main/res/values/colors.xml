@@ -37,9 +37,9 @@
     <color name="comikku_purchased_primary_color">#FAFAFA</color>
     <color name="comikku_purchased_background_border">#757575</color>
 
-    <color name="comikku_expired_background_color">#FF5722</color>
-    <color name="comikku_expired_primary_color">#FBE9E7</color>
-    <color name="comikku_expired_background_border">#F4511E</color>
+    <color name="comikku_expired_background_color">#E53935</color>
+    <color name="comikku_expired_primary_color">#FFEBEE</color>
+    <color name="comikku_expired_background_border">#D32F2F</color>
 
     <color name="comikku_wishlist_background_color">#9C27B0</color>
     <color name="comikku_wishlist_primary_color">#F3E5F5</color>

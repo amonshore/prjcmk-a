@@ -61,7 +61,7 @@ public class ReleaseEditorActivity extends ActionBarActivity {
         super.onCreate(savedInstanceState);
         setContentView(R.layout.activity_release_editor);
         //uso il contesto dell'applicazione, usato anche nell'Activity principale
-        mDataManager = DataManager.getDataManager(getApplicationContext());
+        mDataManager = DataManager.getDataManager();
         //leggo i parametri
         Intent intent = getIntent();
         long comicsId = intent.getLongExtra(EXTRA_COMICS_ID, COMICS_ID_NONE);

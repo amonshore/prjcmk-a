@@ -34,7 +34,7 @@ public class ComicsDetailActivity extends ActionBarActivity {
         super.onCreate(savedInstanceState);
         setContentView(R.layout.activity_comics_detail);
         //uso il contesto dell'applicazione, usato anche nell'Activity principale
-        mDataManager = DataManager.getDataManager(getApplicationContext());
+        mDataManager = DataManager.getDataManager();
         //leggo i parametri
         Intent intent = getIntent();
         //presumo che l'id sia valido

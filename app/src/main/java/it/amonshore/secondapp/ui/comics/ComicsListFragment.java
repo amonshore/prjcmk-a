@@ -197,6 +197,7 @@ public class ComicsListFragment extends AFragment {
             Comics comics = getDataManager().getComics(comicsId);
             int position = mAdapter.insertOrUpdate(comics);
             mAdapter.notifyDataSetChanged();
+            getDataManager().notifyChangedButMe(DataManager.CAUSE_COMICS_CHANGED, this);
         }
     }
 

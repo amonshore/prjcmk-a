@@ -45,13 +45,14 @@ public class ComicsEditorActivity extends ActionBarActivity implements ItemPicke
     private FloatingLabelEditText mTxtName, mTxtSeries, mTxtAuthors, mTxtPrice, mTxtNotes;
     private FloatingLabelAutoCompleteTextView mTxtPublisher;
     private FloatingLabelItemPicker<String> mSpPeriodicity;
+    //TODO manca reserved
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
         setContentView(R.layout.activity_comics_editor);
         //uso il contesto dell'applicazione, usato anche nell'Activity principale
-        mDataManager = DataManager.getDataManager(getApplicationContext());
+        mDataManager = DataManager.getDataManager();
         //leggo i parametri
         Intent intent = getIntent();
         long comicsId = intent.getLongExtra(EXTRA_COMICS_ID, COMICS_ID_NEW);

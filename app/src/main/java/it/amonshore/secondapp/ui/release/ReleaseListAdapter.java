@@ -43,7 +43,7 @@ public class ReleaseListAdapter extends BaseAdapter implements StickyListHeaders
      */
     public ReleaseListAdapter(Context context) {
         mContext = context;
-        mDataManager = DataManager.getDataManager(context);
+        mDataManager = DataManager.getDataManager();
         mInflater = LayoutInflater.from(context);
         mDateFormat = new SimpleDateFormat("c dd MMM", Locale.getDefault());
    }

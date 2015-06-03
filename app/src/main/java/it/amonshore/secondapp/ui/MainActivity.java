@@ -44,8 +44,10 @@ public class MainActivity extends ActionBarActivity implements SharedPreferences
         //setContentView(R.layout.activity_main);
         setContentView(R.layout.activity_main_sliding);
         //
-        mDataManager = DataManager.getDataManager(this.getApplicationContext());
+        mDataManager = DataManager.init(this.getApplicationContext());
+        Utils.d(this.getClass(), "*********** MAIN onCreate -> register observer and start WH");
         mDataManager.registerObserver(this);
+        mDataManager.startWriteHandler();
         //impsota i valori di default, il parametro false assicura che questo venga fatto una sola volta
         //  indipendentemente da quante volte viene chiamato il metodo
         PreferenceManager.setDefaultValues(this, R.xml.preferences, false);
@@ -108,6 +110,14 @@ public class MainActivity extends ActionBarActivity implements SharedPreferences
     }
 
     @Override
+    protected void onDestroy() {
+        super.onDestroy();
+        Utils.d(this.getClass(), "*********** MAIN onDestroy -> unregister observer and stop WH");
+        mDataManager.unregisterObserver(this);
+        mDataManager.stopWriteHandler();
+    }
+
+    @Override
     public boolean onCreateOptionsMenu(Menu menu) {
         // Inflate the menu; this adds items to the action bar if it is present.
         getMenuInflater().inflate(R.menu.menu_main, menu);
@@ -133,26 +143,37 @@ public class MainActivity extends ActionBarActivity implements SharedPreferences
 
     @Override
     public void onChanged(int cause) {
-        if (cause == DataManager.CAUSE_RELEASES_MODE_CHANGED) {
-            ReleaseListFragment fragment = (ReleaseListFragment)mTabPageAdapter.getItem(1);
-            SlidingTabLayout slidingTabLayout = (SlidingTabLayout) findViewById(R.id.sliding_tabs);
-            //slidingTabLayout.setPageTitle(1, "MODE " + fragment.getGroupMode());
-            switch (fragment.getGroupMode()) {
-                case ReleaseGroupHelper.MODE_LAW:
-                    slidingTabLayout.setPageTitle(1, getString(R.string.title_page_wishlist));
-                    break;
-                case ReleaseGroupHelper.MODE_CALENDAR:
-                    slidingTabLayout.setPageTitle(1, getString(R.string.title_page_calendar));
-                    break;
-                case ReleaseGroupHelper.MODE_SHOPPING:
-                    slidingTabLayout.setPageTitle(1, getString(R.string.title_page_shopping));
-                    break;
-                default:
-                    slidingTabLayout.setPageTitle(1, getString(R.string.title_page_releases));
-                    break;
-            }
+        switch (cause) {
+            case DataManager.CAUSE_RELEASES_MODE_CHANGED:
+                ReleaseListFragment fragment = (ReleaseListFragment)mTabPageAdapter.getItem(1);
+                SlidingTabLayout slidingTabLayout = (SlidingTabLayout) findViewById(R.id.sliding_tabs);
+                //slidingTabLayout.setPageTitle(1, "MODE " + fragment.getGroupMode());
+                switch (fragment.getGroupMode()) {
+                    case ReleaseGroupHelper.MODE_LAW:
+                        slidingTabLayout.setPageTitle(1, getString(R.string.title_page_wishlist));
+                        break;
+                    case ReleaseGroupHelper.MODE_CALENDAR:
+                        slidingTabLayout.setPageTitle(1, getString(R.string.title_page_calendar));
+                        break;
+                    case ReleaseGroupHelper.MODE_SHOPPING:
+                        slidingTabLayout.setPageTitle(1, getString(R.string.title_page_shopping));
+                        break;
+                    default:
+                        slidingTabLayout.setPageTitle(1, getString(R.string.title_page_releases));
+                        break;
+                }
+                break;
+            case DataManager.CAUSE_COMICS_ADDED:
+            case DataManager.CAUSE_COMICS_CHANGED:
+            case DataManager.CAUSE_COMICS_REMOVED:
+            case DataManager.CAUSE_RELEASE_ADDED:
+            case DataManager.CAUSE_RELEASE_CHANGED:
+            case DataManager.CAUSE_RELEASE_REMOVED:
+                //TODO può tornare utile :D
+                Utils.d(this.getClass(), "call writeComics");
+                mDataManager.writeComics();
+                break;
         }
-        //TODO se sono stati modificati i dati potrei scatenare il salvataggio
     }
 
     /**

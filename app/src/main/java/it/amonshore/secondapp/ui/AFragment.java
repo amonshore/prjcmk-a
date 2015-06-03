@@ -56,7 +56,7 @@ public abstract class AFragment extends Fragment implements ComicsObserver {
     @Override
     public void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
-        mDataManager = DataManager.getDataManager(getActivity().getApplicationContext());
+        mDataManager = DataManager.getDataManager();
         Utils.d(this.getClass(), "onCreate -> register observer");
         mDataManager.registerObserver(this);
         //TODO se l'app va in background e poi ripristinata, capita che la lista dei comics sia vuota
