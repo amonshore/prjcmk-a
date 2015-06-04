@@ -10,6 +10,7 @@ import android.widget.TextView;
 import com.github.clans.fab.FloatingActionButton;
 
 import it.amonshore.secondapp.R;
+import it.amonshore.secondapp.Utils;
 import it.amonshore.secondapp.data.Comics;
 import it.amonshore.secondapp.data.DataManager;
 import it.amonshore.secondapp.data.ReleaseGroupHelper;
@@ -27,20 +28,22 @@ public class ComicsDetailActivity extends ActionBarActivity {
     private Comics mComics;
     private DataManager mDataManager;
     private ReleaseListFragment mReleaseListFragment;
-    private TextView mTxtName;
+    private TextView mTxtName, mTxtPublisher, mTxtNotes;
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
         setContentView(R.layout.activity_comics_detail);
         //uso il contesto dell'applicazione, usato anche nell'Activity principale
-        mDataManager = DataManager.getDataManager(getApplicationContext());
+        mDataManager = DataManager.getDataManager();
         //leggo i parametri
         Intent intent = getIntent();
         //presumo che l'id sia valido
         mComics = mDataManager.getComics(intent.getLongExtra(EXTRA_COMICS_ID, 0));
         //
         mTxtName = ((TextView)findViewById(R.id.txt_detail_comics_name));
+        mTxtPublisher = ((TextView)findViewById(R.id.txt_detail_comics_publisher));
+        mTxtNotes = ((TextView)findViewById(R.id.txt_detail_comics_notes));
         updateHeader();
         //
         ((FloatingActionButton)findViewById(R.id.fab_comics_edit)).setOnClickListener(new View.OnClickListener() {
@@ -59,7 +62,7 @@ public class ComicsDetailActivity extends ActionBarActivity {
         //
         mReleaseListFragment = ((ReleaseListFragment)getSupportFragmentManager().findFragmentById(R.id.frg_release_list));
         mReleaseListFragment.setComics(mComics, ReleaseGroupHelper.MODE_COMICS);
-        mReleaseListFragment.needDataRefresh(AFragment.CAUSE_LOADING);
+        mReleaseListFragment.onDataChanged(DataManager.CAUSE_LOADING);
     }
 
     @Override
@@ -70,14 +73,18 @@ public class ComicsDetailActivity extends ActionBarActivity {
         if (resultCode == Activity.RESULT_OK) {
             if (requestCode == ComicsEditorActivity.EDIT_COMICS_REQUEST) {
                 updateHeader();
+                mDataManager.notifyChanged(DataManager.CAUSE_COMICS_CHANGED);
             } else if (requestCode == ReleaseEditorActivity.EDIT_RELEASE_REQUEST) {
-                mReleaseListFragment.needDataRefresh(AFragment.CAUSE_DATA_CHANGED);
+                mDataManager.updateBestRelease(mComics.getId());
+                mDataManager.notifyChanged(DataManager.CAUSE_RELEASE_ADDED);
             }
         }
     }
 
     private void updateHeader() {
-        mTxtName.setText(mComics.getName() + " " + mComics.getPublisher());
+        mTxtName.setText(mComics.getName());
+        mTxtPublisher.setText(Utils.nvl(mComics.getPublisher(), ""));
+        mTxtNotes.setText(Utils.join("\n", true, mComics.getAuthors(), mComics.getNotes()));
     }
 
     private void showComicsEditor(Comics comics) {

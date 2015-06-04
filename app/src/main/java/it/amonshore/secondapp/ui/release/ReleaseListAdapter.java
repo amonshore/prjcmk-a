@@ -8,6 +8,9 @@ import android.widget.BaseAdapter;
 import android.widget.TextView;
 
 import java.text.SimpleDateFormat;
+import java.util.ArrayList;
+import java.util.Arrays;
+import java.util.List;
 import java.util.Locale;
 
 import it.amonshore.secondapp.R;
@@ -28,12 +31,12 @@ public class ReleaseListAdapter extends BaseAdapter implements StickyListHeaders
 
     private Context mContext;
     private DataManager mDataManager;
-    private ReleaseInfo[] mReleaseInfos;
+    private List<ReleaseInfo> mReleaseInfos;
     private LayoutInflater mInflater;
     private SimpleDateFormat mDateFormat;
-    //modalità: indica cosa far vedere e come deve essere raggruppato
-    private int mMode;
     private boolean mGroupByMonth;
+    private View.OnClickListener mOnNumberViewClickListener;
+    private boolean mUseSingleComicsLayout;
 
     /**
      *
@@ -41,31 +44,9 @@ public class ReleaseListAdapter extends BaseAdapter implements StickyListHeaders
      */
     public ReleaseListAdapter(Context context) {
         mContext = context;
-        mDataManager = DataManager.getDataManager(context);
+        mDataManager = DataManager.getDataManager();
         mInflater = LayoutInflater.from(context);
-        mDateFormat = new SimpleDateFormat("c dd MMM", Locale.getDefault());
    }
-
-    /**
-     *
-     * @param release
-     * @return  ritorna la posizione dell'elemento
-     */
-    public int insertOrUpdate(Release release) {
-        //TODO insertOrUpdate
-//        Comics comics = mDataManager.getComics(release.getComicsId());
-//        if (comics.putRelease(release)) {
-//            //è un nuovo elemento
-//            mSortedIds.add(new ReleaseId(comics.getId(), release.getNumber()));
-//            //TODO ordinare, raggruppare, etc.
-//            return mSortedIds.indexOf(release);
-//        } else {
-//            //è un elemento già esistente
-//            //TODO ordinare, raggruppare, etc.
-//            return mSortedIds.indexOf(release);
-//        }
-        return -1;
-    }
 
     /**
      *
@@ -78,12 +59,19 @@ public class ReleaseListAdapter extends BaseAdapter implements StickyListHeaders
 
     /**
      *
-     * @param release
+     * @param position
      * @return
      */
-    public boolean remove(Release release) {
-        Comics comics = mDataManager.getComics(release.getComicsId());
-        return comics.removeRelease(release.getNumber());
+    public boolean remove(int position) {
+        ReleaseInfo ri = (ReleaseInfo)getItem(position);
+        Comics comics = mDataManager.getComics(ri.getRelease().getComicsId());
+        if (comics.removeRelease(ri.getRelease().getNumber())) {
+            mDataManager.updateBestRelease(comics.getId());
+            mReleaseInfos.remove(position);
+            return true;
+        } else {
+            return false;
+        }
     }
 
     /**
@@ -95,19 +83,34 @@ public class ReleaseListAdapter extends BaseAdapter implements StickyListHeaders
      * @return
      */
     public int refresh(Comics comics, int mode, boolean groupByMonth, boolean weekStartOnMonday) {
-        mMode = mode;
         mGroupByMonth = groupByMonth;
         //creo gli elementi per la lista
         ReleaseGroupHelper helper = new ReleaseGroupHelper(mode, groupByMonth, weekStartOnMonday);
         if (comics == null) {
+            mUseSingleComicsLayout = false;
+            mDateFormat = new SimpleDateFormat("c dd MMM", Locale.getDefault());
             for (long comicsId : mDataManager.getComics()) {
                 helper.addReleases(mDataManager.getComics(comicsId).getReleases());
             }
         } else {
+            mUseSingleComicsLayout = true;
+            mDateFormat = new SimpleDateFormat("cccc, dd MMM yyyy", Locale.getDefault());
             helper.addReleases(comics.getReleases());
         }
-        mReleaseInfos = helper.getReleaseInfos();
-        return mReleaseInfos.length;
+        mReleaseInfos = new ArrayList<>(Arrays.asList(helper.getReleaseInfos()));
+        return mReleaseInfos.size();
+    }
+
+    public View.OnClickListener getOnNumberViewClickListener() {
+        return mOnNumberViewClickListener;
+    }
+
+    /**
+     *
+     * @param onNumberViewClickListener
+     */
+    public void setOnNumberViewClickListener(View.OnClickListener onNumberViewClickListener) {
+        this.mOnNumberViewClickListener = onNumberViewClickListener;
     }
 
     @Override
@@ -120,12 +123,12 @@ public class ReleaseListAdapter extends BaseAdapter implements StickyListHeaders
 
     @Override
     public int getCount() {
-        return mReleaseInfos == null ? 0 : mReleaseInfos.length;
+        return mReleaseInfos == null ? 0 : mReleaseInfos.size();
     }
 
     @Override
     public Object getItem(int position) {
-        return mReleaseInfos[position];
+        return mReleaseInfos.get(position);
     }
 
     @Override
@@ -135,26 +138,79 @@ public class ReleaseListAdapter extends BaseAdapter implements StickyListHeaders
 
     @Override
     public View getView(int position, View convertView, ViewGroup parent) {
-        ViewHolder holder;
+        ItemViewHolder holder;
 
         if (convertView == null) {
-            holder = new ViewHolder();
-            convertView = mInflater.inflate(R.layout.list_release_item, parent, false);
-            holder.txtName = (TextView) convertView.findViewById(R.id.txt_list_release_name);
-            holder.txtInfo = (TextView) convertView.findViewById(R.id.txt_list_release_info);
+            holder = new ItemViewHolder();
+            if (mUseSingleComicsLayout) {
+                convertView = mInflater.inflate(R.layout.list_single_comics_release_item, parent, false);
+            } else {
+                convertView = mInflater.inflate(R.layout.list_release_item, parent, false);
+                holder.txtName = (TextView) convertView.findViewById(R.id.txt_list_release_name);
+            }
+            holder.txtNotes = (TextView) convertView.findViewById(R.id.txt_list_release_notes);
+            holder.txtDate = (TextView) convertView.findViewById(R.id.txt_list_release_date);
+            holder.txtNumber = (TextView) convertView.findViewById(R.id.txt_list_release_number);
+            //imposto il listener sul click
+            holder.txtNumber.setOnClickListener(mOnNumberViewClickListener);
             convertView.setTag(holder);
         } else {
-            holder = (ViewHolder) convertView.getTag();
+            holder = (ItemViewHolder) convertView.getTag();
         }
 
-        Release release = mReleaseInfos[position].getRelease();
+        ReleaseInfo ri = mReleaseInfos.get(position);
+        Release release = ri.getRelease();
         Comics comics = mDataManager.getComics(release.getComicsId());
         String relDate = "";
         if (release.getDate() != null) {
             relDate = mDateFormat.format(release.getDate());
         }
-        holder.txtName.setText(comics.getName());
-        holder.txtInfo.setText(String.format("#%s - %s - p %s", release.getNumber(), relDate, release.isPurchased()));
+        if (!mUseSingleComicsLayout) {
+            holder.txtName.setText(comics.getName());
+        }
+        holder.txtNumber.setText(Integer.toString(release.getNumber()));
+        holder.txtDate.setText(relDate);
+        holder.txtNotes.setText(Utils.nvl(release.getNotes(), comics.getNotes(), ""));
+
+        //se la release è stata prenotata inserisco una icona
+        if (release.isOrdered()) {
+            holder.txtNotes.setCompoundDrawablesRelativeWithIntrinsicBounds(0, 0, R.drawable.ic_archive_16, 0);
+        } else {
+            holder.txtNotes.setCompoundDrawablesRelativeWithIntrinsicBounds(0, 0, 0, 0);
+        }
+
+        //imposto background e colore del testo in base allo stato della release
+        //me ne frego del gruppo se è purchased, questo perché al click sul numero aggiorno solo questa vista, e non tutta la lista (vedi fragment)
+        //  di conseguenza posso trovarmi release purchased in qualsiasi gruppo
+        if (release.isPurchased()) {
+            holder.txtNumber.setBackgroundResource(R.drawable.background_oval_purchased);
+            holder.txtNumber.setTextColor(mContext.getResources().getColor(R.color.comikku_purchased_primary_color));
+        } else {
+            switch (ri.getGroup()) {
+                case ReleaseGroupHelper.GROUP_LOST:
+                case ReleaseGroupHelper.GROUP_EXPIRED:
+                    holder.txtNumber.setBackgroundResource(R.drawable.background_oval_expired);
+                    holder.txtNumber.setTextColor(mContext.getResources().getColor(R.color.comikku_expired_primary_color));
+                    break;
+                case ReleaseGroupHelper.GROUP_PERIOD:
+                case ReleaseGroupHelper.GROUP_TO_PURCHASE:
+                    if (ri.isReleasedToday()) {
+                        holder.txtNumber.setBackgroundResource(R.drawable.background_oval_today);
+                        holder.txtNumber.setTextColor(mContext.getResources().getColor(R.color.comikku_today_primary_color));
+                        break;
+                    }
+                case ReleaseGroupHelper.GROUP_PERIOD_NEXT:
+                case ReleaseGroupHelper.GROUP_PERIOD_OTHER:
+                case ReleaseGroupHelper.GROUP_PURCHASED:
+                    holder.txtNumber.setBackgroundResource(R.drawable.background_oval_to_purchase);
+                    holder.txtNumber.setTextColor(mContext.getResources().getColor(R.color.comikku_to_purchase_primary_color));
+                    break;
+                case ReleaseGroupHelper.GROUP_WISHLIST:
+                    holder.txtNumber.setBackgroundResource(R.drawable.background_oval_wishlist);
+                    holder.txtNumber.setTextColor(mContext.getResources().getColor(R.color.comikku_wishlist_primary_color));
+                    break;
+            }
+        }
 
         return convertView;
     }
@@ -172,14 +228,14 @@ public class ReleaseListAdapter extends BaseAdapter implements StickyListHeaders
             holder = (HeaderViewHolder) convertView.getTag();
         }
 
-        holder.text.setText(getGroupTitle(mReleaseInfos[position].getGroup()));
+        holder.text.setText(getGroupTitle(mReleaseInfos.get(position).getGroup()));
         return convertView;
     }
 
     @Override
     public long getHeaderId(int position) {
         //return the first character of the country as ID because this is what headers are based upon
-        return mReleaseInfos[position].getGroup();
+        return mReleaseInfos.get(position).getGroup();
     }
 
     public CharSequence getGroupTitle(int group) {
@@ -211,9 +267,11 @@ public class ReleaseListAdapter extends BaseAdapter implements StickyListHeaders
         TextView text;
     }
 
-    final class ViewHolder {
+    final class ItemViewHolder {
         TextView txtName;
-        TextView txtInfo;
+        TextView txtNotes;
+        TextView txtNumber;
+        TextView txtDate;
     }
 
 }

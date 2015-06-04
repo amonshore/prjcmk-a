@@ -258,6 +258,27 @@ public class SlidingTabLayout extends HorizontalScrollView {
         }
     }
 
+    /**
+     *
+     * @param tabIndex
+     * @param title
+     */
+    public void setPageTitle(int tabIndex, CharSequence title) {
+        final int tabStripChildCount = mTabStrip.getChildCount();
+        if (tabStripChildCount == 0 || tabIndex < 0 || tabIndex >= tabStripChildCount) {
+            return;
+        }
+
+        View selectedChild = mTabStrip.getChildAt(tabIndex);
+        if (selectedChild != null) {
+            if (TextView.class.isInstance(selectedChild)) {
+                ((TextView)selectedChild).setText(title);
+            } else if (mTabViewTextViewId != 0) {
+                ((TextView) selectedChild.findViewById(mTabViewTextViewId)).setText(title);
+            }
+        }
+    }
+
     private class InternalViewPagerListener implements ViewPager.OnPageChangeListener {
         private int mScrollState;
 

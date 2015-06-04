@@ -6,10 +6,16 @@ package it.amonshore.secondapp.data;
 public final class ReleaseInfo {
 
     private int group;
+    private boolean releasedToday;
     private Release release;
 
     public ReleaseInfo(int group, Release release) {
+        this(group, false, release);
+    }
+
+    public ReleaseInfo(int group, boolean releasedToday, Release release) {
         this.group = group;
+        this.releasedToday = releasedToday;
         this.release = release;
     }
 
@@ -18,6 +24,12 @@ public final class ReleaseInfo {
      * @return
      */
     public int getGroup() { return group; }
+
+    /**
+     *
+     * @return
+     */
+    public boolean isReleasedToday() { return releasedToday; }
 
     /**
      *

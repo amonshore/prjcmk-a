@@ -63,14 +63,22 @@
                     android:layout_width="match_parent"
                     android:layout_height="wrap_content"
                     android:id="@+id/txt_editor_comics_periodicity"
-                    android:layout_marginBottom="10dp"
+                    android:layout_marginBottom="20dp"
                     app:flw_labelText="@string/editor_comics_periodicity" />
+
+                <Switch
+                    android:layout_width="match_parent"
+                    android:layout_height="wrap_content"
+                    android:id="@+id/chk_editor_comics_reserved"
+                    android:text="@string/editor_comics_reserved"
+                    android:layout_marginBottom="20dp"
+                    android:textColor="@android:color/tertiary_text_light" />
 
                 <com.marvinlabs.widget.floatinglabel.edittext.FloatingLabelEditText
                     android:id="@+id/txt_editor_comics_notes"
                     android:layout_width="match_parent"
                     android:layout_height="wrap_content"
-                    android:inputType="text|textNoSuggestions|textCapSentences|textMultiLine"
+                    android:inputType="text|textCapSentences|textMultiLine"
                     android:layout_marginBottom="10dp"
                     app:flw_labelText="@string/editor_comics_notes" />
 

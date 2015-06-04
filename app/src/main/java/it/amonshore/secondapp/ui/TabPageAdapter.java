@@ -10,6 +10,7 @@ import android.view.ViewGroup;
 import java.util.ArrayList;
 
 import it.amonshore.secondapp.R;
+import it.amonshore.secondapp.Utils;
 import it.amonshore.secondapp.data.ReleaseGroupHelper;
 import it.amonshore.secondapp.ui.comics.ComicsListFragment;
 import it.amonshore.secondapp.ui.release.ReleaseListAdapter;
@@ -52,6 +53,7 @@ public class TabPageAdapter extends FragmentStatePagerAdapter {
         //altrimenti sbarella durante la rotazione della schermo
         //  perché l'adapter mantiene in memoria i "vecchi" fragment
         //return super.instantiateItem(container, position);
+        Utils.d(this.getClass(), "new fragment");
         AFragment fragment = (AFragment)super.instantiateItem(container, position);
         mPages.set(position, fragment);
         return fragment;
@@ -81,9 +83,4 @@ public class TabPageAdapter extends FragmentStatePagerAdapter {
         }
     }
 
-    public void refreshDataOnFragments(int cause) {
-        for (AFragment frg : mPages) {
-            frg.needDataRefresh(cause);
-        }
-    }
 }

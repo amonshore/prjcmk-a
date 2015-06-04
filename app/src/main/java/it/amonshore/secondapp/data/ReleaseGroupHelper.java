@@ -30,7 +30,7 @@ public class ReleaseGroupHelper {
      */
     public final static int MODE_LAW = 3;
     /**
-     * Modalità comics: da acquistare, acquistati, persi, wishlist
+     * Modalità comics: persi, da acquistare, acquistati
      */
     public final static int MODE_COMICS = 4;
 
@@ -204,7 +204,8 @@ public class ReleaseGroupHelper {
                 //else if (tryPutInLost(release)) return GROUP_LOST;
             else if (tryPutInWishlist(release)) return GROUP_WISHLIST;
         } else if (mMode == MODE_COMICS) {
-            if (tryPutInToPurchase(release)) return GROUP_TO_PURCHASE;
+            if (tryPutInExpired(release)) return GROUP_EXPIRED;
+            else if (tryPutInToPurchase(release)) return GROUP_TO_PURCHASE;
             else if (tryPutInPurchased(release)) return GROUP_PURCHASED;
         }
         return GROUP_UNKNOWN;
@@ -217,11 +218,16 @@ public class ReleaseGroupHelper {
      */
     public void addReleases(Release... releases) {
         int group;
+        boolean releasedToday;
         //filtro i dati e inserisco le release in un gruppo
         for (Release rel : releases) {
             group = getGroup(rel);
-            if (group != GROUP_UNKNOWN)
-                mList.add(new ReleaseInfo(group, rel));
+            if (group != GROUP_UNKNOWN) {
+                releasedToday = (group == GROUP_TO_PURCHASE || group == GROUP_PERIOD) &&
+                        rel.getDate() != null &&
+                        mTodayMs == rel.getDate().getTime();
+                mList.add(new ReleaseInfo(group, releasedToday, rel));
+            }
         }
     }
 
