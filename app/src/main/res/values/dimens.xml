@@ -6,9 +6,11 @@
     <!-- Floating action button -->
     <dimen name="floating_action_margin_bottom">14dp</dimen>
     <dimen name="floating_action_margin_right">14dp</dimen>
-    <dimen name="floating_action_elevation">4dp</dimen>
+    <dimen name="floating_action_elevation">8dp</dimen>
+    <dimen name="floating_action_mini_elevation">4dp</dimen>
 
     <!-- Dimensione testo -->
+    <dimen name="comikku_text_size_largest">34sp</dimen>
     <dimen name="comikku_text_size_large">24sp</dimen>
     <dimen name="comikku_text_size_primary">16sp</dimen>
     <dimen name="comikku_text_size_secondary">12sp</dimen>

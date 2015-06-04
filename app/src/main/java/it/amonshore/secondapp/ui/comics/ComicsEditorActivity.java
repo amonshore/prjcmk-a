@@ -11,6 +11,7 @@ import android.view.Menu;
 import android.view.MenuItem;
 import android.widget.ArrayAdapter;
 import android.widget.EditText;
+import android.widget.Switch;
 import android.widget.TextView;
 
 import com.marvinlabs.widget.floatinglabel.autocomplete.FloatingLabelAutoCompleteTextView;
@@ -45,7 +46,7 @@ public class ComicsEditorActivity extends ActionBarActivity implements ItemPicke
     private FloatingLabelEditText mTxtName, mTxtSeries, mTxtAuthors, mTxtPrice, mTxtNotes;
     private FloatingLabelAutoCompleteTextView mTxtPublisher;
     private FloatingLabelItemPicker<String> mSpPeriodicity;
-    //TODO manca reserved
+    private Switch mChkReserved;
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
@@ -114,6 +115,9 @@ public class ComicsEditorActivity extends ActionBarActivity implements ItemPicke
             }
         });
         mSpPeriodicity.setSelectedIndices(new int[] { Utils.indexOf(mPeriodicityKeys, mComics.getPeriodicity(), 0) });
+        //
+        mChkReserved = (Switch)findViewById(R.id.chk_editor_comics_reserved);
+        mChkReserved.setChecked(mComics.isReserved());
     }
 
     @Override
@@ -152,6 +156,7 @@ public class ComicsEditorActivity extends ActionBarActivity implements ItemPicke
                 mComics.setAuthors(getViewText(mTxtAuthors.getInputWidget()));
                 mComics.setPrice(getViewDouble(mTxtPrice.getInputWidget()));
                 mComics.setNotes(getViewText(mTxtNotes.getInputWidget()));
+                mComics.setReserved(mChkReserved.isChecked());
 
                 int[] selPer = mSpPeriodicity.getSelectedIndices();
                 if (selPer != null && selPer.length > 0) {

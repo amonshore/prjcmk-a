@@ -8,6 +8,7 @@ import java.util.List;
 import java.util.TimeZone;
 
 import hirondelle.date4j.DateTime;
+import it.amonshore.secondapp.Utils;
 
 /**
  * Created by Narsenico on 24/05/2015.
@@ -53,9 +54,14 @@ public class ComicsBestReleaseHelper {
         if (found == null) {
             //cerco la prima NON scaduta e non acquistata
             for (Release rel : releases) {
-                if (!rel.isPurchased() && rel.getDate() != null && rel.getDate().getTime() >= today) {
-                    found = new ReleaseInfo(ReleaseGroupHelper.GROUP_TO_PURCHASE, rel);
-                    break;
+                if (!rel.isPurchased() && rel.getDate() != null) {
+                    if (rel.getDate().getTime() > today) {
+                        found = new ReleaseInfo(ReleaseGroupHelper.GROUP_TO_PURCHASE, rel);
+                        break;
+                    } else if (rel.getDate().getTime() == today) {
+                        found = new ReleaseInfo(ReleaseGroupHelper.GROUP_TO_PURCHASE, true, rel);
+                        break;
+                    }
                 }
             }
             if (found == null) {

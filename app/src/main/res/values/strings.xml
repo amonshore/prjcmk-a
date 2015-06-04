@@ -68,6 +68,7 @@
     <string name="editor_comics_authors">Authors</string>
     <string name="editor_comics_price">Price</string>
     <string name="editor_comics_periodicity">Periodicity</string>
+    <string name="editor_comics_reserved">Reserved</string>
     <string name="editor_comics_notes">Notes</string>
 
     <!-- release editor -->

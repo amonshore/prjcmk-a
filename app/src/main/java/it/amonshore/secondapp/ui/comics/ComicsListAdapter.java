@@ -172,10 +172,16 @@ public class ComicsListAdapter extends BaseAdapter {
                     holder.txtNumber.setTextColor(mContext.getResources().getColor(R.color.comikku_expired_primary_color));
                     holder.txtDate.setBackgroundResource(R.drawable.border_expired_releasedate);
                     break;
+                case ReleaseGroupHelper.GROUP_TO_PURCHASE:
+                    if (bestReleaseInfo.isReleasedToday()) {
+                        holder.txtNumber.setBackgroundResource(R.color.comikku_today_background_color);
+                        holder.txtNumber.setTextColor(mContext.getResources().getColor(R.color.comikku_today_primary_color));
+                        holder.txtDate.setBackgroundResource(R.drawable.border_today_releasedate);
+                        break;
+                    }
                 case ReleaseGroupHelper.GROUP_PERIOD:
                 case ReleaseGroupHelper.GROUP_PERIOD_NEXT:
                 case ReleaseGroupHelper.GROUP_PERIOD_OTHER:
-                case ReleaseGroupHelper.GROUP_TO_PURCHASE:
                 case ReleaseGroupHelper.GROUP_PURCHASED:
                     holder.txtNumber.setBackgroundResource(R.color.comikku_to_purchase_background_color);
                     holder.txtNumber.setTextColor(mContext.getResources().getColor(R.color.comikku_to_purchase_primary_color));

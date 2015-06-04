@@ -36,6 +36,7 @@ public class ReleaseListAdapter extends BaseAdapter implements StickyListHeaders
     private SimpleDateFormat mDateFormat;
     private boolean mGroupByMonth;
     private View.OnClickListener mOnNumberViewClickListener;
+    private boolean mUseSingleComicsLayout;
 
     /**
      *
@@ -45,7 +46,6 @@ public class ReleaseListAdapter extends BaseAdapter implements StickyListHeaders
         mContext = context;
         mDataManager = DataManager.getDataManager();
         mInflater = LayoutInflater.from(context);
-        mDateFormat = new SimpleDateFormat("c dd MMM", Locale.getDefault());
    }
 
     /**
@@ -87,10 +87,14 @@ public class ReleaseListAdapter extends BaseAdapter implements StickyListHeaders
         //creo gli elementi per la lista
         ReleaseGroupHelper helper = new ReleaseGroupHelper(mode, groupByMonth, weekStartOnMonday);
         if (comics == null) {
+            mUseSingleComicsLayout = false;
+            mDateFormat = new SimpleDateFormat("c dd MMM", Locale.getDefault());
             for (long comicsId : mDataManager.getComics()) {
                 helper.addReleases(mDataManager.getComics(comicsId).getReleases());
             }
         } else {
+            mUseSingleComicsLayout = true;
+            mDateFormat = new SimpleDateFormat("cccc, dd MMM yyyy", Locale.getDefault());
             helper.addReleases(comics.getReleases());
         }
         mReleaseInfos = new ArrayList<>(Arrays.asList(helper.getReleaseInfos()));
@@ -138,8 +142,12 @@ public class ReleaseListAdapter extends BaseAdapter implements StickyListHeaders
 
         if (convertView == null) {
             holder = new ItemViewHolder();
-            convertView = mInflater.inflate(R.layout.list_release_item, parent, false);
-            holder.txtName = (TextView) convertView.findViewById(R.id.txt_list_release_name);
+            if (mUseSingleComicsLayout) {
+                convertView = mInflater.inflate(R.layout.list_single_comics_release_item, parent, false);
+            } else {
+                convertView = mInflater.inflate(R.layout.list_release_item, parent, false);
+                holder.txtName = (TextView) convertView.findViewById(R.id.txt_list_release_name);
+            }
             holder.txtNotes = (TextView) convertView.findViewById(R.id.txt_list_release_notes);
             holder.txtDate = (TextView) convertView.findViewById(R.id.txt_list_release_date);
             holder.txtNumber = (TextView) convertView.findViewById(R.id.txt_list_release_number);
@@ -157,7 +165,9 @@ public class ReleaseListAdapter extends BaseAdapter implements StickyListHeaders
         if (release.getDate() != null) {
             relDate = mDateFormat.format(release.getDate());
         }
-        holder.txtName.setText(comics.getName());
+        if (!mUseSingleComicsLayout) {
+            holder.txtName.setText(comics.getName());
+        }
         holder.txtNumber.setText(Integer.toString(release.getNumber()));
         holder.txtDate.setText(relDate);
         holder.txtNotes.setText(Utils.nvl(release.getNotes(), comics.getNotes(), ""));
@@ -183,9 +193,14 @@ public class ReleaseListAdapter extends BaseAdapter implements StickyListHeaders
                     holder.txtNumber.setTextColor(mContext.getResources().getColor(R.color.comikku_expired_primary_color));
                     break;
                 case ReleaseGroupHelper.GROUP_PERIOD:
+                case ReleaseGroupHelper.GROUP_TO_PURCHASE:
+                    if (ri.isReleasedToday()) {
+                        holder.txtNumber.setBackgroundResource(R.drawable.background_oval_today);
+                        holder.txtNumber.setTextColor(mContext.getResources().getColor(R.color.comikku_today_primary_color));
+                        break;
+                    }
                 case ReleaseGroupHelper.GROUP_PERIOD_NEXT:
                 case ReleaseGroupHelper.GROUP_PERIOD_OTHER:
-                case ReleaseGroupHelper.GROUP_TO_PURCHASE:
                 case ReleaseGroupHelper.GROUP_PURCHASED:
                     holder.txtNumber.setBackgroundResource(R.drawable.background_oval_to_purchase);
                     holder.txtNumber.setTextColor(mContext.getResources().getColor(R.color.comikku_to_purchase_primary_color));

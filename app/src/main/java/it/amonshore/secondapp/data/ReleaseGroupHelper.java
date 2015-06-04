@@ -218,11 +218,16 @@ public class ReleaseGroupHelper {
      */
     public void addReleases(Release... releases) {
         int group;
+        boolean releasedToday;
         //filtro i dati e inserisco le release in un gruppo
         for (Release rel : releases) {
             group = getGroup(rel);
-            if (group != GROUP_UNKNOWN)
-                mList.add(new ReleaseInfo(group, rel));
+            if (group != GROUP_UNKNOWN) {
+                releasedToday = (group == GROUP_TO_PURCHASE || group == GROUP_PERIOD) &&
+                        rel.getDate() != null &&
+                        mTodayMs == rel.getDate().getTime();
+                mList.add(new ReleaseInfo(group, releasedToday, rel));
+            }
         }
     }
 
