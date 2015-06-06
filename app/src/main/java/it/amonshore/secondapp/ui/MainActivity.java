@@ -8,6 +8,7 @@ import android.support.v4.view.ViewPager;
 import android.support.v7.app.ActionBar;
 import android.support.v7.app.ActionBarActivity;
 import android.os.Bundle;
+import android.support.v7.widget.Toolbar;
 import android.view.Menu;
 import android.view.MenuItem;
 import android.view.View;
@@ -54,12 +55,9 @@ public class MainActivity extends ActionBarActivity implements SharedPreferences
         //registro il listerner per il cambiamento dei settings
         SharedPreferences prefs = PreferenceManager.getDefaultSharedPreferences(this);
         prefs.registerOnSharedPreferenceChangeListener(this);
-
-        //attenzione, usare getSupportActionBar() per recuperare l'action bar
-        final ActionBar actionBar = getSupportActionBar();
-        //imposto la modalità di navitazione a tab (sarà possibile aggiungere tab all'action bar)
-//        actionBar.setNavigationMode(ActionBar.NAVIGATION_MODE_TABS);
-
+        //Toolbar
+        final Toolbar toolbar = (Toolbar)findViewById(R.id.toolbar_actionbar);
+        setSupportActionBar(toolbar);
         //l'adapter fornisce i fragment che comporranno la vista a tab
         mTabPageAdapter = new TabPageAdapter(this, getSupportFragmentManager());
         mViewPager = (ViewPager)findViewById(R.id.pager);
