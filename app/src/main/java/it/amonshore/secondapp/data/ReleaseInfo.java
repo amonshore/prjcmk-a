@@ -7,15 +7,17 @@ public final class ReleaseInfo {
 
     private int group;
     private boolean releasedToday;
+    private boolean expired;
     private Release release;
 
     public ReleaseInfo(int group, Release release) {
-        this(group, false, release);
+        this(group, false, false, release);
     }
 
-    public ReleaseInfo(int group, boolean releasedToday, Release release) {
+    public ReleaseInfo(int group, boolean releasedToday, boolean expired, Release release) {
         this.group = group;
         this.releasedToday = releasedToday;
+        this.expired = expired;
         this.release = release;
     }
 
@@ -30,6 +32,12 @@ public final class ReleaseInfo {
      * @return
      */
     public boolean isReleasedToday() { return releasedToday; }
+
+    /**
+     *
+     * @return
+     */
+    public boolean isExpired() { return expired; }
 
     /**
      *

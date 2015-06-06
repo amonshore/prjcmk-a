@@ -218,7 +218,7 @@ public class ReleaseGroupHelper {
      */
     public void addReleases(Release... releases) {
         int group;
-        boolean releasedToday;
+        boolean releasedToday, expired;
         //filtro i dati e inserisco le release in un gruppo
         for (Release rel : releases) {
             group = getGroup(rel);
@@ -226,7 +226,10 @@ public class ReleaseGroupHelper {
                 releasedToday = (group == GROUP_TO_PURCHASE || group == GROUP_PERIOD) &&
                         rel.getDate() != null &&
                         mTodayMs == rel.getDate().getTime();
-                mList.add(new ReleaseInfo(group, releasedToday, rel));
+                expired = (group == GROUP_TO_PURCHASE || group == GROUP_PERIOD) &&
+                        rel.getDate() != null &&
+                        mTodayMs > rel.getDate().getTime();
+                mList.add(new ReleaseInfo(group, releasedToday, expired, rel));
             }
         }
     }

@@ -190,7 +190,7 @@ public class Comics {
      * @param number
      * @return true se è stata elminata, false altrimenti
      */
-    public boolean removeRelease(int number) {
+    protected boolean removeRelease(int number) {
         int index = indexOf(number);
         if (index >= 0) {
             releases.remove(index);
@@ -203,7 +203,7 @@ public class Comics {
     /**
      *
      */
-    public void removeAllReleases() {
+    protected void removeAllReleases() {
         releases.clear();
     }
 

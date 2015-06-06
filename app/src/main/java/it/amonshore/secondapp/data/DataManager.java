@@ -401,6 +401,16 @@ public class DataManager extends Observable<ComicsObserver> {
 
     /**
      *
+     * @param comicsId
+     * @param number
+     * @return
+     */
+    public boolean removeRelease(long comicsId, int number) {
+        return getComics(comicsId).removeRelease(number);
+    }
+
+    /**
+     *
      * @return
      */
     public String[] getPublishers() {

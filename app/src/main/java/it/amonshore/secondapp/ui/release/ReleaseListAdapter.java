@@ -64,9 +64,9 @@ public class ReleaseListAdapter extends BaseAdapter implements StickyListHeaders
      */
     public boolean remove(int position) {
         ReleaseInfo ri = (ReleaseInfo)getItem(position);
-        Comics comics = mDataManager.getComics(ri.getRelease().getComicsId());
-        if (comics.removeRelease(ri.getRelease().getNumber())) {
-            mDataManager.updateBestRelease(comics.getId());
+        long comicsId = ri.getRelease().getComicsId();
+        if (mDataManager.removeRelease(comicsId, ri.getRelease().getNumber())) {
+            mDataManager.updateBestRelease(comicsId);
             mReleaseInfos.remove(position);
             return true;
         } else {
@@ -197,6 +197,10 @@ public class ReleaseListAdapter extends BaseAdapter implements StickyListHeaders
                     if (ri.isReleasedToday()) {
                         holder.txtNumber.setBackgroundResource(R.drawable.background_oval_today);
                         holder.txtNumber.setTextColor(mContext.getResources().getColor(R.color.comikku_today_primary_color));
+                        break;
+                    }else if (ri.isExpired()) {
+                        holder.txtNumber.setBackgroundResource(R.drawable.background_oval_expired);
+                        holder.txtNumber.setTextColor(mContext.getResources().getColor(R.color.comikku_expired_primary_color));
                         break;
                     }
                 case ReleaseGroupHelper.GROUP_PERIOD_NEXT:
