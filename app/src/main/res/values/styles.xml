@@ -31,7 +31,7 @@
         <!--<item name="colorControlNormal">@color/white</item>-->
 
         <!-- The color applied to framework controls in their activated (ex. checked) state. -->
-        <!--<item name="colorControlActivated">@color/blue</item>-->
+        <item name="colorControlActivated">#8E24AA</item>
 
         <!-- The color applied to framework control highlights (ex. ripples, list selectors). -->
         <!--<item name="colorControlHighlight">@color/red</item>-->
