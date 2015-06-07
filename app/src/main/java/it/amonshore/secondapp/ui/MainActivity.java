@@ -104,7 +104,7 @@ public class MainActivity extends ActionBarActivity implements SharedPreferences
     @Override
     protected void onPostResume() {
         super.onPostResume();
-        new ReadDataAsyncTask().execute();
+        new ReadDataAsyncTask().execute(false);
     }
 
     @Override
@@ -133,6 +133,10 @@ public class MainActivity extends ActionBarActivity implements SharedPreferences
         if (id == R.id.action_settings) {
             Intent intent = new Intent(this, SettingsActivity.class);
             startActivity(intent);
+            return true;
+        } else if (id == R.id.action_restore_backup) {
+            mDataManager.restoreBackup();
+            new ReadDataAsyncTask().execute(true);
             return true;
         }
 
@@ -177,11 +181,11 @@ public class MainActivity extends ActionBarActivity implements SharedPreferences
     /**
      * Task asincrono per la lettura dei dati
      */
-    private class ReadDataAsyncTask extends AsyncTask<Void, Comics, Integer> {
+    private class ReadDataAsyncTask extends AsyncTask<Boolean, Comics, Integer> {
         @Override
-        protected Integer doInBackground(Void... params) {
-            Utils.d(this.getClass(), "readComics");
-            MainActivity.this.mDataManager.readComics();
+        protected Integer doInBackground(Boolean... params) {
+            Utils.d(this.getClass(), "readComics " + params[0]);
+            MainActivity.this.mDataManager.readComics(params[0]);
             return DataManager.CAUSE_LOADING;
         }
 
