@@ -225,10 +225,11 @@ public class ComicsListFragment extends AFragment {
     }
 
     @Override
-    public void onDataChanged(int cause) {
+    public void onDataChanged(int cause, boolean wasPosponed) {
         Utils.d(this.getClass(), "onDataChanged " + cause);
         //
         if (cause == DataManager.CAUSE_COMICS_REMOVED) {
+            mAdapter.notifyDataSetChanged();
             //la gestione dell'undo avviene tramite la classe UndoHelper
             //  che può tenere traccia degli elementi rimossi "marchiandoli" con un tag
             //  quindi una volta visualizzata la snackbar vengono "machiati" gli ultimi elementi eliminati
@@ -245,7 +246,7 @@ public class ComicsListFragment extends AFragment {
                             .actionListener(new ActionClickListener() {
                                 @Override
                                 public void onActionClicked(Snackbar snackbar) {
-                                    int tag = (int)snackbar.getTag();
+                                    int tag = (int) snackbar.getTag();
                                     Comics comics;
 //                                    Utils.d(this.getClass(), "undo ... " + tag);
                                     while ((comics = undoComics.pop(tag)) != null) {
@@ -272,22 +273,21 @@ public class ComicsListFragment extends AFragment {
 
                                 @Override
                                 public void onDismiss(Snackbar snackbar) {
-                                    int tag = (int)snackbar.getTag();
+                                    int tag = (int) snackbar.getTag();
 //                                    Utils.d(this.getClass(), "dismiss r -> clear undo " + tag);
                                     undoComics.removeElements(tag);
                                 }
 
                                 @Override
                                 public void onDismissByReplace(Snackbar snackbar) {
-                                    int tag = (int)snackbar.getTag();
+                                    int tag = (int) snackbar.getTag();
 //                                    Utils.d(this.getClass(), "dismiss r -> clear undo r " + tag);
                                     undoComics.removeElements(tag);
                                 }
 
                             }),
                     getActivity());
-        }
-
+        } else
         //se la causa è la modifica dela modalità di visualizzazione delle release non mi ineressa
         if (cause != DataManager.CAUSE_RELEASES_MODE_CHANGED) {
             //se la causa è il cambio pagina aggiorno i dati solo se l'adapter è vuoto
@@ -339,8 +339,9 @@ public class ComicsListFragment extends AFragment {
 
         @Override
         protected void onProgressUpdate(Long... values) {
-            boolean res = ComicsListFragment.this.mAdapter.remove(values[0]);
-            Utils.d("delete comics " + values[0] + " -> " + res);
+//            boolean res =
+              ComicsListFragment.this.mAdapter.remove(values[0]);
+//            Utils.d("delete comics " + values[0] + " -> " + res);
         }
 
         @Override

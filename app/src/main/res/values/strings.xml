@@ -18,6 +18,7 @@
     <string name="placeholder_wishlist">wish</string>
     <string name="undo">Undo</string>
     <string name="comics_removed">Comics removed</string>
+    <string name="release_removed">Release removed</string>
 
     <!-- settings -->
     <string name="title_activity_settings">Settings</string>

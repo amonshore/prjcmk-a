@@ -34,8 +34,17 @@ public abstract class AFragment extends Fragment implements ComicsObserver {
     /**
      * Avverte il fragment che è richiesto l'aggiornamento dei dati
      * @param cause
+     * @param wasPosponed
      */
-    public abstract void onDataChanged(int cause);
+    public abstract void onDataChanged(int cause, boolean wasPosponed);
+
+    /**
+     *
+     * @param cause
+     */
+    public void onDataChanged(int cause) {
+        onDataChanged(cause, false);
+    }
 
     /**
      * Da chiamare per terminare la barra contestuale
@@ -45,7 +54,7 @@ public abstract class AFragment extends Fragment implements ComicsObserver {
     @Override
     public void onChanged(int cause) {
         if (this.isResumed() || (cause & DataManager.CAUSE_SAFE) == DataManager.CAUSE_SAFE) {
-            onDataChanged(cause);
+            onDataChanged(cause, false);
             mChangedCause = 0;
         } else {
             Utils.d(this.getClass(), "onChanged posponed " + cause);
@@ -78,7 +87,7 @@ public abstract class AFragment extends Fragment implements ComicsObserver {
     public void onResume() {
         super.onResume();
         if (mChangedCause != 0) {
-            onDataChanged(mChangedCause);
+            onDataChanged(mChangedCause, true);
             mChangedCause = 0;
         }
     }

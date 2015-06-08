@@ -19,6 +19,10 @@ import android.widget.AdapterView;
 import android.widget.ListView;
 import android.widget.TextView;
 
+import com.nispok.snackbar.Snackbar;
+import com.nispok.snackbar.SnackbarManager;
+import com.nispok.snackbar.listeners.ActionClickListener;
+
 import java.util.Arrays;
 
 import it.amonshore.secondapp.R;
@@ -28,6 +32,7 @@ import it.amonshore.secondapp.data.Release;
 import it.amonshore.secondapp.data.ReleaseGroupHelper;
 import it.amonshore.secondapp.Utils;
 import it.amonshore.secondapp.data.ReleaseInfo;
+import it.amonshore.secondapp.data.UndoHelper;
 import it.amonshore.secondapp.ui.AFragment;
 import it.amonshore.secondapp.ui.MainActivity;
 import it.amonshore.secondapp.ui.SettingsActivity;
@@ -280,8 +285,72 @@ public class ReleaseListFragment extends AFragment {
     }
 
     @Override
-    public void onDataChanged(int cause) {
+    public void onDataChanged(int cause, boolean wasPosponed) {
         Utils.d(this.getClass(), "onDataChanged " + cause);
+        //se è stato posticipato significa che è stato causato dal dettaglio
+        // quindi non gestisco l'undo anche qua
+        if (cause == DataManager.CAUSE_RELEASE_REMOVED && !wasPosponed) {
+            mAdapter.notifyDataSetChanged();
+            //la gestione dell'undo avviene tramite la classe UndoHelper
+            //  che può tenere traccia degli elementi rimossi "marchiandoli" con un tag
+            //  quindi una volta visualizzata la snackbar vengono "machiati" gli ultimi elementi eliminati
+            //  e la snackbar potrà successivamente gestire (ripristinare o eliminare definitivamente)
+            //  solo i suoi elementi (il tag è memorizzato nell'istanza della snackbar)
+            final DataManager dataManager = getDataManager();
+            final UndoHelper<Release> undoRelease = dataManager.getUndoRelease();
+            SnackbarManager.show(
+                    Snackbar
+                            .with(getActivity().getApplicationContext())
+                            .text(R.string.release_removed)
+                            .actionLabel(R.string.undo)
+                            .duration(5000L)
+                            .actionListener(new ActionClickListener() {
+                                @Override
+                                public void onActionClicked(Snackbar snackbar) {
+                                    int tag = (int) snackbar.getTag();
+                                    Release release;
+//                                    Utils.d(this.getClass(), "undo ... " + tag);
+                                    while ((release = undoRelease.pop(tag)) != null) {
+//                                        Utils.d(this.getClass(), "undo " + comics.getName());
+                                        dataManager.getComics(release.getComicsId()).putRelease(release);
+                                        dataManager.updateBestRelease(release.getComicsId());
+                                    }
+                                    dataManager.notifyChanged(DataManager.CAUSE_RELEASE_ADDED);
+                                }
+                            })
+                            .eventListener(new com.nispok.snackbar.listeners.EventListenerAdapter() {
+                                @Override
+                                public void onShow(Snackbar snackbar) {
+                                    int tag = undoRelease.retainElements();
+//                                    Utils.d(this.getClass(), "undo show " + tag);
+                                    snackbar.setTag(tag);
+                                }
+
+                                @Override
+                                public void onShowByReplace(Snackbar snackbar) {
+                                    int tag = undoRelease.retainElements();
+//                                    Utils.d(this.getClass(), "undo show r " + tag);
+                                    snackbar.setTag(tag);
+                                }
+
+                                @Override
+                                public void onDismiss(Snackbar snackbar) {
+                                    int tag = (int) snackbar.getTag();
+//                                    Utils.d(this.getClass(), "dismiss r -> clear undo " + tag);
+                                    undoRelease.removeElements(tag);
+                                }
+
+                                @Override
+                                public void onDismissByReplace(Snackbar snackbar) {
+                                    int tag = (int) snackbar.getTag();
+//                                    Utils.d(this.getClass(), "dismiss r -> clear undo r " + tag);
+                                    undoRelease.removeElements(tag);
+                                }
+
+                            }),
+                    getActivity());
+
+        } else
         //se la causa è il cambio pagina aggiorno i dati solo se l'adapter è vuoto
         if (mAdapter != null) {
             if ((cause & DataManager.CAUSE_PAGE_CHANGED) != DataManager.CAUSE_PAGE_CHANGED || mAdapter.isEmpty()) {
@@ -322,8 +391,6 @@ public class ReleaseListFragment extends AFragment {
         }
     }
 
-    //TODO udpate task
-
     /**
      * Task asincrono per la rimoazione dei dati
      */
@@ -338,8 +405,9 @@ public class ReleaseListFragment extends AFragment {
 
         @Override
         protected void onProgressUpdate(Integer... values) {
-            boolean res = ReleaseListFragment.this.mAdapter.remove(values[0]);
-            Utils.d("delete release " + values[0] + " -> " + res);
+            //boolean res =
+            ReleaseListFragment.this.mAdapter.remove(values[0]);
+            //Utils.d("delete release " + values[0] + " -> " + res);
         }
 
         @Override

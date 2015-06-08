@@ -14,6 +14,9 @@ import android.view.MenuItem;
 import android.view.View;
 
 import com.google.samples.apps.iosched.ui.widget.SlidingTabLayout;
+import com.nispok.snackbar.Snackbar;
+import com.nispok.snackbar.SnackbarManager;
+import com.nispok.snackbar.listeners.ActionClickListener;
 
 import it.amonshore.secondapp.R;
 import it.amonshore.secondapp.Utils;
@@ -22,6 +25,7 @@ import it.amonshore.secondapp.data.ComicsObserver;
 import it.amonshore.secondapp.data.DataManager;
 import it.amonshore.secondapp.data.Release;
 import it.amonshore.secondapp.data.ReleaseGroupHelper;
+import it.amonshore.secondapp.data.UndoHelper;
 import it.amonshore.secondapp.ui.release.ReleaseListFragment;
 
 /**
@@ -167,13 +171,14 @@ public class MainActivity extends ActionBarActivity implements SharedPreferences
                 break;
             case DataManager.CAUSE_COMICS_ADDED:
             case DataManager.CAUSE_COMICS_CHANGED:
-            case DataManager.CAUSE_COMICS_REMOVED:
             case DataManager.CAUSE_RELEASE_ADDED:
             case DataManager.CAUSE_RELEASE_CHANGED:
-            case DataManager.CAUSE_RELEASE_REMOVED:
-                //TODO può tornare utile :D
                 Utils.d(this.getClass(), "call writeComics");
                 mDataManager.writeComics();
+                break;
+            case DataManager.CAUSE_COMICS_REMOVED:
+            case DataManager.CAUSE_RELEASE_REMOVED:
+                //TODO ho paura a gestirle per via dell'undo
                 break;
         }
     }
