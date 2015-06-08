@@ -27,6 +27,7 @@ import it.amonshore.secondapp.R;
 import it.amonshore.secondapp.data.Comics;
 import it.amonshore.secondapp.Utils;
 import it.amonshore.secondapp.data.DataManager;
+import it.amonshore.secondapp.data.UndoHelper;
 import it.amonshore.secondapp.ui.AFragment;
 import it.amonshore.secondapp.ui.MainActivity;
 
@@ -228,31 +229,61 @@ public class ComicsListFragment extends AFragment {
         Utils.d(this.getClass(), "onDataChanged " + cause);
         //
         if (cause == DataManager.CAUSE_COMICS_REMOVED) {
-            //TODO mostrare SnackBar
+            //la gestione dell'undo avviene tramite la classe UndoHelper
+            //  che può tenere traccia degli elementi rimossi "marchiandoli" con un tag
+            //  quindi una volta visualizzata la snackbar vengono "machiati" gli ultimi elementi eliminati
+            //  e la snackbar potrà successivamente gestire (ripristinare o eliminare definitivamente)
+            //  solo i suoi elementi (il tag è memorizzato nell'istanza della snackbar)
             final DataManager dataManager = getDataManager();
-            //  allo scadere eliminare undo
+            final UndoHelper<Comics> undoComics = dataManager.getUndoComics();
             SnackbarManager.show(
                     Snackbar
                             .with(getActivity().getApplicationContext())
-                            .text("Comics removed")
-                            .actionLabel("UNDO")
-                            .duration(Snackbar.SnackbarDuration.LENGTH_SHORT)
+                            .text(R.string.comics_removed)
+                            .actionLabel(R.string.undo)
+                            .duration(5000L)
                             .actionListener(new ActionClickListener() {
                                 @Override
                                 public void onActionClicked(Snackbar snackbar) {
-                                    for (Comics comics : dataManager.getLastRemovedComics()) {
+                                    int tag = (int)snackbar.getTag();
+                                    Comics comics;
+//                                    Utils.d(this.getClass(), "undo ... " + tag);
+                                    while ((comics = undoComics.pop(tag)) != null) {
+//                                        Utils.d(this.getClass(), "undo " + comics.getName());
                                         dataManager.put(comics);
                                     }
-                                    dataManager.clearUndoComics();
                                     dataManager.notifyChanged(DataManager.CAUSE_COMICS_ADDED);
                                 }
                             })
                             .eventListener(new com.nispok.snackbar.listeners.EventListenerAdapter() {
                                 @Override
-                                public void onDismissed(Snackbar snackbar) {
-                                    //TODO non funziona, provare gli altri metodi
-                                    dataManager.clearUndoComics();
+                                public void onShow(Snackbar snackbar) {
+                                    int tag = undoComics.retainElements();
+//                                    Utils.d(this.getClass(), "undo show " + tag);
+                                    snackbar.setTag(tag);
                                 }
+
+                                @Override
+                                public void onShowByReplace(Snackbar snackbar) {
+                                    int tag = undoComics.retainElements();
+//                                    Utils.d(this.getClass(), "undo show r " + tag);
+                                    snackbar.setTag(tag);
+                                }
+
+                                @Override
+                                public void onDismiss(Snackbar snackbar) {
+                                    int tag = (int)snackbar.getTag();
+//                                    Utils.d(this.getClass(), "dismiss r -> clear undo " + tag);
+                                    undoComics.removeElements(tag);
+                                }
+
+                                @Override
+                                public void onDismissByReplace(Snackbar snackbar) {
+                                    int tag = (int)snackbar.getTag();
+//                                    Utils.d(this.getClass(), "dismiss r -> clear undo r " + tag);
+                                    undoComics.removeElements(tag);
+                                }
+
                             }),
                     getActivity());
         }

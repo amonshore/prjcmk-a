@@ -19,10 +19,8 @@ import java.io.IOException;
 import java.io.OutputStreamWriter;
 import java.text.ParseException;
 import java.text.SimpleDateFormat;
-import java.util.ArrayList;
 import java.util.Date;
 import java.util.HashSet;
-import java.util.List;
 import java.util.Set;
 import java.util.TreeMap;
 import java.util.concurrent.Semaphore;
@@ -106,8 +104,8 @@ public class DataManager extends Observable<ComicsObserver> {
     //
     private TreeMap<Long, Comics> mComicsCache;
     //
-    private List<Comics> mRemovedComics;
-    private List<Release> mRemovedReleases;
+    private UndoHelper<Comics> mUndoComics;
+    private UndoHelper<Release> mUndoRelease;
     //contiene un elenco di tutti gli editori
     private HashSet<String> mPublishers;
     //contiene la best release per ogni comics
@@ -125,8 +123,8 @@ public class DataManager extends Observable<ComicsObserver> {
         //date format non localizzata
         mDateFormat = new SimpleDateFormat("yyyy-MM-dd");
         //
-        mRemovedComics = new ArrayList<>();
-        mRemovedReleases = new ArrayList<>();
+        mUndoComics = new UndoHelper<>();
+        mUndoRelease = new UndoHelper<>();
     }
 
     private boolean isExternalStorageWritable() {
@@ -381,7 +379,7 @@ public class DataManager extends Observable<ComicsObserver> {
         synchronized (mSyncObj) {
             Comics comics = mComicsCache.remove(id);
             if (comics != null) {
-                mRemovedComics.add(comics);
+                mUndoComics.push(comics);
                 return true;
             } else {
                 return false;
@@ -399,7 +397,7 @@ public class DataManager extends Observable<ComicsObserver> {
     public boolean removeRelease(long comicsId, int number) {
         Release release = getComics(comicsId).removeRelease(number);
         if (release != null) {
-            mRemovedReleases.add(release);
+            mUndoRelease.push(release);
             return true;
         } else {
             return false;
@@ -576,34 +574,12 @@ public class DataManager extends Observable<ComicsObserver> {
         mWriteHandler = null;
     }
 
-    /**
-     *
-     * @return
-     */
-    public Comics[] getLastRemovedComics() {
-        return mRemovedComics.toArray(new Comics[mRemovedComics.size()]);
+    public UndoHelper<Comics> getUndoComics() {
+        return mUndoComics;
     }
 
-    /**
-     *
-     */
-    public void clearUndoComics() {
-        mRemovedComics.clear();
-    }
-
-    /**
-     *
-     * @return
-     */
-    public Release[] getLastRemovedReleases() {
-        return mRemovedReleases.toArray(new Release[mRemovedReleases.size()]);
-    }
-
-    /**
-     *
-     */
-    public void clearUndoReleases() {
-        mRemovedReleases.clear();
+    public UndoHelper<Release> getUndoRelease() {
+        return mUndoRelease;
     }
 
     private void dispose() {
