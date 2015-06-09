@@ -34,6 +34,7 @@ public class ComicsDetailActivity extends ActionBarActivity {
     private DataManager mDataManager;
     private ReleaseListFragment mReleaseListFragment;
     private TextView mTxtName, mTxtPublisher, mTxtNotes;
+    private FloatingActionButton mBtnAdd, mBtnEdit;
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
@@ -61,14 +62,16 @@ public class ComicsDetailActivity extends ActionBarActivity {
         mTxtNotes = ((TextView)findViewById(R.id.txt_detail_comics_notes));
         updateHeader();
         //
-        ((FloatingActionButton)findViewById(R.id.fab_comics_edit)).setOnClickListener(new View.OnClickListener() {
+        mBtnEdit = ((FloatingActionButton)findViewById(R.id.fab_comics_edit));
+        mBtnEdit.setOnClickListener(new View.OnClickListener() {
             @Override
             public void onClick(View v) {
                 showComicsEditor(mComics);
             }
         });
         //listener fab
-        ((FloatingActionButton)findViewById(R.id.fab_release_add)).setOnClickListener(new View.OnClickListener() {
+        mBtnAdd = ((FloatingActionButton)findViewById(R.id.fab_release_add));
+        mBtnAdd.setOnClickListener(new View.OnClickListener() {
             @Override
             public void onClick(View v) {
                 showReleaseEditor(mComics.getId(), -1);

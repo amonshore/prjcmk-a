@@ -46,6 +46,7 @@ public class ComicsListFragment extends AFragment {
     private AbsListView mListView;
     private ComicsListAdapter mAdapter;
     private ActionMode mActionMode;
+    private FloatingActionButton mBtnAdd;
 
     @Override
     public void onCreate(Bundle savedInstanceState) {
@@ -114,6 +115,7 @@ public class ComicsListFragment extends AFragment {
                 MenuInflater inflater = mode.getMenuInflater();
                 inflater.inflate(R.menu.menu_comics_cab, menu);
                 mActionMode = mode;
+                mBtnAdd.setVisibility(View.INVISIBLE);
                 return true;
             }
 
@@ -144,11 +146,13 @@ public class ComicsListFragment extends AFragment {
             @Override
             public void onDestroyActionMode(ActionMode mode) {
                 mActionMode = null;
+                mBtnAdd.setVisibility(View.VISIBLE);
             }
         });
 
         //listener fab
-        ((FloatingActionButton)view.findViewById(R.id.fab_comics_add)).setOnClickListener(new View.OnClickListener() {
+        mBtnAdd = ((FloatingActionButton)view.findViewById(R.id.fab_comics_add));
+        mBtnAdd.setOnClickListener(new View.OnClickListener() {
             @Override
             public void onClick(View v) {
                 showComicsEditor(0);
