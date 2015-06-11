@@ -1,19 +1,16 @@
 package it.amonshore.secondapp.ui.comics;
 
 import android.app.Activity;
-import android.app.AlertDialog;
 import android.content.Intent;
 import android.support.v7.app.ActionBarActivity;
 import android.os.Bundle;
 import android.support.v7.widget.Toolbar;
-import android.text.Editable;
 import android.text.TextUtils;
 import android.view.Menu;
 import android.view.MenuItem;
 import android.widget.ArrayAdapter;
 import android.widget.EditText;
 import android.widget.Switch;
-import android.widget.TextView;
 
 import com.marvinlabs.widget.floatinglabel.autocomplete.FloatingLabelAutoCompleteTextView;
 import com.marvinlabs.widget.floatinglabel.edittext.FloatingLabelEditText;
@@ -29,8 +26,6 @@ import it.amonshore.secondapp.R;
 import it.amonshore.secondapp.data.Comics;
 import it.amonshore.secondapp.data.DataManager;
 import it.amonshore.secondapp.Utils;
-import it.amonshore.secondapp.ui.AsyncValidator;
-import it.amonshore.secondapp.ui.SimpleTextWatcher;
 
 public class ComicsEditorActivity extends ActionBarActivity implements ItemPickerListener<String> {
 
@@ -61,16 +56,17 @@ public class ComicsEditorActivity extends ActionBarActivity implements ItemPicke
         if (comicsId == COMICS_ID_NEW) {
             mIsNew = true;
             mComics = new Comics(mDataManager.getSafeNewComicsId());
-            setTitle(R.string.title_activity_comics_editor);
+            setTitle(R.string.title_activity_comics_new);
         } else {
             mIsNew = false;
             mComics = mDataManager.getComics(comicsId);
-            setTitle(mComics.getName());
+            setTitle(R.string.title_activity_comics_edit);
         }
         //Toolbar
         final Toolbar toolbar = (Toolbar)findViewById(R.id.toolbar_actionbar);
         setSupportActionBar(toolbar);
         getSupportActionBar().setDisplayHomeAsUpEnabled(true);
+        toolbar.setNavigationIcon(R.drawable.ic_close);
         //
         mPeriodicityKeys = new String[] { Comics.PERIODICITY_UNKNOWN, Comics.PERIODICITY_WEEKLY,
                 Comics.PERIODICITY_MONTHLY, Comics.PERIODICITY_MONTHLY_X2, Comics.PERIODICITY_MONTHLY_X3,

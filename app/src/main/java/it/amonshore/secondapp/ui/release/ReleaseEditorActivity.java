@@ -81,6 +81,7 @@ public class ReleaseEditorActivity extends ActionBarActivity {
         final Toolbar toolbar = (Toolbar)findViewById(R.id.toolbar_actionbar);
         setSupportActionBar(toolbar);
         getSupportActionBar().setDisplayHomeAsUpEnabled(true);
+        toolbar.setNavigationIcon(R.drawable.ic_close);
         //
         //imposto i valori e creo i listener
         mTxtNumber = (FloatingLabelEditText)findViewById(R.id.txt_editor_release_number);

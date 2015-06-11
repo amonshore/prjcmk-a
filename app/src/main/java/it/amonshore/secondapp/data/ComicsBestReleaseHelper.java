@@ -22,8 +22,9 @@ public class ComicsBestReleaseHelper {
      */
     public static ReleaseInfo getComicsBestRelease(Comics comics) {
         //imposto le date
-        TimeZone timeZone = TimeZone.getDefault();
-        long today = DateTime.today(timeZone).getStartOfDay().getMilliseconds(timeZone);;
+        final TimeZone timeZone = TimeZone.getDefault();
+        final long today = DateTime.today(timeZone).getStartOfDay().getMilliseconds(timeZone);
+        final DataManager dataManager = DataManager.getDataManager();
 
         List<Release> releases = Arrays.asList(comics.getReleases());
         Collections.sort(releases, new Comparator<Release>() {
@@ -31,15 +32,24 @@ public class ComicsBestReleaseHelper {
             public int compare(Release lhs, Release rhs) {
                 Date ldt = lhs.getDate();
                 Date rdt = rhs.getDate();
+                int res;
                 if (ldt != null && rdt != null) {
-                    return ldt.compareTo(rdt);
+                    res = ldt.compareTo(rdt);
                 } else if (ldt == null && rdt == null) {
-                    return lhs.getNumber() - rhs.getNumber();
+                    res = lhs.getNumber() - rhs.getNumber();
                 } else if (ldt == null) {
-                    return -1;
+                    res = -1;
                 } else {
-                    return 1;
+                    res = 1;
                 }
+
+                //se tutto è uguale confronto alfabeticamente
+                if (res == 0) {
+                    res = dataManager.getComics(lhs.getComicsId()).getName()
+                            .compareTo(dataManager.getComics(rhs.getComicsId()).getName());
+                }
+
+                return res;
             }
         });
 

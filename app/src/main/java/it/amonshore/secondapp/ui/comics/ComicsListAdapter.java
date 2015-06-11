@@ -42,7 +42,7 @@ public class ComicsListAdapter extends BaseAdapter {
         mContext = context;
         mDataManager = DataManager.getDataManager();
         mSortedIds = new ArrayList<>();
-        mDateFormat = new SimpleDateFormat("c dd MMM", Locale.getDefault());
+        mDateFormat = new SimpleDateFormat(context.getString(R.string.format_comics_date), Locale.getDefault());
         setOrder(order);
     }
 

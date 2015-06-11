@@ -8,8 +8,10 @@
     <string name="action_comics_delete">Remove</string>
     <string name="action_comics_sort_by_name">Sort by name</string>
     <string name="action_comics_sort_by_release">Sort by release</string>
+    <string name="action_comics_edit">Edit</string>
 
-    <string name="title_activity_comics_editor">New comics</string>
+    <string name="title_activity_comics_new">New comics</string>
+    <string name="title_activity_comics_edit">Edit comics</string>
     <string name="title_activity_release_editor">New release</string>
     <string name="title_activity_comics_detail">Comics detail</string>
 
@@ -18,6 +20,11 @@
     <string name="undo">Undo</string>
     <string name="comics_removed">Comics removed</string>
     <string name="release_removed">Release removed</string>
+
+    <!-- date/time format -->
+    <string name="format_comics_date">EEE, MMM dd</string>
+    <string name="format_release_date">EEE, MMM dd</string>
+    <string name="format_release_longdate">EEEE, MMMM dd, yyyy</string>
 
     <!-- settings -->
     <string name="title_activity_settings">Settings</string>
@@ -94,5 +101,4 @@
     <string name="action_release_shopping">Shopping list</string>
     <string name="action_release_calendar">Calendar</string>
     <string name="action_release_wishlist">Wishlist</string>
-    <string name="action_comics_edit">Edit</string>
 </resources>

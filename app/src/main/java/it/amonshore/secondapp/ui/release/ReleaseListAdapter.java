@@ -88,13 +88,13 @@ public class ReleaseListAdapter extends BaseAdapter implements StickyListHeaders
         ReleaseGroupHelper helper = new ReleaseGroupHelper(mode, groupByMonth, weekStartOnMonday);
         if (comics == null) {
             mUseSingleComicsLayout = false;
-            mDateFormat = new SimpleDateFormat("c dd MMM", Locale.getDefault());
+            mDateFormat = new SimpleDateFormat(mContext.getString(R.string.format_release_date), Locale.getDefault());
             for (long comicsId : mDataManager.getComics()) {
                 helper.addReleases(mDataManager.getComics(comicsId).getReleases());
             }
         } else {
             mUseSingleComicsLayout = true;
-            mDateFormat = new SimpleDateFormat("cccc, dd MMM yyyy", Locale.getDefault());
+            mDateFormat = new SimpleDateFormat(mContext.getString(R.string.format_release_longdate), Locale.getDefault());
             helper.addReleases(comics.getReleases());
         }
         mReleaseInfos = new ArrayList<>(Arrays.asList(helper.getReleaseInfos()));
