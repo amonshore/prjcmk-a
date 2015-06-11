@@ -19,11 +19,15 @@ import android.widget.ListView;
 import android.widget.TextView;
 
 import com.github.clans.fab.FloatingActionButton;
+import com.nispok.snackbar.Snackbar;
+import com.nispok.snackbar.SnackbarManager;
+import com.nispok.snackbar.listeners.ActionClickListener;
 
 import it.amonshore.secondapp.R;
 import it.amonshore.secondapp.data.Comics;
 import it.amonshore.secondapp.Utils;
 import it.amonshore.secondapp.data.DataManager;
+import it.amonshore.secondapp.data.UndoHelper;
 import it.amonshore.secondapp.ui.AFragment;
 import it.amonshore.secondapp.ui.MainActivity;
 
@@ -42,6 +46,7 @@ public class ComicsListFragment extends AFragment {
     private AbsListView mListView;
     private ComicsListAdapter mAdapter;
     private ActionMode mActionMode;
+    private FloatingActionButton mBtnAdd;
 
     @Override
     public void onCreate(Bundle savedInstanceState) {
@@ -110,6 +115,7 @@ public class ComicsListFragment extends AFragment {
                 MenuInflater inflater = mode.getMenuInflater();
                 inflater.inflate(R.menu.menu_comics_cab, menu);
                 mActionMode = mode;
+                mBtnAdd.setVisibility(View.INVISIBLE);
                 return true;
             }
 
@@ -140,11 +146,13 @@ public class ComicsListFragment extends AFragment {
             @Override
             public void onDestroyActionMode(ActionMode mode) {
                 mActionMode = null;
+                mBtnAdd.setVisibility(View.VISIBLE);
             }
         });
 
         //listener fab
-        ((FloatingActionButton)view.findViewById(R.id.fab_comics_add)).setOnClickListener(new View.OnClickListener() {
+        mBtnAdd = ((FloatingActionButton)view.findViewById(R.id.fab_comics_add));
+        mBtnAdd.setOnClickListener(new View.OnClickListener() {
             @Override
             public void onClick(View v) {
                 showComicsEditor(0);
@@ -221,8 +229,69 @@ public class ComicsListFragment extends AFragment {
     }
 
     @Override
-    public void onDataChanged(int cause) {
+    public void onDataChanged(int cause, boolean wasPosponed) {
         Utils.d(this.getClass(), "onDataChanged " + cause);
+        //
+        if (cause == DataManager.CAUSE_COMICS_REMOVED) {
+            mAdapter.notifyDataSetChanged();
+            //la gestione dell'undo avviene tramite la classe UndoHelper
+            //  che può tenere traccia degli elementi rimossi "marchiandoli" con un tag
+            //  quindi una volta visualizzata la snackbar vengono "machiati" gli ultimi elementi eliminati
+            //  e la snackbar potrà successivamente gestire (ripristinare o eliminare definitivamente)
+            //  solo i suoi elementi (il tag è memorizzato nell'istanza della snackbar)
+            final DataManager dataManager = getDataManager();
+            final UndoHelper<Comics> undoComics = dataManager.getUndoComics();
+            SnackbarManager.show(
+                    Snackbar
+                            .with(getActivity().getApplicationContext())
+                            .text(R.string.comics_removed)
+                            .actionLabel(R.string.undo)
+                            .duration(5000L)
+                            .actionListener(new ActionClickListener() {
+                                @Override
+                                public void onActionClicked(Snackbar snackbar) {
+                                    int tag = (int) snackbar.getTag();
+                                    Comics comics;
+//                                    Utils.d(this.getClass(), "undo ... " + tag);
+                                    while ((comics = undoComics.pop(tag)) != null) {
+//                                        Utils.d(this.getClass(), "undo " + comics.getName());
+                                        dataManager.put(comics);
+                                    }
+                                    dataManager.notifyChanged(DataManager.CAUSE_COMICS_ADDED);
+                                }
+                            })
+                            .eventListener(new com.nispok.snackbar.listeners.EventListenerAdapter() {
+                                @Override
+                                public void onShow(Snackbar snackbar) {
+                                    int tag = undoComics.retainElements();
+//                                    Utils.d(this.getClass(), "undo show " + tag);
+                                    snackbar.setTag(tag);
+                                }
+
+                                @Override
+                                public void onShowByReplace(Snackbar snackbar) {
+                                    int tag = undoComics.retainElements();
+//                                    Utils.d(this.getClass(), "undo show r " + tag);
+                                    snackbar.setTag(tag);
+                                }
+
+                                @Override
+                                public void onDismiss(Snackbar snackbar) {
+                                    int tag = (int) snackbar.getTag();
+//                                    Utils.d(this.getClass(), "dismiss r -> clear undo " + tag);
+                                    undoComics.removeElements(tag);
+                                }
+
+                                @Override
+                                public void onDismissByReplace(Snackbar snackbar) {
+                                    int tag = (int) snackbar.getTag();
+//                                    Utils.d(this.getClass(), "dismiss r -> clear undo r " + tag);
+                                    undoComics.removeElements(tag);
+                                }
+
+                            }),
+                    getActivity());
+        } else
         //se la causa è la modifica dela modalità di visualizzazione delle release non mi ineressa
         if (cause != DataManager.CAUSE_RELEASES_MODE_CHANGED) {
             //se la causa è il cambio pagina aggiorno i dati solo se l'adapter è vuoto
@@ -260,32 +329,6 @@ public class ComicsListFragment extends AFragment {
         }
     }
 
-//    /**
-//     * Task asincrono per l'aggiornamento dei dati (nuovo, modifica)
-//     * Il terzo parametro indica l'indice dell'elemento aggiunto/modificato
-//     */
-//    private class UpdateComicsAsyncTask extends AsyncTask<Comics, Comics, Integer> {
-//        @Override
-//        protected Integer doInBackground(Comics... params) {
-//            for (Comics comics : params) {
-//                publishProgress(comics);
-//            }
-//            //TODO salvare i dati con DataManager
-//            return params.length;
-//        }
-//
-//        @Override
-//        protected void onProgressUpdate(Comics... values) {
-//            int index = ComicsListFragment.this.mAdapter.insertOrUpdate(values[0]);
-//            Utils.d("update comics " + index);
-//            if (index < 0) {
-//                ComicsListFragment.this.mAdapter.notifyDataSetChanged();
-//            } else {
-//                //TODO aggiorno solo la visa dell'elemento modificao
-//            }
-//        }
-//    }
-
     /**
      * Task asincrono per la rimoazione dei dati
      */
@@ -300,8 +343,9 @@ public class ComicsListFragment extends AFragment {
 
         @Override
         protected void onProgressUpdate(Long... values) {
-            boolean res = ComicsListFragment.this.mAdapter.remove(values[0]);
-            Utils.d("delete comics " + values[0] + " -> " + res);
+//            boolean res =
+              ComicsListFragment.this.mAdapter.remove(values[0]);
+//            Utils.d("delete comics " + values[0] + " -> " + res);
         }
 
         @Override

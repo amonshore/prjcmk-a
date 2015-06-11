@@ -1,22 +1,53 @@
 <resources>
 
     <!-- Base application theme. -->
-    <style name="AppTheme" parent="Theme.AppCompat.Light.DarkActionBar">
-        <item name="android:actionBarStyle">@style/AppActionBarStyle</item>
-        <item name="android:windowContentOverlay">@null</item>
+    <style name="AppTheme" parent="Theme.AppCompat.Light.NoActionBar">
+        <!-- L'action bar è sostituita via codice dalla toolbar -->
+        <item name="android:windowActionBar">false</item>
+        <item name="windowActionBar">false</item>
+        <!-- L'action mode copre la toolbar -->
+        <item name="android:windowActionModeOverlay">true</item>
+        <item name="windowActionModeOverlay">true</item>
+        <!-- padding delle liste -->
+        <item name="android:listPreferredItemPaddingLeft">12dp</item>
+        <item name="android:listPreferredItemPaddingRight">12dp</item>
 
-        <!-- Support library compatibility -->
-        <item name="actionBarStyle">@style/AppActionBarStyle</item>
+        <!-- Colore di sfondo dell'action mode -->
+        <item name="android:actionModeBackground">@color/comikku_primary_color_800</item>
+
+        <!-- The primary branding color for the app. By default, this is the color applied to the
+         action bar background. -->
+        <item name="colorPrimary">@color/comikku_primary_color</item>
+
+        <!-- Dark variant of the primary branding color. By default, this is the color applied to
+             the status bar (via statusBarColor) and navigation bar (via navigationBarColor). -->
+        <item name="colorPrimaryDark">@color/comikku_primary_color_800</item>
+
+        <!-- Bright complement to the primary branding color. By default, this is the color applied
+             to framework controls (via colorControlActivated). -->
+        <!--<item name="colorAccent">@android:color/holo_green_dark</item>-->
+
+        <!-- The color applied to framework controls in their normal state. -->
+        <!--<item name="colorControlNormal">@color/white</item>-->
+
+        <!-- The color applied to framework controls in their activated (ex. checked) state. -->
+        <item name="colorControlActivated">#8E24AA</item>
+
+        <!-- The color applied to framework control highlights (ex. ripples, list selectors). -->
+        <!--<item name="colorControlHighlight">@color/red</item>-->
+
+        <!-- The color applied to framework buttons in their normal state. -->
+        <!--<attr name="colorButtonNormal" format="color" />-->
+
+        <!-- The color applied to framework switch thumbs in their normal state. -->
+        <!--<attr name="colorSwitchThumbNormal" format="color" />-->
+
     </style>
 
-    <!-- ActionBar styles -->
-    <style name="AppActionBarStyle"
-        parent="@style/Widget.AppCompat.Light.ActionBar.Solid">
-        <item name="android:background">@color/comikku_primary_color</item>
-
-        <!-- Support library compatibility -->
-        <item name="background">@color/comikku_primary_color</item>
-        <item name="elevation">0dp</item>"
+    <!-- Toolbar -->
+    <style name="DefaultToolBarStyle" parent="">
+        <item name="popupTheme">@style/ThemeOverlay.AppCompat.Light</item>
+        <item name="theme">@style/ThemeOverlay.AppCompat.Dark.ActionBar</item>
     </style>
 
 </resources>

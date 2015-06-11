@@ -3,18 +3,18 @@
     xmlns:app="http://schemas.android.com/apk/res-auto">
 
     <item android:id="@+id/action_releases_mode_shopping"
-        android:title="Shopping list"
+        android:title="@string/action_release_shopping"
         android:icon="@drawable/ic_cart_outline"
-        android:orderInCategory="20" app:showAsAction="never" />
+        android:orderInCategory="10" app:showAsAction="ifRoom" />
 
     <item android:id="@+id/action_releases_mode_calendar"
-        android:title="Calendar"
+        android:title="@string/action_release_calendar"
         android:icon="@drawable/ic_calendar"
-        android:orderInCategory="20" app:showAsAction="never" />
+        android:orderInCategory="20" app:showAsAction="ifRoom" />
 
     <item android:id="@+id/action_releases_mode_law"
-        android:title="Wishlist"
-        android:icon="@drawable/ic_cash_multiple"
-        android:orderInCategory="20" app:showAsAction="never" />
+        android:title="@string/action_release_wishlist"
+        android:icon="@drawable/ic_star_outline"
+        android:orderInCategory="30" app:showAsAction="ifRoom" />
 
 </menu>

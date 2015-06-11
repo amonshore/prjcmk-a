@@ -59,7 +59,7 @@ public class ComicsBestReleaseHelper {
                         found = new ReleaseInfo(ReleaseGroupHelper.GROUP_TO_PURCHASE, rel);
                         break;
                     } else if (rel.getDate().getTime() == today) {
-                        found = new ReleaseInfo(ReleaseGroupHelper.GROUP_TO_PURCHASE, true, rel);
+                        found = new ReleaseInfo(ReleaseGroupHelper.GROUP_TO_PURCHASE, true, false, rel);
                         break;
                     }
                 }

@@ -4,7 +4,9 @@ import android.app.Activity;
 import android.app.AlertDialog;
 import android.content.Intent;
 import android.os.Bundle;
+import android.support.v4.app.NavUtils;
 import android.support.v7.app.ActionBarActivity;
+import android.support.v7.widget.Toolbar;
 import android.text.Editable;
 import android.text.TextUtils;
 import android.view.Menu;
@@ -75,6 +77,10 @@ public class ReleaseEditorActivity extends ActionBarActivity {
             mIsNew = false;
             mRelease = mComics.getRelease(releaseNumber);
         }
+        //Toolbar
+        final Toolbar toolbar = (Toolbar)findViewById(R.id.toolbar_actionbar);
+        setSupportActionBar(toolbar);
+        getSupportActionBar().setDisplayHomeAsUpEnabled(true);
         //
         //imposto i valori e creo i listener
         mTxtNumber = (FloatingLabelEditText)findViewById(R.id.txt_editor_release_number);
@@ -139,14 +145,6 @@ public class ReleaseEditorActivity extends ActionBarActivity {
     }
 
     @Override
-    public Intent getSupportParentActivityIntent() {
-        //TODO creare l'intent che carica la corretta activity
-        //  se sono arrivato qua da comics detail ComicsDetailActivity
-        //  altrimenti MainActivity
-        return super.getSupportParentActivityIntent();
-    }
-
-    @Override
     public boolean onCreateOptionsMenu(Menu menu) {
         // Inflate the menu; this adds items to the action bar if it is present.
         getMenuInflater().inflate(R.menu.menu_release_editor, menu);
@@ -155,13 +153,14 @@ public class ReleaseEditorActivity extends ActionBarActivity {
 
     @Override
     public boolean onOptionsItemSelected(MenuItem item) {
-        // Handle action bar item clicks here. The action bar will
-        // automatically handle clicks on the Home/Up button, so long
-        // as you specify a parent activity in AndroidManifest.xml.
         int id = item.getItemId();
-
-        //noinspection SimplifiableIfStatement
-        if (id == R.id.action_save) {
+        if (id == android.R.id.home) {
+            //intercetto il back
+            //termino l'activity in modo che torni all'activity chiamante
+            //  e non al padre indicato nel manifest
+            finish();
+            return true;
+        } else if (id == R.id.action_save) {
             if (validateAll()) {
                 //TODO eseguire i controlli sui dati
                 //preparo i dati per la risposta

@@ -4,6 +4,11 @@ import android.text.TextUtils;
 import android.text.format.Time;
 import android.util.Log;
 
+import java.io.File;
+import java.io.FileInputStream;
+import java.io.FileOutputStream;
+import java.io.IOException;
+
 import hirondelle.date4j.DateTime;
 
 /**
@@ -114,6 +119,16 @@ public class Utils {
     }
 
     /**
+     *
+     * @param aClass
+     * @param msg
+     * @param err
+     */
+    public static void e(Class aClass, String msg, Throwable err) {
+        Log.e(aClass.getName(), msg, err);
+    }
+
+    /**
      * Calcola il primo giorno della settimana
      * @param date
      * @param weekStartOnMonday
@@ -137,6 +152,26 @@ public class Utils {
      */
     public static DateTime getEndOfWeek(DateTime date, boolean weekStartOnMonday) {
         return getStartOfWeek(date, weekStartOnMonday).plusDays(6);
+    }
+
+    /**
+     *
+     * @param source
+     * @param dest
+     * @throws IOException
+     */
+    public static void copyFile(File source, File dest) throws IOException {
+        if (source.exists()) {
+            try (FileOutputStream fw = new FileOutputStream(dest)) {
+                try (FileInputStream fr = new FileInputStream(source)) {
+                    byte[] buff = new byte[1024];
+                    int nn;
+                    while ((nn = fr.read(buff, 0, buff.length)) > 0) {
+                        fw.write(buff, 0, nn);
+                    }
+                }
+            }
+        }
     }
 
 }

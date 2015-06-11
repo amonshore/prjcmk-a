@@ -1,8 +1,7 @@
 <resources>
     <string name="app_name">Comikku-A</string>
-    <string name="title_activity_main">Comikku-A</string>
+    <string name="title_activity_main" translatable="false">Comikku-A</string>
 
-    <string name="hello_world">Hello world!</string>
     <string name="action_settings">Settings</string>
     <string name="action_save">Save</string>
 
@@ -10,12 +9,15 @@
     <string name="action_comics_sort_by_name">Sort by name</string>
     <string name="action_comics_sort_by_release">Sort by release</string>
 
-    <string name="selected_items">%1d selected</string>
     <string name="title_activity_comics_editor">New comics</string>
     <string name="title_activity_release_editor">New release</string>
     <string name="title_activity_comics_detail">Comics detail</string>
 
-    <string name="placeholder_wishlist">wish</string>
+    <string name="selected_items">%1d selected</string>
+    <string name="placeholder_wishlist" translatable="false">wish</string>
+    <string name="undo">Undo</string>
+    <string name="comics_removed">Comics removed</string>
+    <string name="release_removed">Release removed</string>
 
     <!-- settings -->
     <string name="title_activity_settings">Settings</string>
@@ -48,21 +50,29 @@
     <string name="title_release_group_unknown">Unknown %1</string>
 
     <!-- periodicity -->
+    <string name="periodicity_unknown">Nothing</string>
+    <string name="periodicity_weekly">Weekly</string>
+    <string name="periodicity_monthly">Monthly</string>
+    <string name="periodicity_every_2_months">Every 2 months</string>
+    <string name="periodicity_every_3_months">Every 3 months</string>
+    <string name="periodicity_every_4_months">Every 4 months</string>
+    <string name="periodicity_every_6_months">Every 6 months</string>
+    <string name="periodicity_every_year">Every year</string>
     <string-array name="periodicity_value_array">
-        <item>Unknown</item>
-        <item>Weekly</item>
-        <item>Monthly</item>
-        <item>Every 2 months</item>
-        <item>Every 3 months</item>
-        <item>Every 4 months</item>
-        <item>Every 6 months</item>
-        <item>Every year</item>
+        <item>@string/periodicity_unknown</item>
+        <item>@string/periodicity_weekly</item>
+        <item>@string/periodicity_monthly</item>
+        <item>@string/periodicity_every_2_months</item>
+        <item>@string/periodicity_every_3_months</item>
+        <item>@string/periodicity_every_4_months</item>
+        <item>@string/periodicity_every_6_months</item>
+        <item>@string/periodicity_every_year</item>
     </string-array>
 
     <!-- comics editor -->
     <string name="editor_comics_name">Name</string>
-    <string name="editor_comics_name_empty">Name can not be empty</string>
-    <string name="editor_comics_name_duplicate">Name must be unique</string>
+    <string name="editor_comics_name_empty">The name is required</string>
+    <string name="editor_comics_name_duplicate">The name is already being used</string>
     <string name="editor_comics_publisher">Publisher</string>
     <string name="editor_comics_series">Series</string>
     <string name="editor_comics_authors">Authors</string>
@@ -73,12 +83,16 @@
 
     <!-- release editor -->
     <string name="editor_release_number">Number</string>
-    <string name="editor_release_number_empty">Number can not be empty</string>
-    <string name="editor_release_number_negative">Number can not be negative</string>
-    <string name="editor_release_number_duplicate">Number must be unique</string>
+    <string name="editor_release_number_empty">The number is required</string>
+    <string name="editor_release_number_negative">Number must be positive</string>
+    <string name="editor_release_number_duplicate">The number is already being used</string>
     <string name="editor_release_date">Date</string>
     <string name="editor_release_price">Price</string>
     <string name="editor_release_notes">Notes</string>
     <string name="editor_release_purchased">Purchased</string>
     <string name="editor_release_ordered">Ordered</string>
+    <string name="action_release_shopping">Shopping list</string>
+    <string name="action_release_calendar">Calendar</string>
+    <string name="action_release_wishlist">Wishlist</string>
+    <string name="action_comics_edit">Edit</string>
 </resources>

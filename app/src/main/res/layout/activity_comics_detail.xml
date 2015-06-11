@@ -1,91 +1,90 @@
 <?xml version="1.0" encoding="utf-8"?>
-<RelativeLayout xmlns:android="http://schemas.android.com/apk/res/android"
+<FrameLayout xmlns:android="http://schemas.android.com/apk/res/android"
     xmlns:app="http://schemas.android.com/apk/res-auto"
     xmlns:tools="http://schemas.android.com/tools"
-    android:orientation="vertical"
     android:layout_width="match_parent"
     android:layout_height="match_parent">
 
-    <RelativeLayout
-        android:id="@+id/detail_comics_header"
+    <RelativeLayout xmlns:android="http://schemas.android.com/apk/res/android"
+        android:orientation="vertical"
         android:layout_width="match_parent"
-        android:layout_height="102dp"
-        android:background="@drawable/background_comics_detail"
-        android:layout_alignParentTop="true">
+        android:layout_height="match_parent">
 
-        <TextView
-            android:id="@+id/txt_detail_comics_name"
-            tools:text="Name"
-            android:layout_width="fill_parent"
-            android:layout_height="wrap_content"
-            android:textSize="@dimen/comikku_text_size_largest"
-            android:textColor="@color/white"
-            android:ellipsize="end"
-            android:singleLine="true"
-            android:gravity="right|top"
-            android:paddingLeft="4dp"
-            android:paddingRight="4dp" />
+        <android.support.v7.widget.Toolbar
+            android:id="@+id/toolbar_actionbar"
+            style="@style/DefaultToolBarStyle"
+            android:layout_width="match_parent"
+            android:layout_height="102dp"
+            android:background="@drawable/background_comics_detail"
+            android:layout_alignParentTop="true"
+            android:backgroundTint="@color/transparent_black"
+            android:backgroundTintMode="src_atop">
 
-        <TextView
-            android:id="@+id/txt_detail_comics_publisher"
-            tools:text="Publisher"
-            android:layout_width="fill_parent"
-            android:layout_height="wrap_content"
-            android:textSize="@dimen/comikku_text_size_primary"
-            android:textColor="@color/white"
-            android:layout_below="@+id/txt_detail_comics_name"
-            android:layout_alignParentEnd="true"
-            android:layout_marginBottom="4dp"
-            android:ellipsize="end"
-            android:singleLine="true"
-            android:layout_alignStart="@+id/txt_detail_comics_name"
-            android:paddingLeft="4dp"
-            android:paddingRight="4dp"
-            android:gravity="right" />
+            <RelativeLayout
+                android:layout_width="match_parent"
+                android:layout_height="match_parent">
 
-        <TextView
-            android:id="@+id/txt_detail_comics_notes"
-            tools:text="Notes notes notes notes notes notes notes notes notes notes notes notes notes notes notes notes notes notes notes notes notes"
-            android:layout_width="fill_parent"
+                <TextView
+                    android:id="@+id/txt_detail_comics_name"
+                    tools:text="Name"
+                    android:layout_width="fill_parent"
+                    android:layout_height="wrap_content"
+                    android:textSize="@dimen/comikku_text_size_large"
+                    android:textColor="@color/white"
+                    android:ellipsize="end"
+                    android:singleLine="true"
+                    android:paddingLeft="4dp"
+                    android:layout_marginTop="8dp" />
+
+                <TextView
+                    android:id="@+id/txt_detail_comics_publisher"
+                    tools:text="Publisher"
+                    android:layout_width="fill_parent"
+                    android:layout_height="wrap_content"
+                    android:textSize="@dimen/comikku_text_size_primary"
+                    android:textColor="@color/white"
+                    android:layout_below="@+id/txt_detail_comics_name"
+                    android:layout_alignParentEnd="true"
+                    android:layout_marginBottom="4dp"
+                    android:ellipsize="end"
+                    android:singleLine="true"
+                    android:layout_alignStart="@+id/txt_detail_comics_name"
+                    android:paddingLeft="4dp"
+                    android:paddingRight="8dp"
+                    android:gravity="right" />
+
+                <TextView
+                    android:id="@+id/txt_detail_comics_notes"
+                    tools:text="Notes notes notes notes notes notes notes notes notes notes notes notes notes notes notes notes notes notes notes notes notes"
+                    android:layout_width="fill_parent"
+                    android:layout_height="wrap_content"
+                    android:textSize="@dimen/comikku_text_size_secondary"
+                    android:textColor="@color/white"
+                    android:layout_alignParentBottom="true"
+                    android:ellipsize="end"
+                    android:maxLines="2"
+                    android:layout_below="@+id/txt_detail_comics_publisher"
+                    android:layout_alignStart="@+id/txt_detail_comics_publisher"
+                    android:layout_marginLeft="84dp"
+                    android:paddingLeft="4dp"
+                    android:paddingRight="8dp"
+                    android:gravity="center_vertical|right" />
+
+            </RelativeLayout>
+
+        </android.support.v7.widget.Toolbar>
+
+        <fragment
+            android:layout_width="wrap_content"
             android:layout_height="wrap_content"
-            android:textSize="@dimen/comikku_text_size_secondary"
-            android:textColor="@color/white"
-            android:layout_alignParentBottom="true"
-            android:ellipsize="end"
-            android:maxLines="2"
-            android:layout_below="@+id/txt_detail_comics_publisher"
-            android:layout_alignStart="@+id/txt_detail_comics_publisher"
-            android:layout_marginLeft="84dp"
-            android:paddingLeft="4dp"
-            android:paddingRight="4dp"
-            android:gravity="center_vertical|right" />
+            android:name="it.amonshore.secondapp.ui.release.ReleaseListFragment"
+            android:id="@+id/frg_release_list"
+            tools:layout="@layout/fragment_releases_list"
+            android:layout_alignParentStart="true"
+            android:layout_below="@+id/toolbar_actionbar"
+            android:layout_alignParentBottom="true" />
 
     </RelativeLayout>
-
-    <com.github.clans.fab.FloatingActionButton
-        android:id="@+id/fab_comics_edit"
-        android:layout_width="wrap_content"
-        android:layout_height="wrap_content"
-        android:src="@drawable/ic_edit"
-        app:fab_size="mini"
-        app:fab_elevationCompat="@dimen/floating_action_mini_elevation"
-        app:fab_colorNormal="@color/comikku_fab_mini_normal_color"
-        app:fab_colorPressed="@color/comikku_fab_mini_pressed_color"
-        app:fab_colorRipple="@color/comikku_fab_mini_ripple_color"
-        android:layout_above="@+id/frg_release_list"
-        android:layout_alignParentStart="true"
-        android:layout_marginLeft="18dp"
-        android:layout_marginBottom="-14dp" />
-
-    <fragment
-        android:layout_width="wrap_content"
-        android:layout_height="wrap_content"
-        android:name="it.amonshore.secondapp.ui.release.ReleaseListFragment"
-        android:id="@+id/frg_release_list"
-        tools:layout="@layout/fragment_releases_list"
-        android:layout_alignParentStart="true"
-        android:layout_below="@+id/detail_comics_header"
-        android:layout_alignParentBottom="true" />
 
     <com.github.clans.fab.FloatingActionButton
         android:id="@+id/fab_release_add"
@@ -98,8 +97,6 @@
         app:fab_elevationCompat="@dimen/floating_action_elevation"
         app:fab_colorNormal="@color/comikku_fab_normal_color"
         app:fab_colorPressed="@color/comikku_fab_pressed_color"
-        app:fab_colorRipple="@color/comikku_fab_ripple_color"
-        android:layout_alignBottom="@+id/frg_release_list"
-        android:layout_alignRight="@+id/frg_release_list" />
+        app:fab_colorRipple="@color/comikku_fab_ripple_color" />
 
-</RelativeLayout>
+</FrameLayout>

@@ -188,22 +188,21 @@ public class Comics {
     /**
      *
      * @param number
-     * @return true se è stata elminata, false altrimenti
+     * @return la release rimossa oppure null se non viene trovata
      */
-    public boolean removeRelease(int number) {
+    protected Release removeRelease(int number) {
         int index = indexOf(number);
         if (index >= 0) {
-            releases.remove(index);
-            return true;
+            return releases.remove(index);
         } else {
-            return false;
+            return null;
         }
     }
 
     /**
      *
      */
-    public void removeAllReleases() {
+    protected void removeAllReleases() {
         releases.clear();
     }
 
