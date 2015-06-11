@@ -87,19 +87,6 @@
     </RelativeLayout>
 
     <com.github.clans.fab.FloatingActionButton
-        android:id="@+id/fab_comics_edit"
-        android:layout_width="wrap_content"
-        android:layout_height="wrap_content"
-        android:src="@drawable/ic_edit"
-        app:fab_size="mini"
-        app:fab_elevationCompat="@dimen/floating_action_mini_elevation"
-        app:fab_colorNormal="@color/comikku_fab_mini_normal_color"
-        app:fab_colorPressed="@color/comikku_fab_mini_pressed_color"
-        app:fab_colorRipple="@color/comikku_fab_mini_ripple_color"
-        android:layout_marginLeft="18dp"
-        android:layout_marginTop="70dp" />
-
-    <com.github.clans.fab.FloatingActionButton
         android:id="@+id/fab_release_add"
         android:layout_width="wrap_content"
         android:layout_height="wrap_content"

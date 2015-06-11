@@ -7,6 +7,8 @@ import android.os.Build;
 import android.os.Bundle;
 import android.support.v7.app.ActionBarActivity;
 import android.support.v7.widget.Toolbar;
+import android.view.Menu;
+import android.view.MenuItem;
 import android.view.View;
 import android.view.Window;
 import android.view.WindowManager;
@@ -34,7 +36,7 @@ public class ComicsDetailActivity extends ActionBarActivity {
     private DataManager mDataManager;
     private ReleaseListFragment mReleaseListFragment;
     private TextView mTxtName, mTxtPublisher, mTxtNotes;
-    private FloatingActionButton mBtnAdd, mBtnEdit;
+    private FloatingActionButton mBtnAdd;
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
@@ -61,14 +63,6 @@ public class ComicsDetailActivity extends ActionBarActivity {
         mTxtPublisher = ((TextView)findViewById(R.id.txt_detail_comics_publisher));
         mTxtNotes = ((TextView)findViewById(R.id.txt_detail_comics_notes));
         updateHeader();
-        //
-        mBtnEdit = ((FloatingActionButton)findViewById(R.id.fab_comics_edit));
-        mBtnEdit.setOnClickListener(new View.OnClickListener() {
-            @Override
-            public void onClick(View v) {
-                showComicsEditor(mComics);
-            }
-        });
         //listener fab
         mBtnAdd = ((FloatingActionButton)findViewById(R.id.fab_release_add));
         mBtnAdd.setOnClickListener(new View.OnClickListener() {
@@ -97,6 +91,25 @@ public class ComicsDetailActivity extends ActionBarActivity {
                 mDataManager.notifyChanged(DataManager.CAUSE_RELEASE_ADDED);
             }
         }
+    }
+
+    @Override
+    public boolean onCreateOptionsMenu(Menu menu) {
+        // Inflate the menu; this adds items to the action bar if it is present.
+        getMenuInflater().inflate(R.menu.menu_comics_detail, menu);
+        return true;
+    }
+
+    @Override
+    public boolean onOptionsItemSelected(MenuItem item) {
+        int id = item.getItemId();
+        //
+        if (id == R.id.action_comics_edit) {
+            showComicsEditor(mComics);
+            return true;
+        }
+
+        return super.onOptionsItemSelected(item);
     }
 
     private void updateHeader() {

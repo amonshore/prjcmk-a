@@ -14,7 +14,7 @@
 
     <item android:id="@+id/action_releases_mode_law"
         android:title="@string/action_release_wishlist"
-        android:icon="@drawable/ic_cash_multiple"
+        android:icon="@drawable/ic_star_outline"
         android:orderInCategory="30" app:showAsAction="ifRoom" />
 
 </menu>

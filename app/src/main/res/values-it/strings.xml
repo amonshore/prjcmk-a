@@ -33,9 +33,9 @@
     <string name="editor_release_purchased">Acquistato</string>
     <string name="editor_release_price">Prezzo</string>
     <string name="editor_release_ordered">Ordinato</string>
-    <string name="editor_release_number_negative">Il numero non può essere negativo</string>
-    <string name="editor_release_number_empty">Il numero non può essere vuoto</string>
-    <string name="editor_release_number_duplicate">Numero già usato</string>
+    <string name="editor_release_number_negative">Il numero deve essere positivo</string>
+    <string name="editor_release_number_empty">Il numero è richiesto</string>
+    <string name="editor_release_number_duplicate">Il numero è già stato usato</string>
     <string name="editor_release_number">Numero</string>
     <string name="editor_release_notes">Note</string>
     <string name="editor_release_date">Data</string>
@@ -44,8 +44,8 @@
     <string name="editor_comics_price">Prezzo</string>
     <string name="editor_comics_periodicity">Periodicità</string>
     <string name="editor_comics_notes">Note</string>
-    <string name="editor_comics_name_empty">Il nome non può essere vuoto</string>
-    <string name="editor_comics_name_duplicate">Nome già usato</string>
+    <string name="editor_comics_name_empty">Il nome è richiesto</string>
+    <string name="editor_comics_name_duplicate">Il nome è già stato usato</string>
     <string name="editor_comics_name">Nome</string>
     <string name="editor_comics_authors">Autori</string>
     <string name="comics_removed">Fumetto rimosso</string>
@@ -67,4 +67,5 @@
     <string name="periodicity_every_year">Ogni anno</string>
     <string name="periodicity_monthly">Mensile</string>
     <string name="periodicity_weekly">Settimanale</string>
+    <string name="action_comics_edit">Modifica</string>
 </resources>
