@@ -12,6 +12,8 @@
         <item name="android:listPreferredItemPaddingLeft">12dp</item>
         <item name="android:listPreferredItemPaddingRight">12dp</item>
 
+        <item name="android:fastScrollOverlayPosition">atThumb</item>
+
         <!-- Colore di sfondo dell'action mode -->
         <item name="android:actionModeBackground">@color/comikku_primary_color_800</item>
 

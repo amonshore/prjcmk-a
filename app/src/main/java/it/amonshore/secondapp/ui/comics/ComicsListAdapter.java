@@ -1,16 +1,20 @@
 package it.amonshore.secondapp.ui.comics;
 
 import android.content.Context;
+import android.util.SparseArray;
 import android.view.LayoutInflater;
 import android.view.View;
 import android.view.ViewGroup;
 import android.widget.BaseAdapter;
+import android.widget.SectionIndexer;
 import android.widget.TextView;
 
 import java.text.SimpleDateFormat;
 import java.util.ArrayList;
 import java.util.Collections;
 import java.util.Comparator;
+import java.util.HashMap;
+import java.util.LinkedHashMap;
 import java.util.Locale;
 
 import it.amonshore.secondapp.R;
@@ -26,7 +30,7 @@ import it.amonshore.secondapp.data.ReleaseInfo;
  *
  * L'id di ogni elemento della lista è dato da Comics.getId()
  */
-public class ComicsListAdapter extends BaseAdapter {
+public class ComicsListAdapter extends BaseAdapter implements SectionIndexer {
 
     public final static int ORDER_BY_NAME = 2;
     public final static int ORDER_BY_BEST_RELEASE = 4;
@@ -37,6 +41,9 @@ public class ComicsListAdapter extends BaseAdapter {
     private Comparator<Long> mComparator;
     private int mOrder;
     private SimpleDateFormat mDateFormat;
+
+    private HashMap<String, Integer> mMapFastScrollSections;
+    private String[] mFastScrollSections;
 
     public ComicsListAdapter(Context context, int order) {
         mContext = context;
@@ -68,6 +75,7 @@ public class ComicsListAdapter extends BaseAdapter {
                 mComparator = new ReleaseComparator();
             }
             Collections.sort(mSortedIds, mComparator);
+            prepareFastScrollSections();
         }
     }
 
@@ -81,21 +89,14 @@ public class ComicsListAdapter extends BaseAdapter {
             //è un nuovo elemento
             mSortedIds.add(comics.getId());
             Collections.sort(mSortedIds, mComparator);
+            prepareFastScrollSections();
             return mSortedIds.indexOf(comics.getId());
         } else {
             //è un elemento già esistente
             Collections.sort(mSortedIds, mComparator);
+            prepareFastScrollSections();
             return mSortedIds.indexOf(comics.getId());
         }
-    }
-
-    /**
-     *
-     * @param comics
-     * @return
-     */
-    public boolean remove(Comics comics) {
-        return remove(comics.getId());
     }
 
     /**
@@ -106,6 +107,7 @@ public class ComicsListAdapter extends BaseAdapter {
     public boolean remove(long id) {
         if (mDataManager.remove(id)) {
             mSortedIds.remove(id);
+            prepareFastScrollSections();
             return true;
         } else {
             return false;
@@ -120,7 +122,41 @@ public class ComicsListAdapter extends BaseAdapter {
         mSortedIds.clear();
         mSortedIds.addAll(mDataManager.getComics());
         Collections.sort(mSortedIds, mComparator);
+        prepareFastScrollSections();
         return mSortedIds.size();
+    }
+
+    private void prepareFastScrollSections() {
+        if (mOrder == ORDER_BY_NAME) {
+            mMapFastScrollSections = new LinkedHashMap<>();
+            for (int ii = 0; ii < mSortedIds.size(); ii++) {
+                Comics comics = mDataManager.getComics(mSortedIds.get(ii));
+                String ch = comics.getName().substring(0, 1).toUpperCase();
+                if (!mMapFastScrollSections.containsKey(ch))
+                    mMapFastScrollSections.put(ch, ii);
+            }
+            mFastScrollSections = mMapFastScrollSections.keySet().toArray(new String[mMapFastScrollSections.size()]);
+        } else {
+            mMapFastScrollSections = null;
+            mFastScrollSections = null;
+        }
+    }
+
+    @Override
+    public Object[] getSections() {
+        return mFastScrollSections;
+    }
+
+    @Override
+    public int getPositionForSection(int sectionIndex) {
+//        Utils.d(this.getClass(), "getPositionForSection " + sectionIndex);
+        return mMapFastScrollSections.get(mFastScrollSections[sectionIndex]);
+    }
+
+    @Override
+    public int getSectionForPosition(int position) {
+//        Utils.d(this.getClass(), "getSectionForPosition " + position);
+        return 0;
     }
 
     @Override
@@ -135,80 +171,6 @@ public class ComicsListAdapter extends BaseAdapter {
     public int getCount() {
         return mSortedIds.size();
     }
-
-//    @Override
-//    public View getView(int position, View convertView, ViewGroup parent) {
-//        ItemViewHolder holder;
-//
-//        if (convertView == null) {
-//            holder = new ItemViewHolder();
-//            convertView = LayoutInflater.from(mContext).inflate(R.layout.list_comics_item, null);
-//            holder.txtName = (TextView) convertView.findViewById(R.id.txt_list_comics_name);
-//            holder.txtPublisher = (TextView) convertView.findViewById(R.id.txt_list_comics_publisher);
-//            holder.txtNotes = (TextView) convertView.findViewById(R.id.txt_list_comics_notes);
-//            holder.txtDate = (TextView) convertView.findViewById(R.id.txt_list_comics_date);
-//            holder.txtNumber = (TextView) convertView.findViewById(R.id.txt_list_comics_number);
-//            convertView.setTag(holder);
-//        } else {
-//            holder = (ItemViewHolder) convertView.getTag();
-//        }
-//
-//        Comics comics = (Comics)getItem(position);
-//        ReleaseInfo bestReleaseInfo = mDataManager.getBestRelease(comics.getId());
-//        String bestReleaseNotes = null;
-//        if (bestReleaseInfo != null) {
-//            Release bestRelease = bestReleaseInfo.getRelease();
-//            String relDate = mContext.getString(R.string.placeholder_wishlist);
-//            if (bestRelease.getDate() != null) {
-//                relDate = mDateFormat.format(bestRelease.getDate());
-//            }
-//            holder.txtNumber.setText(Integer.toString(bestRelease.getNumber()));
-//            holder.txtDate.setText(relDate);
-//
-//            switch (bestReleaseInfo.getGroup()) {
-//                case ReleaseGroupHelper.GROUP_LOST:
-//                case ReleaseGroupHelper.GROUP_EXPIRED:
-//                    holder.txtNumber.setBackgroundResource(R.color.comikku_expired_background_color);
-//                    holder.txtNumber.setTextColor(mContext.getResources().getColor(R.color.comikku_expired_primary_color));
-//                    holder.txtDate.setBackgroundResource(R.drawable.border_expired_releasedate);
-//                    break;
-//                case ReleaseGroupHelper.GROUP_TO_PURCHASE:
-//                    if (bestReleaseInfo.isReleasedToday()) {
-//                        holder.txtNumber.setBackgroundResource(R.color.comikku_today_background_color);
-//                        holder.txtNumber.setTextColor(mContext.getResources().getColor(R.color.comikku_today_primary_color));
-//                        holder.txtDate.setBackgroundResource(R.drawable.border_today_releasedate);
-//                        break;
-//                    }
-//                case ReleaseGroupHelper.GROUP_PERIOD:
-//                case ReleaseGroupHelper.GROUP_PERIOD_NEXT:
-//                case ReleaseGroupHelper.GROUP_PERIOD_OTHER:
-//                case ReleaseGroupHelper.GROUP_PURCHASED:
-//                    holder.txtNumber.setBackgroundResource(R.color.comikku_to_purchase_background_color);
-//                    holder.txtNumber.setTextColor(mContext.getResources().getColor(R.color.comikku_to_purchase_primary_color));
-//                    holder.txtDate.setBackgroundResource(R.drawable.border_to_purchase_releasedate);
-//                    break;
-//                case ReleaseGroupHelper.GROUP_WISHLIST:
-//                    holder.txtNumber.setBackgroundResource(R.color.comikku_wishlist_background_color);
-//                    holder.txtNumber.setTextColor(mContext.getResources().getColor(R.color.comikku_wishlist_primary_color));
-//                    holder.txtDate.setBackgroundResource(R.drawable.border_wishlist_releasedate);
-//                    break;
-//            }
-//
-//            holder.txtNumber.setVisibility(View.VISIBLE);
-//            holder.txtDate.setVisibility(View.VISIBLE);
-//            bestReleaseNotes = bestRelease.getNotes();
-//        } else {
-//            holder.txtNumber.setText("");
-//            holder.txtDate.setText("");
-//            holder.txtNumber.setVisibility(View.INVISIBLE);
-//            holder.txtDate.setVisibility(View.INVISIBLE);
-//        }
-//        holder.txtName.setText(comics.getName());
-//        holder.txtPublisher.setText(comics.getPublisher());
-//        holder.txtNotes.setText(Utils.join(" - ", true, comics.getAuthors(),
-//                Utils.nvl(bestReleaseNotes, comics.getNotes())));
-//        return convertView;
-//    }
 
     @Override
     public View getView(int position, View convertView, ViewGroup parent) {
