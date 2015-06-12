@@ -92,7 +92,7 @@ public class ComicsListFragment extends AFragment {
 
         // Set the adapter
         mListView = (AbsListView) view.findViewById(android.R.id.list);
-        ((AdapterView<ListAdapter>) mListView).setAdapter(mAdapter);
+        mListView.setAdapter(mAdapter);
 
         //
         mListView.setChoiceMode(ListView.CHOICE_MODE_MULTIPLE_MODAL);
@@ -121,7 +121,7 @@ public class ComicsListFragment extends AFragment {
 
             @Override
             public boolean onActionItemClicked(ActionMode mode, MenuItem item) {
-                Utils.d("onActionItemClicked " + item.getTitle());
+//                Utils.d("onActionItemClicked " + item.getTitle());
                 //risponde alla selezione di una azione del menu_comics_cab
                 long menuId = item.getItemId();
                 if (menuId == R.id.action_comics_delete) {
@@ -181,17 +181,21 @@ public class ComicsListFragment extends AFragment {
     @Override
     public boolean onOptionsItemSelected(MenuItem item) {
         int id = item.getItemId();
-        Utils.d("onOptionsItemSelected " + item.getTitle());
+//        Utils.d("onOptionsItemSelected " + item.getTitle());
 
         if (id == R.id.action_comics_sort_by_name) {
             mAdapter.setOrder(ComicsListAdapter.ORDER_BY_NAME);
             mAdapter.notifyDataSetChanged();
             getActivity().invalidateOptionsMenu();
+            mListView.setFastScrollEnabled(true);
+            mListView.setFastScrollAlwaysVisible(true);
             return true;
         }  else if (id == R.id.action_comics_sort_by_release) {
             mAdapter.setOrder(ComicsListAdapter.ORDER_BY_BEST_RELEASE);
             mAdapter.notifyDataSetChanged();
             getActivity().invalidateOptionsMenu();
+            mListView.setFastScrollEnabled(false);
+            mListView.setFastScrollAlwaysVisible(false);
             return true;
         } else {
             return false;
@@ -326,6 +330,14 @@ public class ComicsListFragment extends AFragment {
         @Override
         protected void onPostExecute(Integer result) {
             ComicsListFragment.this.mAdapter.notifyDataSetChanged();
+            if (mAdapter.getOrder() == ComicsListAdapter.ORDER_BY_NAME) {
+//                Utils.d(this.getClass(), "sect fast enable");
+                mListView.setFastScrollEnabled(true);
+                mListView.setFastScrollAlwaysVisible(true);
+            } else {
+                mListView.setFastScrollEnabled(false);
+                mListView.setFastScrollAlwaysVisible(false);
+            }
         }
     }
 
