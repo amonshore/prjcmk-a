@@ -13,6 +13,6 @@
     <dimen name="comikku_text_size_largest">34sp</dimen>
     <dimen name="comikku_text_size_large">24sp</dimen>
     <dimen name="comikku_text_size_primary">16sp</dimen>
-    <dimen name="comikku_text_size_secondary">12sp</dimen>
+    <dimen name="comikku_text_size_secondary">14sp</dimen>
     <dimen name="comikku_text_size_smallest">10sp</dimen>
 </resources>

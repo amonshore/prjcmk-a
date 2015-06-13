@@ -135,6 +135,10 @@ public class MainActivity extends ActionBarActivity implements SharedPreferences
             mDataManager.restoreBackup();
             new ReadDataAsyncTask().execute(true);
             return true;
+        } else if (id == R.id.action_info) {
+            Intent intent = new Intent(this, InfoActivity.class);
+            startActivity(intent);
+            return true;
         }
 
         return super.onOptionsItemSelected(item);

@@ -55,6 +55,14 @@
                 android:name="android.support.PARENT_ACTIVITY"
                 android:value="it.amonshore.comikkua.ui.MainActivity" />
         </activity>
+        <activity
+            android:name="it.amonshore.comikkua.ui.InfoActivity"
+            android:label="@string/title_activity_info"
+            android:parentActivityName="it.amonshore.comikkua.ui.MainActivity" >
+            <meta-data
+                android:name="android.support.PARENT_ACTIVITY"
+                android:value="it.amonshore.comikkua.ui.MainActivity" />
+        </activity>
     </application>
 
 </manifest>
