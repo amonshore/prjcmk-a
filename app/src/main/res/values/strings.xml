@@ -21,6 +21,9 @@
     <string name="comics_removed">Comics removed</string>
     <string name="release_removed">Release removed</string>
 
+    <string name="comics_empty_list">You have no comics</string>
+    <string name="release_empty_list">You have no releases</string>
+
     <!-- date/time format -->
     <string name="format_comics_date">EEE, MMM dd</string>
     <string name="format_release_date">EEE, MMM dd</string>

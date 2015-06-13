@@ -92,6 +92,9 @@ public class ComicsListFragment extends AFragment {
         // Set the adapter
         mListView = (AbsListView) view.findViewById(android.R.id.list);
         mListView.setAdapter(mAdapter);
+        //A0022
+        mListView.setEmptyView(view.findViewById(android.R.id.empty));
+        setEmptyText(getString(R.string.comics_empty_list));
 
         //
         mListView.setChoiceMode(ListView.CHOICE_MODE_MULTIPLE_MODAL);
@@ -322,8 +325,7 @@ public class ComicsListFragment extends AFragment {
     private class UpdateListAsyncTask extends AsyncTask<Void, Comics, Integer> {
         @Override
         protected Integer doInBackground(Void... params) {
-            ComicsListFragment.this.mAdapter.refresh();
-            return 0;
+            return ComicsListFragment.this.mAdapter.refresh();
         }
 
         @Override

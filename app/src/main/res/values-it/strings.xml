@@ -72,4 +72,6 @@
     <string name="format_comics_date">EEE, dd MMM</string>
     <string name="format_release_date">EEE, dd MMM</string>
     <string name="format_release_longdate">EEEE, dd MMMM  yyyy</string>
+    <string name="comics_empty_list">Non ci sono fumetti</string>
+    <string name="release_empty_list">Non ci sono uscite</string>
 </resources>

@@ -1,3 +1,4 @@
 # prjcmk-a
+Autore: narsenico
 
-Author: narsenico
+Versione: v1.0.0-alpha (1)

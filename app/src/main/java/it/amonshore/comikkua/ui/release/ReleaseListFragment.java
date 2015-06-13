@@ -151,6 +151,9 @@ public class ReleaseListFragment extends AFragment {
         list.setAdapter(mAdapter);
         //questa è la vera lista
         mListView = list.getWrappedList();
+        //A0022
+        mListView.setEmptyView(view.findViewById(android.R.id.empty));
+        setEmptyText(getString(R.string.release_empty_list));
         mListView.setChoiceMode(ListView.CHOICE_MODE_MULTIPLE_MODAL);
         mListView.setOnItemClickListener(new AdapterView.OnItemClickListener() {
             @Override
