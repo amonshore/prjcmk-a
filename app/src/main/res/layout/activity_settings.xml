@@ -13,6 +13,6 @@
         android:id="@+id/frg_settings"
         android:layout_width="match_parent"
         android:layout_height="match_parent"
-        android:name="it.amonshore.secondapp.ui.SettingsActivity$SettingsFragment" />
+        android:name="it.amonshore.comikkua.ui.SettingsActivity$SettingsFragment" />
 
 </LinearLayout>

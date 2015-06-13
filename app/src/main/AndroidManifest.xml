@@ -1,6 +1,6 @@
 <?xml version="1.0" encoding="utf-8"?>
 <manifest xmlns:android="http://schemas.android.com/apk/res/android"
-    package="it.amonshore.secondapp" >
+    package="it.amonshore.comikkua" >
 
     <uses-permission
         android:name="android.permission.WRITE_EXTERNAL_STORAGE"
@@ -12,7 +12,7 @@
         android:label="@string/app_name"
         android:theme="@style/AppTheme" >
         <activity
-            android:name=".ui.MainActivity"
+            android:name="it.amonshore.comikkua.ui.MainActivity"
             android:launchMode="singleTop"
             android:label="@string/title_activity_main" >
             <intent-filter>
@@ -22,38 +22,38 @@
             </intent-filter>
         </activity>
         <activity
-            android:name=".ui.SettingsActivity"
+            android:name="it.amonshore.comikkua.ui.SettingsActivity"
             android:label="@string/title_activity_settings"
-            android:parentActivityName=".ui.MainActivity" >
+            android:parentActivityName="it.amonshore.comikkua.ui.MainActivity" >
             <meta-data
                 android:name="android.support.PARENT_ACTIVITY"
-                android:value="it.amonshore.secondapp.ui.MainActivity" />
+                android:value="it.amonshore.comikkua.ui.MainActivity" />
         </activity>
         <activity
-            android:name=".ui.comics.ComicsEditorActivity"
+            android:name="it.amonshore.comikkua.ui.comics.ComicsEditorActivity"
             android:label="@string/title_activity_comics_new"
-            android:parentActivityName=".ui.MainActivity"
+            android:parentActivityName="it.amonshore.comikkua.ui.MainActivity"
             android:windowSoftInputMode="stateUnchanged" >
             <meta-data
                 android:name="android.support.PARENT_ACTIVITY"
-                android:value="it.amonshore.secondapp.ui.MainActivity" />
+                android:value="it.amonshore.comikkua.ui.MainActivity" />
         </activity>
         <activity
-            android:name=".ui.release.ReleaseEditorActivity"
+            android:name="it.amonshore.comikkua.ui.release.ReleaseEditorActivity"
             android:label="@string/title_activity_release_editor"
-            android:parentActivityName=".ui.MainActivity"
+            android:parentActivityName="it.amonshore.comikkua.ui.MainActivity"
             android:windowSoftInputMode="stateUnchanged" >
             <meta-data
                 android:name="android.support.PARENT_ACTIVITY"
-                android:value="it.amonshore.secondapp.ui.MainActivity" />
+                android:value="it.amonshore.comikkua.ui.MainActivity" />
         </activity>
         <activity
-            android:name=".ui.comics.ComicsDetailActivity"
+            android:name="it.amonshore.comikkua.ui.comics.ComicsDetailActivity"
             android:label="@string/title_activity_comics_detail"
-            android:parentActivityName=".ui.MainActivity" >
+            android:parentActivityName="it.amonshore.comikkua.ui.MainActivity" >
             <meta-data
                 android:name="android.support.PARENT_ACTIVITY"
-                android:value="it.amonshore.secondapp.ui.MainActivity" />
+                android:value="it.amonshore.comikkua.ui.MainActivity" />
         </activity>
     </application>
 

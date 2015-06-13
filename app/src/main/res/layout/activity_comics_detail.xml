@@ -77,7 +77,7 @@
         <fragment
             android:layout_width="wrap_content"
             android:layout_height="wrap_content"
-            android:name="it.amonshore.secondapp.ui.release.ReleaseListFragment"
+            android:name="it.amonshore.comikkua.ui.release.ReleaseListFragment"
             android:id="@+id/frg_release_list"
             tools:layout="@layout/fragment_releases_list"
             android:layout_alignParentStart="true"

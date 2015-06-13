@@ -4,7 +4,7 @@
     android:orientation="vertical"
     android:layout_width="fill_parent"
     android:layout_height="fill_parent"
-    tools:context="it.amonshore.secondapp.ui.release.ReleaseEditorActivity">
+    tools:context="it.amonshore.comikkua.ui.release.ReleaseEditorActivity">
 
     <include
         android:id="@+id/toolbar_actionbar"

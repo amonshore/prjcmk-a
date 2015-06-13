@@ -1,7 +1,7 @@
 <menu xmlns:android="http://schemas.android.com/apk/res/android"
     xmlns:app="http://schemas.android.com/apk/res-auto"
     xmlns:tools="http://schemas.android.com/tools"
-    tools:context="it.amonshore.secondapp.ui.comics.ComicsEditorActivity">
+    tools:context="it.amonshore.comikkua.ui.comics.ComicsEditorActivity">
     <item android:id="@+id/action_save" android:title="@string/action_save"
         android:icon="@drawable/ic_action_accept"
         android:orderInCategory="100" app:showAsAction="always" />
