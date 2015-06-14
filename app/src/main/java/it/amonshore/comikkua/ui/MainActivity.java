@@ -41,8 +41,8 @@ public class MainActivity extends ActionBarActivity implements SharedPreferences
         //l'action bar è fornita dalla super classe
         //setContentView(R.layout.activity_main);
         setContentView(R.layout.activity_main_sliding);
-        //
-        mDataManager = DataManager.init(this.getApplicationContext());
+        //TODO recuperare il nome utente dalle preferenze
+        mDataManager = DataManager.init(this.getApplicationContext(), null);
         Utils.d(this.getClass(), "*********** MAIN onCreate -> register observer and start WH");
         mDataManager.registerObserver(this);
         mDataManager.startWriteHandler();
@@ -131,10 +131,10 @@ public class MainActivity extends ActionBarActivity implements SharedPreferences
             Intent intent = new Intent(this, SettingsActivity.class);
             startActivity(intent);
             return true;
-        } else if (id == R.id.action_restore_backup) {
-            mDataManager.restoreBackup();
-            new ReadDataAsyncTask().execute(true);
-            return true;
+//        } else if (id == R.id.action_restore_backup) {
+//            mDataManager.restoreBackup();
+//            new ReadDataAsyncTask().execute(true);
+//            return true;
         } else if (id == R.id.action_info) {
             Intent intent = new Intent(this, InfoActivity.class);
             startActivity(intent);

@@ -75,9 +75,10 @@ public class DataManager extends Observable<ComicsObserver> {
     /**
      *
      * @param context   usare Context.getApplicationContext()
+     * @param userName nome utente
      * @return  istanza di DataManager
      */
-    public static DataManager init(Context context) {
+    public static DataManager init(Context context, String userName) {
         if (instance != null && instance.mContext != context) {
             Utils.d(DataManager.class, "dispose DM");
             instance.dispose();
@@ -86,7 +87,7 @@ public class DataManager extends Observable<ComicsObserver> {
 
         if (instance == null) {
             Utils.d(DataManager.class, "init DM");
-            instance = new DataManager(context);
+            instance = new DataManager(context, userName);
             instance.createBackup();
         }
 
@@ -97,6 +98,7 @@ public class DataManager extends Observable<ComicsObserver> {
         return instance;
     }
 
+    private String mUserName;
     private long mLastComicsId;
     private boolean mExternalStorage;
     private Context mContext;
@@ -114,8 +116,9 @@ public class DataManager extends Observable<ComicsObserver> {
     //
     private AsyncWriteHandler mWriteHandler;
 
-    private DataManager(Context context) {
+    private DataManager(Context context, String userName) {
         mContext = context;
+        mUserName = userName;
         mLastComicsId = System.currentTimeMillis();
         //controllo che la memoria esternza sia disponibile
         mExternalStorage = isExternalStorageWritable();
@@ -133,18 +136,20 @@ public class DataManager extends Observable<ComicsObserver> {
     }
 
     private File getDataFile() {
+        String fileName = Utils.nvl(mUserName, "") + FILE_NAME;
         if (mExternalStorage) {
-            return new File(mContext.getExternalFilesDir(null), FILE_NAME);
+            return new File(mContext.getExternalFilesDir(null), fileName);
         } else {
-            return new File(mContext.getFilesDir(), FILE_NAME);
+            return new File(mContext.getFilesDir(), fileName);
         }
     }
 
     private File getBackupDataFile() {
+        String fileName = Utils.nvl(mUserName, "") + FILE_BACKUP;
         if (mExternalStorage) {
-            return new File(mContext.getExternalFilesDir(null), FILE_BACKUP);
+            return new File(mContext.getExternalFilesDir(null), fileName);
         } else {
-            return new File(mContext.getFilesDir(), FILE_BACKUP);
+            return new File(mContext.getFilesDir(), fileName);
         }
     }
 
@@ -574,10 +579,18 @@ public class DataManager extends Observable<ComicsObserver> {
         mWriteHandler = null;
     }
 
+    /**
+     *
+     * @return
+     */
     public UndoHelper<Comics> getUndoComics() {
         return mUndoComics;
     }
 
+    /**
+     *
+     * @return
+     */
     public UndoHelper<Release> getUndoRelease() {
         return mUndoRelease;
     }

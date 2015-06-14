@@ -236,25 +236,29 @@ public class ReleaseGroupHelper {
      * @return
      */
     public ReleaseInfo[] getReleaseInfos( ) {
+        //A0032
         Collections.sort(mList, new Comparator<ReleaseInfo>() {
             @Override
             public int compare(ReleaseInfo lhs, ReleaseInfo rhs) {
-                int dif = (lhs.getGroup() - rhs.getGroup());
-                if (dif == 0) {
+                int res = (lhs.getGroup() - rhs.getGroup());
+                if (res == 0) {
                     Date ldt = lhs.getRelease().getDate();
                     Date rdt = rhs.getRelease().getDate();
+
                     if (ldt != null && rdt != null) {
-                        return ldt.compareTo(rdt);
-                    } else if (ldt == null && rdt == null) {
-                        return lhs.getRelease().getNumber() - rhs.getRelease().getNumber();
-                    } else if (ldt == null) {
-                        return -1;
-                    } else {
-                        return 1;
+                        res = ldt.compareTo(rdt);
+                    } else if (ldt == null && rdt != null) {
+                        res = -1;
+                    } else if (ldt != null && rdt == null) {
+                        res = 1;
                     }
-                } else {
-                    return dif;
+
+                    if (res == 0) {
+                        res =  lhs.getRelease().getNumber() - rhs.getRelease().getNumber();
+                    }
                 }
+
+                return res;
             }
         });
         //

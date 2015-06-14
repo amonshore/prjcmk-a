@@ -23,7 +23,6 @@ public class ComicsBestReleaseHelper {
         //imposto le date
         final TimeZone timeZone = TimeZone.getDefault();
         final long today = DateTime.today(timeZone).getStartOfDay().getMilliseconds(timeZone);
-        final DataManager dataManager = DataManager.getDataManager();
 
         List<Release> releases = Arrays.asList(comics.getReleases());
         Collections.sort(releases, new Comparator<Release>() {
@@ -40,12 +39,6 @@ public class ComicsBestReleaseHelper {
                     res = -1;
                 } else {
                     res = 1;
-                }
-
-                //se tutto è uguale confronto alfabeticamente
-                if (res == 0) {
-                    res = dataManager.getComics(lhs.getComicsId()).getName()
-                            .compareTo(dataManager.getComics(rhs.getComicsId()).getName());
                 }
 
                 return res;

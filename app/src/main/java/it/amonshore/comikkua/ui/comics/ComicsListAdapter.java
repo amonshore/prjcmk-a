@@ -281,17 +281,25 @@ public class ComicsListAdapter extends BaseAdapter implements SectionIndexer {
             if (lre == null) lrer = emptyRelease; else lrer = lre.getRelease();
             if (rre == null) rrer = emptyRelease; else rrer = rre.getRelease();
 
+            //A0032
+            int res;
             if (lrer.getDate() != null && rrer.getDate() != null) {
-                return lrer.getDate().compareTo(rrer.getDate());
+                res = lrer.getDate().compareTo(rrer.getDate());
             } else if (lrer.getDate() != null && rrer.getDate() == null) {
-                return -1;
+                res = -1;
             } else if (lrer.getDate() == null && rrer.getDate() != null) {
-                return 1;
+                res = 1;
             } else if (lrer.getNumber() == rrer.getNumber()) {
-                return lco.getName().compareToIgnoreCase(rco.getName());
+                res = lco.getName().compareToIgnoreCase(rco.getName());
             } else {
-                return lrer.getNumber() - rrer.getNumber();
+                res = lrer.getNumber() - rrer.getNumber();
             }
+
+            if (res == 0 ) {
+                res = lco.getName().compareToIgnoreCase(rco.getName());
+            }
+
+            return res;
         }
     }
 
