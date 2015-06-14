@@ -23,7 +23,7 @@
         android:layout_height="48dp"
         android:layout_marginTop="2dip"
         android:textAppearance="?android:attr/textAppearanceLarge"
-        android:textColor="@color/comikku_to_purchase_primary_color"
+        android:textColor="@color/comikku_to_purchase_color_secondary"
         android:background="@drawable/background_oval_to_purchase"
         android:gravity="center" />
 

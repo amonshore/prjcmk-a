@@ -3,6 +3,15 @@
     <dimen name="activity_horizontal_margin">16dp</dimen>
     <dimen name="activity_vertical_margin">16dp</dimen>
 
+    <dimen name="header_elevation">3dp</dimen>
+
+    <!-- Liste -->
+    <dimen name="list_padding_top">8dp</dimen>
+    <dimen name="list_item_padding_top">8dp</dimen>
+    <dimen name="list_item_padding_bottom">8dp</dimen>
+    <dimen name="list_item_padding_left">16dp</dimen>
+    <dimen name="list_item_padding_right">16dp</dimen>
+
     <!-- Floating action button -->
     <dimen name="floating_action_margin_bottom">14dp</dimen>
     <dimen name="floating_action_margin_right">14dp</dimen>

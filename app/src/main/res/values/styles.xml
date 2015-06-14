@@ -9,13 +9,13 @@
         <item name="android:windowActionModeOverlay">true</item>
         <item name="windowActionModeOverlay">true</item>
         <!-- padding delle liste -->
-        <item name="android:listPreferredItemPaddingLeft">12dp</item>
-        <item name="android:listPreferredItemPaddingRight">12dp</item>
+        <item name="android:listPreferredItemPaddingLeft">@dimen/list_item_padding_left</item>
+        <item name="android:listPreferredItemPaddingRight">@dimen/list_item_padding_right</item>
 
         <item name="android:fastScrollOverlayPosition">atThumb</item>
 
         <!-- Colore di sfondo dell'action mode -->
-        <item name="android:actionModeBackground">@color/comikku_primary_color_800</item>
+        <item name="android:actionModeBackground">@color/comikku_primary_color_dark</item>
 
         <!-- The primary branding color for the app. By default, this is the color applied to the
          action bar background. -->
@@ -23,7 +23,7 @@
 
         <!-- Dark variant of the primary branding color. By default, this is the color applied to
              the status bar (via statusBarColor) and navigation bar (via navigationBarColor). -->
-        <item name="colorPrimaryDark">@color/comikku_primary_color_800</item>
+        <item name="colorPrimaryDark">@color/comikku_primary_color_dark</item>
 
         <!-- Bright complement to the primary branding color. By default, this is the color applied
              to framework controls (via colorControlActivated). -->
@@ -33,7 +33,7 @@
         <!--<item name="colorControlNormal">@color/white</item>-->
 
         <!-- The color applied to framework controls in their activated (ex. checked) state. -->
-        <item name="colorControlActivated">#8E24AA</item>
+        <item name="colorControlActivated">@color/comikku_control_activated_color</item>
 
         <!-- The color applied to framework control highlights (ex. ripples, list selectors). -->
         <!--<item name="colorControlHighlight">@color/red</item>-->

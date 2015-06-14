@@ -70,7 +70,7 @@ public class MainActivity extends ActionBarActivity implements SharedPreferences
         slidingTabLayout.setCustomTabColorizer(new SlidingTabLayout.TabColorizer() {
             @Override
             public int getIndicatorColor(int position) {
-                return getResources().getColor(R.color.comikku_primary_color_900);
+                return getResources().getColor(R.color.comikku_selected_tab_color);
             }
         });
         slidingTabLayout.setOnPageChangeListener(new ViewPager.SimpleOnPageChangeListener() {

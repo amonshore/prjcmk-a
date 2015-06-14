@@ -177,7 +177,8 @@ public class ComicsListAdapter extends BaseAdapter implements SectionIndexer {
 
         if (convertView == null) {
             holder = new ItemViewHolder();
-            convertView = LayoutInflater.from(mContext).inflate(R.layout.list_comics_item2, null);
+            //indicare il parent altrimenti NON vengono considerate le dimensioni dell'item
+            convertView = LayoutInflater.from(mContext).inflate(R.layout.list_comics_item, parent, false);
             holder.leftView = convertView.findViewById(R.id.lay_number);
             holder.txtName = (TextView) convertView.findViewById(R.id.txt_list_comics_name);
             holder.txtPublisher = (TextView) convertView.findViewById(R.id.txt_list_comics_publisher);
@@ -204,12 +205,12 @@ public class ComicsListAdapter extends BaseAdapter implements SectionIndexer {
             switch (bestReleaseInfo.getGroup()) {
                 case ReleaseGroupHelper.GROUP_LOST:
                 case ReleaseGroupHelper.GROUP_EXPIRED:
-                    holder.txtNumber.setTextColor(mContext.getResources().getColor(R.color.comikku_expired_background_color));
+                    holder.txtNumber.setTextColor(mContext.getResources().getColor(R.color.comikku_expired_color_primary));
                     holder.leftView.setBackgroundResource(R.drawable.border_comics_expired);
                     break;
                 case ReleaseGroupHelper.GROUP_TO_PURCHASE:
                     if (bestReleaseInfo.isReleasedToday()) {
-                        holder.txtNumber.setTextColor(mContext.getResources().getColor(R.color.comikku_today_background_color));
+                        holder.txtNumber.setTextColor(mContext.getResources().getColor(R.color.comikku_today_color_primary));
                         holder.leftView.setBackgroundResource(R.drawable.border_comics_today);
                         break;
                     }
@@ -217,25 +218,19 @@ public class ComicsListAdapter extends BaseAdapter implements SectionIndexer {
                 case ReleaseGroupHelper.GROUP_PERIOD_NEXT:
                 case ReleaseGroupHelper.GROUP_PERIOD_OTHER:
                 case ReleaseGroupHelper.GROUP_PURCHASED:
-                    holder.txtNumber.setTextColor(mContext.getResources().getColor(R.color.comikku_to_purchase_background_color));
+                    holder.txtNumber.setTextColor(mContext.getResources().getColor(R.color.comikku_to_purchase_color_primary));
                     holder.leftView.setBackgroundResource(R.drawable.border_comics_to_purchase);
                     break;
                 case ReleaseGroupHelper.GROUP_WISHLIST:
-                    holder.txtNumber.setTextColor(mContext.getResources().getColor(R.color.comikku_wishlist_background_color));
+                    holder.txtNumber.setTextColor(mContext.getResources().getColor(R.color.comikku_wishlist_color_primary));
                     holder.leftView.setBackgroundResource(R.drawable.border_comics_wishlist);
                     break;
             }
-
-            holder.leftView.setVisibility(View.VISIBLE);
-            holder.txtNumber.setVisibility(View.VISIBLE);
-            holder.txtDate.setVisibility(View.VISIBLE);
             bestReleaseNotes = bestRelease.getNotes();
         } else {
             holder.txtNumber.setText("");
             holder.txtDate.setText("");
-            holder.leftView.setVisibility(View.INVISIBLE);
-            holder.txtNumber.setVisibility(View.INVISIBLE);
-            holder.txtDate.setVisibility(View.INVISIBLE);
+            holder.leftView.setBackgroundResource(R.drawable.border_comics_empty);
         }
         holder.txtName.setText(comics.getName());
         holder.txtPublisher.setText(comics.getPublisher());

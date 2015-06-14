@@ -184,34 +184,34 @@ public class ReleaseListAdapter extends BaseAdapter implements StickyListHeaders
         //  di conseguenza posso trovarmi release purchased in qualsiasi gruppo
         if (release.isPurchased()) {
             holder.txtNumber.setBackgroundResource(R.drawable.background_oval_purchased);
-            holder.txtNumber.setTextColor(mContext.getResources().getColor(R.color.comikku_purchased_primary_color));
+            holder.txtNumber.setTextColor(mContext.getResources().getColor(R.color.comikku_purchased_color_text_light));
         } else {
             switch (ri.getGroup()) {
                 case ReleaseGroupHelper.GROUP_LOST:
                 case ReleaseGroupHelper.GROUP_EXPIRED:
                     holder.txtNumber.setBackgroundResource(R.drawable.background_oval_expired);
-                    holder.txtNumber.setTextColor(mContext.getResources().getColor(R.color.comikku_expired_primary_color));
+                    holder.txtNumber.setTextColor(mContext.getResources().getColor(R.color.comikku_expired_color_text_light));
                     break;
                 case ReleaseGroupHelper.GROUP_PERIOD:
                 case ReleaseGroupHelper.GROUP_TO_PURCHASE:
                     if (ri.isReleasedToday()) {
                         holder.txtNumber.setBackgroundResource(R.drawable.background_oval_today);
-                        holder.txtNumber.setTextColor(mContext.getResources().getColor(R.color.comikku_today_primary_color));
+                        holder.txtNumber.setTextColor(mContext.getResources().getColor(R.color.comikku_today_color_text_light));
                         break;
                     }else if (ri.isExpired()) {
                         holder.txtNumber.setBackgroundResource(R.drawable.background_oval_expired);
-                        holder.txtNumber.setTextColor(mContext.getResources().getColor(R.color.comikku_expired_primary_color));
+                        holder.txtNumber.setTextColor(mContext.getResources().getColor(R.color.comikku_expired_color_text_light));
                         break;
                     }
                 case ReleaseGroupHelper.GROUP_PERIOD_NEXT:
                 case ReleaseGroupHelper.GROUP_PERIOD_OTHER:
                 case ReleaseGroupHelper.GROUP_PURCHASED:
                     holder.txtNumber.setBackgroundResource(R.drawable.background_oval_to_purchase);
-                    holder.txtNumber.setTextColor(mContext.getResources().getColor(R.color.comikku_to_purchase_primary_color));
+                    holder.txtNumber.setTextColor(mContext.getResources().getColor(R.color.comikku_to_purchase_color_text_light));
                     break;
                 case ReleaseGroupHelper.GROUP_WISHLIST:
                     holder.txtNumber.setBackgroundResource(R.drawable.background_oval_wishlist);
-                    holder.txtNumber.setTextColor(mContext.getResources().getColor(R.color.comikku_wishlist_primary_color));
+                    holder.txtNumber.setTextColor(mContext.getResources().getColor(R.color.comikku_wishlist_color_text_light));
                     break;
             }
         }

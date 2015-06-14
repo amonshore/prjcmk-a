@@ -3,5 +3,5 @@
     android:shape="oval">
     <corners android:radius="10dip"/>
     <!--<stroke android:color="@color/comikku_purchased_background_border" android:width="1dip"/>-->
-    <solid android:color="@color/comikku_purchased_background_color"/>
+    <solid android:color="@color/comikku_purchased_color_primary"/>
 </shape>
