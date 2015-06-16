@@ -34,7 +34,7 @@ public class ComicsDetailActivity extends ActionBarActivity {
     private Comics mComics;
     private DataManager mDataManager;
     private ReleaseListFragment mReleaseListFragment;
-    private TextView mTxtName, mTxtPublisher, mTxtNotes;
+    private TextView mTxtName, mTxtPublisher, mTxtAuthors, mTxtNotes;
     private FloatingActionButton mBtnAdd;
 
     @Override
@@ -42,11 +42,11 @@ public class ComicsDetailActivity extends ActionBarActivity {
         super.onCreate(savedInstanceState);
         setContentView(R.layout.activity_comics_detail);
         //TODO cambiare il colore della status bar in base al colore primario dell'immagine dell'header
-        if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.LOLLIPOP) {
-            Window window = getWindow();
-            window.addFlags(WindowManager.LayoutParams.FLAG_DRAWS_SYSTEM_BAR_BACKGROUNDS);
-            window.setStatusBarColor(Color.parseColor("#02B1CE"));
-        }
+//        if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.LOLLIPOP) {
+//            Window window = getWindow();
+//            window.addFlags(WindowManager.LayoutParams.FLAG_DRAWS_SYSTEM_BAR_BACKGROUNDS);
+//            window.setStatusBarColor(Color.parseColor("#02B1CE"));
+//        }
         //uso il contesto dell'applicazione, usato anche nell'Activity principale
         mDataManager = DataManager.getDataManager();
         //leggo i parametri
@@ -60,6 +60,7 @@ public class ComicsDetailActivity extends ActionBarActivity {
         //
         mTxtName = ((TextView)findViewById(R.id.txt_detail_comics_name));
         mTxtPublisher = ((TextView)findViewById(R.id.txt_detail_comics_publisher));
+        mTxtAuthors = ((TextView)findViewById(R.id.txt_detail_comics_authors));
         mTxtNotes = ((TextView)findViewById(R.id.txt_detail_comics_notes));
         updateHeader();
         //listener fab
@@ -114,7 +115,11 @@ public class ComicsDetailActivity extends ActionBarActivity {
     private void updateHeader() {
         mTxtName.setText(mComics.getName());
         mTxtPublisher.setText(Utils.nvl(mComics.getPublisher(), ""));
-        mTxtNotes.setText(Utils.join("\n", true, mComics.getAuthors(), mComics.getNotes()));
+        mTxtAuthors.setText(Utils.nvl(mComics.getAuthors(), ""));
+        mTxtNotes.setText(Utils.nvl(mComics.getNotes(), ""));
+        if (mComics.isReserved()) {
+            //TODO impostare icona "reserved" alla destra delle note
+        }
     }
 
     private void showComicsEditor(Comics comics) {
