@@ -9,7 +9,8 @@
         android:layout_height="wrap_content"/>
 
     <TextView android:id="@android:id/empty" android:layout_width="match_parent"
-        android:layout_height="match_parent" android:gravity="center"
-        tools:text="@string/release_empty_list" />
+        android:layout_height="match_parent"
+        tools:text="@string/release_empty_list"
+        android:gravity="center" />
 
 </FrameLayout>
