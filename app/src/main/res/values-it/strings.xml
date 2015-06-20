@@ -81,4 +81,6 @@
     <string name="toast_backup_problem">Si è verificato un errore durante il backup</string>
     <string name="toast_backup_restored">Backup ripristinato</string>
     <string name="toast_restore_problem">Si è verificato un errore durante il ripristino</string>
+    <string name="action_comics_share">Condividi</string>
+    <string name="share">Condividi</string>
 </resources>

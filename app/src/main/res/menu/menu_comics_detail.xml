@@ -7,4 +7,9 @@
         android:icon="@drawable/ic_edit"
         android:orderInCategory="10" app:showAsAction="always" />
 
+    <item android:id="@+id/action_comics_share"
+        android:title="@string/action_comics_share"
+        android:icon="@drawable/ic_share_variant"
+        android:orderInCategory="100" app:showAsAction="ifRoom" />
+
 </menu>

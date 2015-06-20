@@ -9,6 +9,7 @@
     <string name="action_comics_sort_by_name">Sort by name</string>
     <string name="action_comics_sort_by_release">Sort by release</string>
     <string name="action_comics_edit">Edit</string>
+    <string name="action_comics_share">Share</string>
 
     <string name="title_activity_comics_new">New comics</string>
     <string name="title_activity_comics_edit">Edit comics</string>
@@ -16,6 +17,7 @@
     <string name="title_activity_comics_detail">Comics detail</string>
     <string name="title_activity_info" translatable="false">Info</string>
 
+    <string name="share">Share</string>
     <string name="selected_items">%1d selected</string>
     <string name="placeholder_wishlist" translatable="false">wish</string>
     <string name="undo">Undo</string>

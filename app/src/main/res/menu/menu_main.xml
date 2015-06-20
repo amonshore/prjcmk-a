@@ -4,10 +4,6 @@
     tools:context="it.amonshore.comikkua.ui.MainActivity">
     <item android:id="@+id/action_settings" android:title="@string/action_settings"
         android:orderInCategory="100" app:showAsAction="never" />
-
-    <!--<item android:id="@+id/action_restore_backup" android:title="Restore backup"-->
-        <!--android:orderInCategory="100" app:showAsAction="never" />-->
-
     <item android:id="@+id/action_info" android:title="Info"
         android:orderInCategory="100" app:showAsAction="never" />
 

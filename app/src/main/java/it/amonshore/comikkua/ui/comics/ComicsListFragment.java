@@ -135,6 +135,18 @@ public class ComicsListFragment extends AFragment {
                     new RemoveComicsAsyncTask().execute(lgs);
                     finishActionMode();
                     return true;
+                } else if (menuId == R.id.action_comics_share) {
+                    long[] ags = mListView.getCheckedItemIds();
+                    String[] names = new String[ags.length];
+                    for (int ii = 0; ii < names.length; ii++) {
+                        names[ii] = getDataManager().getComics(ags[ii]).getName();
+                    }
+                    Intent sendIntent = new Intent();
+                    sendIntent.setAction(Intent.ACTION_SEND);
+                    sendIntent.putExtra(Intent.EXTRA_TEXT, Utils.join("\n", false, names));
+                    sendIntent.setType("text/plain");
+                    startActivity(Intent.createChooser(sendIntent, getResources().getText(R.string.share)));
+                    return true;
                 } else {
                     return false;
                 }

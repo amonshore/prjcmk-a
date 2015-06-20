@@ -54,7 +54,7 @@ public class ComicsDetailActivity extends ActionBarActivity {
         //presumo che l'id sia valido
         mComics = mDataManager.getComics(intent.getLongExtra(EXTRA_COMICS_ID, 0));
         //Toolbar
-        final Toolbar toolbar = (Toolbar)findViewById(R.id.toolbar_actionbar);
+        Toolbar toolbar = (Toolbar)findViewById(R.id.toolbar_actionbar);
         setSupportActionBar(toolbar);
         getSupportActionBar().setDisplayHomeAsUpEnabled(true);
         //
@@ -106,6 +106,19 @@ public class ComicsDetailActivity extends ActionBarActivity {
         //
         if (id == R.id.action_comics_edit) {
             showComicsEditor(mComics);
+            return true;
+        } else if (id == R.id.action_comics_share) {
+            String[] infos = new String[] {
+                    mComics.getName(),
+                    mComics.getAuthors(),
+                    mComics.getPublisher(),
+                    mComics.getNotes()
+            };
+            Intent sendIntent = new Intent();
+            sendIntent.setAction(Intent.ACTION_SEND);
+            sendIntent.putExtra(Intent.EXTRA_TEXT, Utils.join("\n", true, infos));
+            sendIntent.setType("text/plain");
+            startActivity(Intent.createChooser(sendIntent, getResources().getText(R.string.share)));
             return true;
         }
 
