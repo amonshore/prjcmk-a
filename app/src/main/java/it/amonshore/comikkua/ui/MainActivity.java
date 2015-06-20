@@ -131,13 +131,16 @@ public class MainActivity extends ActionBarActivity implements SharedPreferences
             Intent intent = new Intent(this, SettingsActivity.class);
             startActivity(intent);
             return true;
-//        } else if (id == R.id.action_restore_backup) {
-//            mDataManager.restoreBackup();
-//            new ReadDataAsyncTask().execute(true);
-//            return true;
         } else if (id == R.id.action_info) {
             Intent intent = new Intent(this, InfoActivity.class);
             startActivity(intent);
+            return true;
+        } else if (id == R.id.action_share_data) {
+            Intent sendIntent = new Intent();
+            sendIntent.setAction(Intent.ACTION_SEND);
+            sendIntent.putExtra(Intent.EXTRA_STREAM, mDataManager.getDataFileUri());
+            sendIntent.setType("text/plain");
+            startActivity(Intent.createChooser(sendIntent, getResources().getText(R.string.share_data)));
             return true;
         }
 

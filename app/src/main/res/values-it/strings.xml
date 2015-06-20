@@ -83,4 +83,7 @@
     <string name="toast_restore_problem">Si è verificato un errore durante il ripristino</string>
     <string name="action_comics_share">Condividi</string>
     <string name="share">Condividi</string>
+    <string name="action_info">Informazioni</string>
+    <string name="action_share_data">Convidividi</string>
+    <string name="share_data">Condividi tutti i dati</string>
 </resources>

@@ -2,6 +2,7 @@ package it.amonshore.comikkua.data;
 
 import android.content.Context;
 import android.database.Observable;
+import android.net.Uri;
 import android.os.Environment;
 import android.text.TextUtils;
 import android.util.JsonWriter;
@@ -516,6 +517,14 @@ public class DataManager extends Observable<ComicsObserver> {
      */
     public long getLastModifiedBackupFile() {
         return getBackupDataFile().lastModified();
+    }
+
+    /**
+     *
+     * @return
+     */
+    public Uri getDataFileUri() {
+        return Uri.fromFile(getDataFile());
     }
 
     /**
