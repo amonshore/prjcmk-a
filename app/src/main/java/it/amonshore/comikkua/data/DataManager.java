@@ -88,7 +88,6 @@ public class DataManager extends Observable<ComicsObserver> {
         if (instance == null) {
             Utils.d(DataManager.class, "init DM");
             instance = new DataManager(context, userName);
-            instance.createBackup();
         }
 
         return instance;
@@ -441,11 +440,10 @@ public class DataManager extends Observable<ComicsObserver> {
     /**
      * Legge i dati
      *
-     * @param forceReadFile
      * @return  numero di comics letti
      */
-    public int readComics(boolean forceReadFile) {
-        if (mComicsCache == null || forceReadFile) {
+    public int readComics() {
+        if (mComicsCache == null || !mDataLoaded) {
             synchronized (mSyncObj) {
                 BufferedReader br = null;
                 File file = getDataFile();
@@ -483,7 +481,7 @@ public class DataManager extends Observable<ComicsObserver> {
     }
 
     /**
-     * @return
+     * @return  true se il backup è statao create con successo
      */
     public boolean createBackup() {
         try {
@@ -504,11 +502,20 @@ public class DataManager extends Observable<ComicsObserver> {
         try {
             Utils.d(this.getClass(), "restore backup");
             Utils.copyFile(getBackupDataFile(), getDataFile());
+            mDataLoaded = false;
             return true;
         } catch (IOException ioex) {
             Utils.e(this.getClass(), "restoreBackup", ioex);
         }
         return false;
+    }
+
+    /**
+     *
+     * @return
+     */
+    public long getLastModifiedBackupFile() {
+        return getBackupDataFile().lastModified();
     }
 
     /**

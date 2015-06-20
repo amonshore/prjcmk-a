@@ -74,4 +74,11 @@
     <string name="format_release_longdate">EEEE, dd MMMM  yyyy</string>
     <string name="comics_empty_list">Non ci sono fumetti</string>
     <string name="release_empty_list">Non ci sono uscite</string>
+    <string name="last_restored">Ultimo backup eseguito il %1$te %1$tB, %1$tY alle %1$tl:%1$tM %1$tp</string>
+    <string name="pref_backup_now_title">Crea backup</string>
+    <string name="pref_restore_now_title">Ripristina backup</string>
+    <string name="toast_backup_created">Backup creato</string>
+    <string name="toast_backup_problem">Si è verificato un errore durante il backup</string>
+    <string name="toast_backup_restored">Backup ripristinato</string>
+    <string name="toast_restore_problem">Si è verificato un errore durante il ripristino</string>
 </resources>

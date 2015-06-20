@@ -14,4 +14,12 @@
         android:summaryOff="@string/pref_week_start_on_monday_off"
         android:defaultValue="true" />
 
+    <Preference
+        android:key="pref_backup_now"
+        android:title="@string/pref_backup_now_title" />
+
+    <Preference
+        android:key="pref_restore_now"
+        android:title="@string/pref_restore_now_title" />
+
 </PreferenceScreen>
