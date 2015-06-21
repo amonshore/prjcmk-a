@@ -1,6 +1,6 @@
 <?xml version="1.0" encoding="utf-8"?>
 <resources>
-    <string name="app_name">Comikku-A</string>
+    <string name="app_name">Comikku</string>
     <string name="undo">Annulla</string>
     <string name="title_activity_settings">Impostazioni</string>
     <string name="title_page_calendar">CALENDARIO</string>
@@ -86,4 +86,5 @@
     <string name="action_info">Informazioni</string>
     <string name="action_share_data">Convidividi</string>
     <string name="share_data">Condividi tutti i dati</string>
+    <string name="title_activity_info">Informazioni</string>
 </resources>

@@ -198,7 +198,11 @@ public class ReleaseListAdapter extends BaseAdapter implements StickyListHeaders
                         holder.txtNumber.setBackgroundResource(R.drawable.background_oval_today);
                         holder.txtNumber.setTextColor(mContext.getResources().getColor(R.color.comikku_today_color_text_light));
                         break;
-                    }else if (ri.isExpired()) {
+                    } else if (ri.getRelease().isWishlist()) { //A0037
+                        holder.txtNumber.setBackgroundResource(R.drawable.background_oval_wishlist);
+                        holder.txtNumber.setTextColor(mContext.getResources().getColor(R.color.comikku_wishlist_color_text_light));
+                        break;
+                    } else if (ri.isExpired()) {
                         holder.txtNumber.setBackgroundResource(R.drawable.background_oval_expired);
                         holder.txtNumber.setTextColor(mContext.getResources().getColor(R.color.comikku_expired_color_text_light));
                         break;
