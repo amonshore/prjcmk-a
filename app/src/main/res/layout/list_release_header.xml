@@ -3,18 +3,17 @@
     xmlns:tools="http://schemas.android.com/tools"
     android:orientation="vertical"
     android:layout_width="match_parent"
-    android:layout_height="match_parent"
+    android:layout_height="?android:attr/listPreferredItemHeightSmall"
     android:paddingTop="2dip"
     android:paddingBottom="2dip"
-    android:background="@drawable/background_list_header"
-    android:minHeight="?android:attr/listPreferredItemHeightSmall">
+    android:background="@drawable/background_list_header">
 
     <TextView
         tools:text="Questa settimana"
         android:layout_width="wrap_content"
         android:layout_height="wrap_content"
         android:layout_marginStart="?android:attr/listPreferredItemPaddingStart"
-        android:layout_marginTop="12dip"
+        android:layout_marginTop="16dip"
         android:id="@+id/txt_list_release_header"
         android:textColor="@color/comikku_secondary_text"
         android:textSize="@dimen/comikku_text_size_secondary"

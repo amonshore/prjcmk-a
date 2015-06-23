@@ -46,6 +46,7 @@ public class SettingsActivity extends ActionBarActivity {
             findPreference("pref_backup_now").setOnPreferenceClickListener(new Preference.OnPreferenceClickListener() {
                 @Override
                 public boolean onPreferenceClick(Preference preference) {
+                    //TODO A0021 attendere che non ci siano richieste di salvataggio pendenti
                     if (DataManager.getDataManager().createBackup()) {
                         Toast.makeText(getActivity(), R.string.toast_backup_created, Toast.LENGTH_SHORT).show();
                         updateBackupFileInfo();
@@ -60,7 +61,6 @@ public class SettingsActivity extends ActionBarActivity {
             findPreference("pref_restore_now").setOnPreferenceClickListener(new Preference.OnPreferenceClickListener() {
                 @Override
                 public boolean onPreferenceClick(Preference preference) {
-                    //TODO non ci devono essere richieste di salvataggio pendenti
                     if (DataManager.getDataManager().restoreBackup()) {
                         Toast.makeText(getActivity(), R.string.toast_backup_restored, Toast.LENGTH_SHORT).show();
                     } else {

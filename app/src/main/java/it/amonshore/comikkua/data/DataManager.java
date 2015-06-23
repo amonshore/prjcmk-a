@@ -531,8 +531,17 @@ public class DataManager extends Observable<ComicsObserver> {
      * Salva i dati
      */
     public void writeComics() {
+        writeComics(false);
+    }
+
+    /**
+     * Salva i dati
+     *
+     * @param flush se true i dati verranno salvati subito
+     */
+    public void writeComics(boolean flush) {
         if (mWriteHandler != null) {
-            mWriteHandler.appendRequest();
+            mWriteHandler.appendRequest(flush);
         }
     }
 
@@ -622,9 +631,20 @@ public class DataManager extends Observable<ComicsObserver> {
         private Semaphore mNoLongerHandler;
         private long mTimeout = 1000;
         private boolean mCancel;
+        private boolean mFlush;
+        private boolean mHasPendingRequest;
+
+        public boolean hasPendingRequest() {
+            return mHasPendingRequest;
+        }
 
         public void appendRequest() {
-            Utils.d(this.getClass(), "appendRequest");
+            appendRequest(false);
+        }
+
+        public void appendRequest(boolean flush) {
+            Utils.d(this.getClass(), "appendRequest " + flush);
+            mFlush = flush;
             mMainLoopHandler.release();
             mNoLongerHandler.release();
         }
@@ -651,11 +671,14 @@ public class DataManager extends Observable<ComicsObserver> {
                             mMainLoopHandler.acquire();
 //                            Utils.d(this.getClass(), "*** aquired");
                             //finchè ci sono richieste ciclo
-                            while (!mCancel && mNoLongerHandler.tryAcquire(mTimeout, TimeUnit.MILLISECONDS)) {
+                            mHasPendingRequest = true;
+                            while (!mFlush && !mCancel && mNoLongerHandler.tryAcquire(mTimeout, TimeUnit.MILLISECONDS)) {
                             }
+                            mFlush = false;
                             Utils.d(this.getClass(), "*** saving");
                             //quando scade salvo
                             DataManager.this.save();
+                            mHasPendingRequest = false;
                         }
                     } catch (InterruptedException iex) {
                         Utils.e("async save main loop", iex);

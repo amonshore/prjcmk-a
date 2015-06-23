@@ -170,7 +170,11 @@ public class ReleaseListAdapter extends BaseAdapter implements StickyListHeaders
         }
         holder.txtNumber.setText(Integer.toString(release.getNumber()));
         holder.txtDate.setText(relDate);
-        holder.txtNotes.setText(Utils.nvl(release.getNotes(), comics.getNotes(), ""));
+        if (mUseSingleComicsLayout) {
+            holder.txtNotes.setText(Utils.nvl(release.getNotes(), ""));
+        } else {
+            holder.txtNotes.setText(Utils.nvl(release.getNotes(), comics.getNotes(), ""));
+        }
 
         //se la release è stata prenotata inserisco una icona
         if (release.isOrdered()) {

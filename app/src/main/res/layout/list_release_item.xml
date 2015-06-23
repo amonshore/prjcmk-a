@@ -6,36 +6,32 @@
     xmlns:android="http://schemas.android.com/apk/res/android"
     xmlns:tools="http://schemas.android.com/tools"
     android:layout_width="fill_parent"
-    android:layout_height="?android:attr/listPreferredItemHeight"
+    android:layout_height="wrap_content"
     android:baselineAligned="false"
     android:orientation="horizontal"
-    android:paddingTop="4dip"
-    android:paddingBottom="4dip"
-    android:paddingLeft="?android:listPreferredItemPaddingLeft"
-    android:paddingRight="?android:listPreferredItemPaddingRight"
     android:weightSum="4"
-    android:descendantFocusability="blocksDescendants"
-    android:background="?android:attr/activatedBackgroundIndicator" >
+    android:background="?android:attr/activatedBackgroundIndicator"
+    android:paddingRight="?android:listPreferredItemPaddingRight">
 
     <TextView android:id="@+id/txt_list_release_number"
         tools:text="999"
-        android:layout_width="48dp"
-        android:layout_height="48dp"
+        android:layout_width="72dp"
+        android:layout_height="72dp"
         android:textSize="@dimen/comikku_text_size_primary"
         android:textColor="@color/comikku_to_purchase_color_secondary"
         android:background="@drawable/background_oval_to_purchase"
-        android:gravity="center"
-        android:layout_marginTop="4dp" />
+        android:gravity="center" />
 
     <TextView android:id="@+id/txt_list_release_date"
         tools:text="gio, 24 giu"
         android:layout_width="wrap_content"
         android:layout_height="wrap_content"
-        android:textSize="@dimen/comikku_text_size_smallest"
+        android:textSize="@dimen/comikku_text_size_small"
         android:textColor="@color/comikku_tertiary_text"
         android:singleLine="true"
         android:layout_alignTop="@+id/txt_list_release_name"
-        android:layout_alignParentEnd="true" />
+        android:layout_alignParentEnd="true"
+        android:layout_marginTop="12dp" />
 
     <TextView android:id="@+id/txt_list_release_name"
         tools:text="Comcis name"
@@ -47,19 +43,21 @@
         android:ellipsize="end"
         android:layout_toRightOf="@+id/txt_list_release_number"
         android:layout_toLeftOf="@+id/txt_list_release_date"
-        android:layout_marginLeft="12dp"
         android:layout_marginRight="12dp"
-        android:paddingTop="8dp" />
+        android:minHeight="36dp"
+        android:gravity="bottom" />
 
     <TextView android:id="@+id/txt_list_release_notes"
         tools:text="Comics info"
         android:layout_width="match_parent"
-        android:layout_height="fill_parent"
+        android:layout_height="wrap_content"
         android:layout_below="@id/txt_list_release_name"
         android:textSize="@dimen/comikku_text_size_secondary"
         android:textColor="@color/comikku_secondary_text"
         android:singleLine="false"
         android:ellipsize="end"
-        android:layout_alignStart="@+id/txt_list_release_name" />
+        android:layout_alignStart="@+id/txt_list_release_name"
+        android:gravity="top"
+        android:minHeight="36dp" />
 
 </RelativeLayout>
