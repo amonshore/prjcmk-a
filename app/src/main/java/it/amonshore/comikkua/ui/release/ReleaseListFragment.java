@@ -18,10 +18,12 @@ import android.widget.AdapterView;
 import android.widget.ListView;
 import android.widget.TextView;
 
+import com.google.android.gms.analytics.HitBuilders;
 import com.nispok.snackbar.Snackbar;
 import com.nispok.snackbar.SnackbarManager;
 import com.nispok.snackbar.listeners.ActionClickListener;
 
+import it.amonshore.comikkua.ComikkuApp;
 import it.amonshore.comikkua.R;
 import it.amonshore.comikkua.data.Comics;
 import it.amonshore.comikkua.data.DataManager;
@@ -99,6 +101,11 @@ public class ReleaseListFragment extends AFragment {
             //recupero la modalità dalle preferenze
             SharedPreferences settings = getActivity().getSharedPreferences(MainActivity.PREFS_NAME, 0);
             mGroupMode = settings.getInt(STATE_MODE, ReleaseGroupHelper.MODE_CALENDAR);
+            //traccio quale vista è usata
+            ComikkuApp.trackEvent(ComikkuApp.CATEGORY_UI,
+                    ComikkuApp.ACTION_RELEASE_VIEW_START,
+                    ComikkuApp.LABEL_RELEASE_VIEW,
+                    mGroupMode);
         }
     }
 
@@ -248,16 +255,31 @@ public class ReleaseListFragment extends AFragment {
             mGroupMode = ReleaseGroupHelper.MODE_CALENDAR;
             getDataManager().notifyChanged(DataManager.CAUSE_RELEASES_MODE_CHANGED);
             getActivity().invalidateOptionsMenu();
+            //traccio quale vista è usata
+            ComikkuApp.trackEvent(ComikkuApp.CATEGORY_UI,
+                    ComikkuApp.ACTION_RELEASE_VIEW_CHANGED,
+                    ComikkuApp.LABEL_RELEASE_VIEW,
+                    mGroupMode);
             return true;
         } else if (id == R.id.action_releases_mode_shopping) {
             mGroupMode = ReleaseGroupHelper.MODE_SHOPPING;
             getDataManager().notifyChanged(DataManager.CAUSE_RELEASES_MODE_CHANGED);
             getActivity().invalidateOptionsMenu();
+            //traccio quale vista è usata
+            ComikkuApp.trackEvent(ComikkuApp.CATEGORY_UI,
+                    ComikkuApp.ACTION_RELEASE_VIEW_CHANGED,
+                    ComikkuApp.LABEL_RELEASE_VIEW,
+                    mGroupMode);
             return true;
         } else if (id == R.id.action_releases_mode_law) {
             mGroupMode = ReleaseGroupHelper.MODE_LAW;
             getDataManager().notifyChanged(DataManager.CAUSE_RELEASES_MODE_CHANGED);
             getActivity().invalidateOptionsMenu();
+            //traccio quale vista è usata
+            ComikkuApp.trackEvent(ComikkuApp.CATEGORY_UI,
+                    ComikkuApp.ACTION_RELEASE_VIEW_CHANGED,
+                    ComikkuApp.LABEL_RELEASE_VIEW,
+                    mGroupMode);
             return true;
         }
         //
