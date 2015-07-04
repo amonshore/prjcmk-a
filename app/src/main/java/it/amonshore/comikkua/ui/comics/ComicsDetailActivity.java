@@ -2,6 +2,7 @@ package it.amonshore.comikkua.ui.comics;
 
 import android.app.Activity;
 import android.content.Intent;
+import android.content.res.Configuration;
 import android.graphics.Color;
 import android.os.Build;
 import android.os.Bundle;
@@ -40,7 +41,7 @@ public class ComicsDetailActivity extends ActionBarActivity {
     @Override
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
-        setContentView(R.layout.activity_comics_detail);
+        setContentView(R.layout.activity_comics_detail2);
         //TODO cambiare il colore della status bar in base al colore primario dell'immagine dell'header
 //        if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.LOLLIPOP) {
 //            Window window = getWindow();
@@ -127,8 +128,14 @@ public class ComicsDetailActivity extends ActionBarActivity {
 
     private void updateHeader() {
         mTxtName.setText(mComics.getName());
-        mTxtPublisher.setText(Utils.nvl(mComics.getPublisher(), ""));
-        mTxtAuthors.setText(Utils.nvl(mComics.getAuthors(), ""));
+        if (getResources().getConfiguration().orientation == Configuration.ORIENTATION_LANDSCAPE) {
+            mTxtPublisher.setVisibility(View.INVISIBLE);
+            mTxtAuthors.setText(Utils.join(" - ", true, mComics.getPublisher(), mComics.getAuthors()));
+        } else {
+            mTxtPublisher.setVisibility(View.VISIBLE);
+            mTxtPublisher.setText(Utils.nvl(mComics.getPublisher(), ""));
+            mTxtAuthors.setText(Utils.nvl(mComics.getAuthors(), ""));
+        }
         mTxtNotes.setText(Utils.nvl(mComics.getNotes(), ""));
         if (mComics.isReserved()) {
             //TODO impostare icona "reserved" alla destra delle note

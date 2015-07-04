@@ -135,13 +135,13 @@ public class MainActivity extends ActionBarActivity implements SharedPreferences
             Intent intent = new Intent(this, InfoActivity.class);
             startActivity(intent);
             return true;
-        } else if (id == R.id.action_share_data) {
-            Intent sendIntent = new Intent();
-            sendIntent.setAction(Intent.ACTION_SEND);
-            sendIntent.putExtra(Intent.EXTRA_STREAM, mDataManager.getDataFileUri());
-            sendIntent.setType("text/plain");
-            startActivity(Intent.createChooser(sendIntent, getResources().getText(R.string.share_data)));
-            return true;
+//        } else if (id == R.id.action_share_data) {
+//            Intent sendIntent = new Intent();
+//            sendIntent.setAction(Intent.ACTION_SEND);
+//            sendIntent.putExtra(Intent.EXTRA_STREAM, mDataManager.getDataFileUri());
+//            sendIntent.setType("text/plain");
+//            startActivity(Intent.createChooser(sendIntent, getResources().getText(R.string.share_data)));
+//            return true;
         }
 
         return super.onOptionsItemSelected(item);

@@ -1,13 +1,18 @@
 apply plugin: 'com.android.application'
 
 android {
+    signingConfigs {
+        config {
+            storeFile file('C:/Users/Gianfranco/Documents/dev/android_key_store/my-release-key.keystore')
+        }
+    }
     compileSdkVersion 21
     buildToolsVersion "21.1.2"
     defaultConfig {
         applicationId "it.amonshore.comikkua"
         minSdkVersion 19
         targetSdkVersion 21
-        versionCode 3
+        versionCode 4
         versionName 'v1.0.0-alpha'
     }
     buildTypes {
