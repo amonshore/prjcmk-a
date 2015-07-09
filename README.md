@@ -7,3 +7,7 @@ Versione: v1.0.0-alpha (3)
 - sharing
 - google analytics
 - correzione bug
+
+Versione: v1.0.0-alpha (4)
+- tolto sharing .json
+- layout comics detail diversificato per orientamento
