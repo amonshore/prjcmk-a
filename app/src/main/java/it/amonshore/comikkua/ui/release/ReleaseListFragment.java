@@ -5,6 +5,7 @@ import android.content.Intent;
 import android.content.SharedPreferences;
 import android.os.AsyncTask;
 import android.os.Bundle;
+import android.os.Handler;
 import android.preference.PreferenceManager;
 import android.view.ActionMode;
 import android.view.LayoutInflater;
@@ -101,11 +102,12 @@ public class ReleaseListFragment extends AFragment {
             //recupero la modalità dalle preferenze
             SharedPreferences settings = getActivity().getSharedPreferences(MainActivity.PREFS_NAME, 0);
             mGroupMode = settings.getInt(STATE_MODE, ReleaseGroupHelper.MODE_CALENDAR);
-            //traccio quale vista è usata
-            ComikkuApp.trackEvent(ComikkuApp.CATEGORY_UI,
-                    ComikkuApp.ACTION_RELEASE_VIEW_START,
-                    ComikkuApp.LABEL_RELEASE_VIEW,
-                    mGroupMode);
+//A0040
+//            //traccio quale vista è usata
+//            ComikkuApp.trackEvent(ComikkuApp.CATEGORY_UI,
+//                    ComikkuApp.ACTION_RELEASE_VIEW_START,
+//                    ComikkuApp.LABEL_RELEASE_VIEW,
+//                    mGroupMode);
         }
     }
 
@@ -195,9 +197,10 @@ public class ReleaseListFragment extends AFragment {
                     long[] ags = mListView.getCheckedItemIds();
                     Integer[] igs = new Integer[ags.length];
                     //ma ho bisogno di rimuoverli in ordine inverso
-                    for (int ii = ags.length-1, jj = 0; ii >=0; ii--, jj++) {
-                        igs[jj] = (int)ags[ii];
+                    for (int ii = ags.length - 1, jj = 0; ii >= 0; ii--, jj++) {
+                        igs[jj] = (int) ags[ii];
                     }
+                    //TODO A0040 usare Handler invece di AsyncTask
                     new RemoveReleasesAsyncTask().execute(igs);
                     finishActionMode();
                     return true;
@@ -255,31 +258,34 @@ public class ReleaseListFragment extends AFragment {
             mGroupMode = ReleaseGroupHelper.MODE_CALENDAR;
             getDataManager().notifyChanged(DataManager.CAUSE_RELEASES_MODE_CHANGED);
             getActivity().invalidateOptionsMenu();
-            //traccio quale vista è usata
-            ComikkuApp.trackEvent(ComikkuApp.CATEGORY_UI,
-                    ComikkuApp.ACTION_RELEASE_VIEW_CHANGED,
-                    ComikkuApp.LABEL_RELEASE_VIEW,
-                    mGroupMode);
+//A0040
+//            //traccio quale vista è usata
+//            ComikkuApp.trackEvent(ComikkuApp.CATEGORY_UI,
+//                    ComikkuApp.ACTION_RELEASE_VIEW_CHANGED,
+//                    ComikkuApp.LABEL_RELEASE_VIEW,
+//                    mGroupMode);
             return true;
         } else if (id == R.id.action_releases_mode_shopping) {
             mGroupMode = ReleaseGroupHelper.MODE_SHOPPING;
             getDataManager().notifyChanged(DataManager.CAUSE_RELEASES_MODE_CHANGED);
             getActivity().invalidateOptionsMenu();
-            //traccio quale vista è usata
-            ComikkuApp.trackEvent(ComikkuApp.CATEGORY_UI,
-                    ComikkuApp.ACTION_RELEASE_VIEW_CHANGED,
-                    ComikkuApp.LABEL_RELEASE_VIEW,
-                    mGroupMode);
+//A0040
+//            //traccio quale vista è usata
+//            ComikkuApp.trackEvent(ComikkuApp.CATEGORY_UI,
+//                    ComikkuApp.ACTION_RELEASE_VIEW_CHANGED,
+//                    ComikkuApp.LABEL_RELEASE_VIEW,
+//                    mGroupMode);
             return true;
         } else if (id == R.id.action_releases_mode_law) {
             mGroupMode = ReleaseGroupHelper.MODE_LAW;
             getDataManager().notifyChanged(DataManager.CAUSE_RELEASES_MODE_CHANGED);
             getActivity().invalidateOptionsMenu();
-            //traccio quale vista è usata
-            ComikkuApp.trackEvent(ComikkuApp.CATEGORY_UI,
-                    ComikkuApp.ACTION_RELEASE_VIEW_CHANGED,
-                    ComikkuApp.LABEL_RELEASE_VIEW,
-                    mGroupMode);
+//A0040
+//            //traccio quale vista è usata
+//            ComikkuApp.trackEvent(ComikkuApp.CATEGORY_UI,
+//                    ComikkuApp.ACTION_RELEASE_VIEW_CHANGED,
+//                    ComikkuApp.LABEL_RELEASE_VIEW,
+//                    mGroupMode);
             return true;
         }
         //
@@ -375,8 +381,29 @@ public class ReleaseListFragment extends AFragment {
         //se la causa è il cambio pagina aggiorno i dati solo se l'adapter è vuoto
         if (mAdapter != null) {
             if ((cause & DataManager.CAUSE_PAGE_CHANGED) != DataManager.CAUSE_PAGE_CHANGED || mAdapter.isEmpty()) {
-                Utils.d("needDataRefresh ok");
-                new ReadReleasesAsyncTask().execute();
+                Utils.d(this.getClass(), "needDataRefresh ok " + mComics);
+                //A0040 new ReadReleasesAsyncTask().execute();
+
+                SharedPreferences sharedPref = PreferenceManager.getDefaultSharedPreferences(getActivity());
+                mGroupByMonth = sharedPref.getBoolean(SettingsActivity.KEY_PREF_GROUP_BY_MONTH, false);
+                mWeekStartOnMonday = sharedPref.getBoolean(SettingsActivity.KEY_PREF_WEEK_START_ON_MONDAY, false);
+
+                Handler mh = new Handler(getActivity().getMainLooper());
+                Runnable runnable = new Runnable() {
+                    @Override
+                    public void run() {
+                        try {
+                            mAdapter.refresh(mComics,
+                                    mGroupMode,
+                                    mGroupByMonth,
+                                    mWeekStartOnMonday);
+                            mAdapter.notifyDataSetInvalidated();
+                        } catch (Exception ex) {
+                            Utils.e("A0040 refresh", ex);
+                        }
+                    }
+                };
+                mh.post(runnable);
             }
         }
     }
@@ -388,29 +415,30 @@ public class ReleaseListFragment extends AFragment {
         startActivityForResult(intent, ReleaseEditorActivity.EDIT_RELEASE_REQUEST);
     }
 
-    /**
-     * Task asincrono per la lettura dei dati
-     */
-    private class ReadReleasesAsyncTask extends AsyncTask<Void, Release, Integer> {
-        @Override
-        protected Integer doInBackground(Void... params) {
-            //TODO settings -> che schifo! rivedere dove leggere le preferenze
-            SharedPreferences sharedPref = PreferenceManager.getDefaultSharedPreferences(getActivity());
-            mGroupByMonth = sharedPref.getBoolean(SettingsActivity.KEY_PREF_GROUP_BY_MONTH, false);
-            mWeekStartOnMonday = sharedPref.getBoolean(SettingsActivity.KEY_PREF_WEEK_START_ON_MONDAY, false);
-
-            return ReleaseListFragment.this.mAdapter.refresh(ReleaseListFragment.this.mComics,
-                    ReleaseListFragment.this.mGroupMode,
-                    ReleaseListFragment.this.mGroupByMonth,
-                    ReleaseListFragment.this.mWeekStartOnMonday);
-        }
-
-        @Override
-        protected void onPostExecute(Integer result) {
-            Utils.d("ReadReleasesAsyncTask " + result);
-            ReleaseListFragment.this.mAdapter.notifyDataSetInvalidated();
-        }
-    }
+//A0040 sembra provocare un crash della VM per qualche strana ragione
+//    /**
+//     * Task asincrono per la lettura dei dati
+//     */
+//    private class ReadReleasesAsyncTask extends AsyncTask<Void, Release, Integer> {
+//        @Override
+//        protected Integer doInBackground(Void... params) {
+//            //TODO settings -> che schifo! rivedere dove leggere le preferenze
+//            SharedPreferences sharedPref = PreferenceManager.getDefaultSharedPreferences(getActivity());
+//            mGroupByMonth = sharedPref.getBoolean(SettingsActivity.KEY_PREF_GROUP_BY_MONTH, false);
+//            mWeekStartOnMonday = sharedPref.getBoolean(SettingsActivity.KEY_PREF_WEEK_START_ON_MONDAY, false);
+//
+//            return mAdapter.refresh(mComics,
+//                    mGroupMode,
+//                    mGroupByMonth,
+//                    mWeekStartOnMonday);
+//        }
+//
+//        @Override
+//        protected void onPostExecute(Integer result) {
+//            Utils.d("ReadReleasesAsyncTask " + result);
+//            mAdapter.notifyDataSetInvalidated();
+//        }
+//    }
 
     /**
      * Task asincrono per la rimoazione dei dati
