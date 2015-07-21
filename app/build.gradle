@@ -12,7 +12,7 @@ android {
         applicationId "it.amonshore.comikkua"
         minSdkVersion 19
         targetSdkVersion 21
-        versionCode 5
+        versionCode 6
         versionName 'v1.0.0-alpha'
     }
     buildTypes {
@@ -36,11 +36,9 @@ dependencies {
     compile 'com.android.support:appcompat-v7:22.0.0'
     compile 'com.android.support:support-v4:22.0.0'
     compile 'com.darwinsys:hirondelle-date4j:1.5.1'
-    compile 'com.github.kanytu:android-parallax-listview:v1.1'
     compile 'se.emilsjolander:stickylistheaders:2.7.0'
     compile 'com.github.clans:fab:1.5.0'
     compile 'com.marvinlabs:android-floatinglabel-widgets:1.6.1@aar'
     compile 'com.github.citux:datetimepicker:0.1.2'
     compile 'com.nispok:snackbar:2.10.10'
-    compile 'com.google.android.gms:play-services:7.5.0'
 }

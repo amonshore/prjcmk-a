@@ -108,7 +108,12 @@ public class ComicsListFragment extends AFragment {
             @Override
             public void onItemCheckedStateChanged(ActionMode mode, int position, long id, boolean checked) {
                 //Utils.d("onItemCheckedStateChanged " + position);
-                mode.setTitle(getString(R.string.selected_items, mListView.getCheckedItemCount()));
+                int count = mListView.getCheckedItemCount();
+                if (count == 1) {
+                    mode.setTitle(getString(R.string.selected_item, count));
+                } else {
+                    mode.setTitle(getString(R.string.selected_items, count));
+                }
             }
 
             @Override

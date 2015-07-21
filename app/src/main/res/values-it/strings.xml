@@ -87,4 +87,5 @@
     <string name="action_share_data">Convidividi</string>
     <string name="share_data">Condividi tutti i dati</string>
     <string name="title_activity_info">Informazioni</string>
+    <string name="selected_item">%1d selezionato</string>
 </resources>

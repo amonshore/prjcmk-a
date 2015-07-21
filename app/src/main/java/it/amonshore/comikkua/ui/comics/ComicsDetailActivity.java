@@ -35,7 +35,7 @@ public class ComicsDetailActivity extends ActionBarActivity {
     private Comics mComics;
     private DataManager mDataManager;
     private ReleaseListFragment mReleaseListFragment;
-    private TextView mTxtName, mTxtPublisher, mTxtAuthors, mTxtNotes;
+    private TextView mTxtName, mTxtAuthors, mTxtNotes;
     private FloatingActionButton mBtnAdd;
 
     @Override
@@ -56,11 +56,12 @@ public class ComicsDetailActivity extends ActionBarActivity {
         mComics = mDataManager.getComics(intent.getLongExtra(EXTRA_COMICS_ID, 0));
         //Toolbar
         Toolbar toolbar = (Toolbar)findViewById(R.id.toolbar_actionbar);
+        //tolgo il titolo dell'activity
+        toolbar.setTitle("");
         setSupportActionBar(toolbar);
         getSupportActionBar().setDisplayHomeAsUpEnabled(true);
         //
         mTxtName = ((TextView)findViewById(R.id.txt_detail_comics_name));
-        mTxtPublisher = ((TextView)findViewById(R.id.txt_detail_comics_publisher));
         mTxtAuthors = ((TextView)findViewById(R.id.txt_detail_comics_authors));
         mTxtNotes = ((TextView)findViewById(R.id.txt_detail_comics_notes));
         updateHeader();
@@ -69,7 +70,7 @@ public class ComicsDetailActivity extends ActionBarActivity {
         mBtnAdd.setOnClickListener(new View.OnClickListener() {
             @Override
             public void onClick(View v) {
-                showReleaseEditor(mComics.getId(), -1);
+                showReleaseEditor(mComics.getId(), ReleaseEditorActivity.RELEASE_NEW);
             }
         });
         //
@@ -109,15 +110,13 @@ public class ComicsDetailActivity extends ActionBarActivity {
             showComicsEditor(mComics);
             return true;
         } else if (id == R.id.action_comics_share) {
-            String[] infos = new String[] {
+            Intent sendIntent = new Intent();
+            sendIntent.setAction(Intent.ACTION_SEND);
+            sendIntent.putExtra(Intent.EXTRA_TEXT, Utils.join("\n", true,
                     mComics.getName(),
                     mComics.getAuthors(),
                     mComics.getPublisher(),
-                    mComics.getNotes()
-            };
-            Intent sendIntent = new Intent();
-            sendIntent.setAction(Intent.ACTION_SEND);
-            sendIntent.putExtra(Intent.EXTRA_TEXT, Utils.join("\n", true, infos));
+                    mComics.getNotes()));
             sendIntent.setType("text/plain");
             startActivity(Intent.createChooser(sendIntent, getResources().getText(R.string.share)));
             return true;
@@ -128,14 +127,7 @@ public class ComicsDetailActivity extends ActionBarActivity {
 
     private void updateHeader() {
         mTxtName.setText(mComics.getName());
-        if (getResources().getConfiguration().orientation == Configuration.ORIENTATION_LANDSCAPE) {
-            mTxtPublisher.setVisibility(View.INVISIBLE);
-            mTxtAuthors.setText(Utils.join(" - ", true, mComics.getPublisher(), mComics.getAuthors()));
-        } else {
-            mTxtPublisher.setVisibility(View.VISIBLE);
-            mTxtPublisher.setText(Utils.nvl(mComics.getPublisher(), ""));
-            mTxtAuthors.setText(Utils.nvl(mComics.getAuthors(), ""));
-        }
+        mTxtAuthors.setText(Utils.join(" - ", true, mComics.getPublisher(), mComics.getAuthors()));
         mTxtNotes.setText(Utils.nvl(mComics.getNotes(), ""));
         if (mComics.isReserved()) {
             //TODO impostare icona "reserved" alla destra delle note

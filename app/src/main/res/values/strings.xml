@@ -21,6 +21,7 @@
 
     <string name="share">Share</string>
     <string name="share_data">Share all data</string>
+    <string name="selected_item">%1d selected</string>
     <string name="selected_items">%1d selected</string>
     <string name="placeholder_wishlist" translatable="false">wish</string>
     <string name="undo">Undo</string>
