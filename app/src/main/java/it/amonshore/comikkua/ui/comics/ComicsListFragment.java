@@ -53,7 +53,7 @@ public class ComicsListFragment extends AFragment {
         //deve essere chiamato in onCreate
         setHasOptionsMenu(true);
         //
-        int order = 0;
+        int order;
         if (savedInstanceState != null) {
             //recupero l'ordine usato in precedenza e salvato alla chiusura dell'activity
             order = savedInstanceState.getInt(STATE_ORDER, ComicsListAdapter.ORDER_BY_NAME);
@@ -81,7 +81,7 @@ public class ComicsListFragment extends AFragment {
         SharedPreferences settings = getActivity().getSharedPreferences(MainActivity.PREFS_NAME, 0);
         SharedPreferences.Editor editor = settings.edit();
         editor.putInt(STATE_ORDER, mAdapter.getOrder());
-        editor.commit();
+        editor.apply();
     }
 
     @Override
@@ -93,9 +93,9 @@ public class ComicsListFragment extends AFragment {
         mListView = (AbsListView) view.findViewById(android.R.id.list);
         mListView.setAdapter(mAdapter);
         //A0022
-        mListView.setEmptyView(view.findViewById(android.R.id.empty));
-        setEmptyText(getString(R.string.comics_empty_list));
-
+        TextView emptyView = (TextView)view.findViewById(android.R.id.empty);
+        emptyView.setText(getString(R.string.comics_empty_list));
+        mListView.setEmptyView(emptyView);
         //
         mListView.setChoiceMode(ListView.CHOICE_MODE_MULTIPLE_MODAL);
         mListView.setOnItemClickListener(new AdapterView.OnItemClickListener() {
@@ -174,7 +174,7 @@ public class ComicsListFragment extends AFragment {
         mBtnAdd.setOnClickListener(new View.OnClickListener() {
             @Override
             public void onClick(View v) {
-                showComicsEditor(0);
+                showComicsEditor();
             }
         });
 
@@ -224,24 +224,11 @@ public class ComicsListFragment extends AFragment {
     @Override
     public void onActivityResult(int requestCode, int resultCode, Intent data) {
         if (resultCode == Activity.RESULT_OK && requestCode == ComicsEditorActivity.EDIT_COMICS_REQUEST) {
-            long comicsId = data.getLongExtra(ComicsEditorActivity.EXTRA_COMICS_ID, 0);
-            Comics comics = getDataManager().getComics(comicsId);
-            int position = mAdapter.insertOrUpdate(comics);
+//            long comicsId = data.getLongExtra(ComicsEditorActivity.EXTRA_COMICS_ID, 0);
+//            Comics comics = getDataManager().getComics(comicsId);
+//            int position = mAdapter.insertOrUpdate(comics);
             mAdapter.notifyDataSetChanged();
             getDataManager().notifyChangedButMe(DataManager.CAUSE_COMICS_CHANGED, this);
-        }
-    }
-
-    /**
-     * The default content for this Fragment has a TextView that is shown when
-     * the list is empty. If you would like to change the text, call this method
-     * to supply the text it should use.
-     */
-    public void setEmptyText(CharSequence emptyText) {
-        View emptyView = mListView.getEmptyView();
-
-        if (emptyView instanceof TextView) {
-            ((TextView) emptyView).setText(emptyText);
         }
     }
 
@@ -324,9 +311,9 @@ public class ComicsListFragment extends AFragment {
         }
     }
 
-    private void showComicsEditor(long comicsId) {
+    private void showComicsEditor() {
         Intent intent = new Intent(getActivity(), ComicsEditorActivity.class);
-        intent.putExtra(ComicsEditorActivity.EXTRA_COMICS_ID, comicsId);
+        intent.putExtra(ComicsEditorActivity.EXTRA_COMICS_ID, ComicsEditorActivity.COMICS_ID_NEW);
         startActivityForResult(intent, ComicsEditorActivity.EDIT_COMICS_REQUEST);
     }
 

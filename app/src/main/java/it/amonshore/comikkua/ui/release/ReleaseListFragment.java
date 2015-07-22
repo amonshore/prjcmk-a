@@ -3,7 +3,6 @@ package it.amonshore.comikkua.ui.release;
 import android.app.Activity;
 import android.content.Intent;
 import android.content.SharedPreferences;
-import android.os.AsyncTask;
 import android.os.Bundle;
 import android.os.Handler;
 import android.preference.PreferenceManager;
@@ -19,12 +18,10 @@ import android.widget.AdapterView;
 import android.widget.ListView;
 import android.widget.TextView;
 
-//import com.google.android.gms.analytics.HitBuilders;
 import com.nispok.snackbar.Snackbar;
 import com.nispok.snackbar.SnackbarManager;
 import com.nispok.snackbar.listeners.ActionClickListener;
 
-import it.amonshore.comikkua.ComikkuApp;
 import it.amonshore.comikkua.R;
 import it.amonshore.comikkua.data.Comics;
 import it.amonshore.comikkua.data.DataManager;
@@ -39,7 +36,7 @@ import it.amonshore.comikkua.ui.SettingsActivity;
 import se.emilsjolander.stickylistheaders.StickyListHeadersListView;
 
 /**
- * Created by Calgia on 15/05/2015.
+ * Created by Narsenico on 15/05/2015.
  */
 public class ReleaseListFragment extends AFragment {
 
@@ -58,7 +55,7 @@ public class ReleaseListFragment extends AFragment {
 
     /**
      *
-     * @return
+     * @return  ritorna la modalità di raggruppamento risorse attuale
      */
     public int getGroupMode() {
         return mGroupMode;
@@ -66,8 +63,8 @@ public class ReleaseListFragment extends AFragment {
 
     /**
      *
-     * @param comics
-     * @param groupMode
+     * @param comics    usato per filtrare per release, null per considearle tutte
+     * @param groupMode modalità di raggruppamento delle release
      */
     public void setComics(Comics comics, int groupMode) {
         mComics = comics;
@@ -128,7 +125,7 @@ public class ReleaseListFragment extends AFragment {
             SharedPreferences settings = getActivity().getSharedPreferences(MainActivity.PREFS_NAME, 0);
             SharedPreferences.Editor editor = settings.edit();
             editor.putInt(STATE_MODE, mGroupMode);
-            editor.commit();
+            editor.apply();
         }
     }
 
@@ -161,8 +158,10 @@ public class ReleaseListFragment extends AFragment {
         //questa è la vera lista
         mListView = list.getWrappedList();
         //A0022
-        mListView.setEmptyView(view.findViewById(android.R.id.empty));
-        setEmptyText(getString(R.string.release_empty_list));
+        TextView emptyView = (TextView)view.findViewById(android.R.id.empty);
+        emptyView.setText(getString(R.string.release_empty_list));
+        mListView.setEmptyView(emptyView);
+        //
         mListView.setChoiceMode(ListView.CHOICE_MODE_MULTIPLE_MODAL);
         mListView.setOnItemClickListener(new AdapterView.OnItemClickListener() {
             @Override
@@ -200,13 +199,19 @@ public class ReleaseListFragment extends AFragment {
                 if (menuId == R.id.action_release_delete) {
                     //sono già ordinati in ordine crescente
                     long[] ags = mListView.getCheckedItemIds();
-                    Integer[] igs = new Integer[ags.length];
-                    //ma ho bisogno di rimuoverli in ordine inverso
-                    for (int ii = ags.length - 1, jj = 0; ii >= 0; ii--, jj++) {
-                        igs[jj] = (int) ags[ii];
+//A0040
+//                    Integer[] igs = new Integer[ags.length];
+//                    //ma ho bisogno di rimuoverli in ordine inverso
+//                    for (int ii = ags.length - 1, jj = 0; ii >= 0; ii--, jj++) {
+//                        igs[jj] = (int) ags[ii];
+//                    }
+//                    new RemoveReleasesAsyncTask().execute(igs);
+                    //visto che l'adapter considera come id la posizione dell'elemento
+                    //posso usare l'id come posizione per rimuoverli dall'adapter
+                    for (int ii = ags.length - 1; ii >= 0; ii--) {
+                        mAdapter.remove((int)ags[ii]);
                     }
-                    //TODO A0040 usare Handler invece di AsyncTask
-                    new RemoveReleasesAsyncTask().execute(igs);
+                    getDataManager().notifyChanged(DataManager.CAUSE_RELEASE_REMOVED);
                     finishActionMode();
                     return true;
                 } else {
@@ -295,19 +300,6 @@ public class ReleaseListFragment extends AFragment {
         }
         //
         return false;
-    }
-
-    /**
-     * The default content for this Fragment has a TextView that is shown when
-     * the list is empty. If you would like to change the text, call this method
-     * to supply the text it should use.
-     */
-    public void setEmptyText(CharSequence emptyText) {
-        View emptyView = mListView.getEmptyView();
-
-        if (emptyView instanceof TextView) {
-            ((TextView) emptyView).setText(emptyText);
-        }
     }
 
     @Override
@@ -445,31 +437,30 @@ public class ReleaseListFragment extends AFragment {
 //        }
 //    }
 
-    /**
-     * Task asincrono per la rimoazione dei dati
-     */
-    private class RemoveReleasesAsyncTask extends AsyncTask<Integer, Integer, Integer> {
-        @Override
-        protected Integer doInBackground(Integer... params) {
-            for (Integer position : params) {
-                publishProgress(position);
-            }
-            return params.length;
-        }
-
-        @Override
-        protected void onProgressUpdate(Integer... values) {
-            //boolean res =
-            ReleaseListFragment.this.mAdapter.remove(values[0]);
-            //Utils.d("delete release " + values[0] + " -> " + res);
-        }
-
-        @Override
-        protected void onPostExecute(Integer integer) {
-            ReleaseListFragment.this.getDataManager().notifyChanged(DataManager.CAUSE_RELEASE_REMOVED);
-        }
-    }
-
-
+//A0040
+//    /**
+//     * Task asincrono per la rimoazione dei dati
+//     */
+//    private class RemoveReleasesAsyncTask extends AsyncTask<Integer, Integer, Integer> {
+//        @Override
+//        protected Integer doInBackground(Integer... params) {
+//            for (Integer position : params) {
+//                publishProgress(position);
+//            }
+//            return params.length;
+//        }
+//
+//        @Override
+//        protected void onProgressUpdate(Integer... values) {
+//            //boolean res =
+//            ReleaseListFragment.this.mAdapter.remove(values[0]);
+//            //Utils.d("delete release " + values[0] + " -> " + res);
+//        }
+//
+//        @Override
+//        protected void onPostExecute(Integer integer) {
+//            ReleaseListFragment.this.getDataManager().notifyChanged(DataManager.CAUSE_RELEASE_REMOVED);
+//        }
+//    }
 
 }
