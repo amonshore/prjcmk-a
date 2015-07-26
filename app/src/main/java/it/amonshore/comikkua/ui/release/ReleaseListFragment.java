@@ -25,6 +25,7 @@ import com.nispok.snackbar.listeners.ActionClickListener;
 import it.amonshore.comikkua.R;
 import it.amonshore.comikkua.data.Comics;
 import it.amonshore.comikkua.data.DataManager;
+import it.amonshore.comikkua.data.MultiReleaseInfo;
 import it.amonshore.comikkua.data.Release;
 import it.amonshore.comikkua.data.ReleaseGroupHelper;
 import it.amonshore.comikkua.Utils;
@@ -33,6 +34,7 @@ import it.amonshore.comikkua.data.UndoHelper;
 import it.amonshore.comikkua.ui.AFragment;
 import it.amonshore.comikkua.ui.MainActivity;
 import it.amonshore.comikkua.ui.SettingsActivity;
+import it.amonshore.comikkua.ui.comics.ComicsDetailActivity;
 import se.emilsjolander.stickylistheaders.StickyListHeadersListView;
 
 /**
@@ -166,8 +168,14 @@ public class ReleaseListFragment extends AFragment {
         mListView.setOnItemClickListener(new AdapterView.OnItemClickListener() {
             @Override
             public void onItemClick(AdapterView<?> parent, View view, int position, long id) {
-                Release release = ((ReleaseInfo) mAdapter.getItem(position)).getRelease();
-                showReleaseEditor(release.getComicsId(), release.getNumber());
+                //A0041 se MultiReleaseInfo apro il dettaglio comics
+                ReleaseInfo ri = (ReleaseInfo) mAdapter.getItem(position);
+                Release release = ri.getRelease();
+                if (ri instanceof MultiReleaseInfo) {
+                    showComicsDetail(release.getComicsId());
+                } else {
+                    showReleaseEditor(release.getComicsId(), release.getNumber());
+                }
             }
         });
         mListView.setMultiChoiceModeListener(new AbsListView.MultiChoiceModeListener() {
@@ -410,6 +418,12 @@ public class ReleaseListFragment extends AFragment {
         intent.putExtra(ReleaseEditorActivity.EXTRA_COMICS_ID, comicsId);
         intent.putExtra(ReleaseEditorActivity.EXTRA_RELEASE_NUMBER, number);
         startActivityForResult(intent, ReleaseEditorActivity.EDIT_RELEASE_REQUEST);
+    }
+
+    private void showComicsDetail(long comicsId) {
+        Intent intent = new Intent(getActivity(), ComicsDetailActivity.class);
+        intent.putExtra(ComicsDetailActivity.EXTRA_COMICS_ID, comicsId);
+        startActivity(intent);
     }
 
 //A0040 sembra provocare un crash della VM per qualche strana ragione

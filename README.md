@@ -11,3 +11,6 @@ Versione: v1.0.0-alpha (3)
 Versione: v1.0.0-alpha (4)
 - tolto sharing .json
 - layout comics detail diversificato per orientamento
+
+Versione: v1.0.0-alpha (6)
+- wishlist raggruppate

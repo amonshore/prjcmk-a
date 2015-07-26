@@ -16,6 +16,7 @@ import java.util.Locale;
 import it.amonshore.comikkua.R;
 import it.amonshore.comikkua.data.Comics;
 import it.amonshore.comikkua.data.DataManager;
+import it.amonshore.comikkua.data.MultiReleaseInfo;
 import it.amonshore.comikkua.data.Release;
 import it.amonshore.comikkua.data.ReleaseGroupHelper;
 import it.amonshore.comikkua.data.ReleaseInfo;
@@ -65,12 +66,22 @@ public class ReleaseListAdapter extends BaseAdapter implements StickyListHeaders
     public boolean remove(int position) {
         ReleaseInfo ri = (ReleaseInfo)getItem(position);
         long comicsId = ri.getRelease().getComicsId();
-        if (mDataManager.removeRelease(comicsId, ri.getRelease().getNumber())) {
+        //A0041 se multi rimuovo tutte le release
+        if (ri instanceof MultiReleaseInfo) {
+            for (Release rel : ((MultiReleaseInfo)ri)) {
+                mDataManager.removeRelease(comicsId, rel.getNumber());
+            }
             mDataManager.updateBestRelease(comicsId);
             mReleaseInfos.remove(position);
             return true;
         } else {
-            return false;
+            if (mDataManager.removeRelease(comicsId, ri.getRelease().getNumber())) {
+                mDataManager.updateBestRelease(comicsId);
+                mReleaseInfos.remove(position);
+                return true;
+            } else {
+                return false;
+            }
         }
     }
 
@@ -90,7 +101,8 @@ public class ReleaseListAdapter extends BaseAdapter implements StickyListHeaders
             mUseSingleComicsLayout = false;
             mDateFormat = new SimpleDateFormat(mContext.getString(R.string.format_release_date), Locale.getDefault());
             for (long comicsId : mDataManager.getComics()) {
-                helper.addReleases(mDataManager.getComics(comicsId).getReleases());
+                //A0041 raggruppo tutte le wishlist in un'unica release
+                helper.addReleases(true, mDataManager.getComics(comicsId).getReleases());
             }
         } else {
             mUseSingleComicsLayout = true;
@@ -170,7 +182,16 @@ public class ReleaseListAdapter extends BaseAdapter implements StickyListHeaders
         }
         holder.txtNumber.setText(Integer.toString(release.getNumber()));
         holder.txtDate.setText(relDate);
-        if (mUseSingleComicsLayout) {
+
+        //A0041 se MultiReleaseInfo in note riporto tutti i numeri delle release
+        if (ri instanceof MultiReleaseInfo) {
+            MultiReleaseInfo mri = (MultiReleaseInfo)ri;
+            if (mri.size() > 1) {
+                holder.txtNotes.setText(mContext.getString(R.string.also_releases, mri.getFormattedReleaseNumbers()));
+            } else {
+                holder.txtNotes.setText(Utils.nvl(release.getNotes(), comics.getNotes(), ""));
+            }
+        } else if (mUseSingleComicsLayout) {
             holder.txtNotes.setText(Utils.nvl(release.getNotes(), ""));
         } else {
             holder.txtNotes.setText(Utils.nvl(release.getNotes(), comics.getNotes(), ""));

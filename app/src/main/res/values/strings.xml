@@ -27,6 +27,7 @@
     <string name="undo">Undo</string>
     <string name="comics_removed">Comics removed</string>
     <string name="release_removed">Release removed</string>
+    <string name="also_releases">Also: %1s</string>
 
     <string name="comics_empty_list">You have no comics</string>
     <string name="release_empty_list">You have no releases</string>

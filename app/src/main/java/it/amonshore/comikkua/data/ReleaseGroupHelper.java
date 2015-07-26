@@ -71,23 +71,16 @@ public class ReleaseGroupHelper {
     private int mMode;
     private ArrayList<ReleaseInfo> mList;
     //
-    private DateTime mToday, mPeriodStart, mPeriodEnd,
-            mNextPeriodStart, mNextPeriodEnd;
     private long mTodayMs, mPeriodStartMs, mPeriodEndMs,
             mNextPeriodStartMs, mNextPeriodEndMs;
-    //
-    private boolean mGroupByMonth = false;
-    //
-    private boolean mWeekStartOnMonday = true;
 
     public ReleaseGroupHelper(int mode, boolean groupByMonth, boolean weekStartOnMonday) {
         mMode = mode;
         mList = new ArrayList<>();
 
         //imposto le date
+        DateTime mToday, mPeriodStart, mPeriodEnd, mNextPeriodStart, mNextPeriodEnd;
         TimeZone timeZone = TimeZone.getDefault();
-        mGroupByMonth = groupByMonth;
-        mWeekStartOnMonday = weekStartOnMonday;
         mToday = DateTime.today(timeZone).getStartOfDay();
         //calcolo la data/ora di inizio/fine periodo
         if (groupByMonth) {
@@ -96,7 +89,7 @@ public class ReleaseGroupHelper {
             mNextPeriodStart = mPeriodStart.plus(0, 1, 0, 0, 0, 0, 0, DateTime.DayOverflow.Spillover);
             mNextPeriodEnd = mNextPeriodStart.getEndOfMonth();
         } else {
-            mPeriodStart = Utils.getStartOfWeek(mToday, mWeekStartOnMonday).getStartOfDay();
+            mPeriodStart = Utils.getStartOfWeek(mToday, weekStartOnMonday).getStartOfDay();
             mPeriodEnd = mPeriodStart.plusDays(6).getEndOfDay();
             mNextPeriodStart = mPeriodStart.plusDays(7);
             mNextPeriodEnd = mPeriodEnd.plusDays(7);
@@ -112,79 +105,47 @@ public class ReleaseGroupHelper {
 
     private boolean tryPutInPeriod(Release release) {
         //data specificata e nel periodo
-        if (release.getDate() != null &&
+        return release.getDate() != null &&
                 mPeriodStartMs <= release.getDate().getTime() &&
-                mPeriodEndMs >= release.getDate().getTime()) {
-            return true;
-        } else {
-            return false;
-        }
+                mPeriodEndMs >= release.getDate().getTime();
     }
 
     private boolean tryPutInPeriodNext(Release release) {
         //data specificata e nel periodo successivo
-        if (release.getDate() != null &&
+        return release.getDate() != null &&
                 mNextPeriodStartMs <= release.getDate().getTime() &&
-                mNextPeriodEndMs >= release.getDate().getTime()) {
-            return true;
-        } else {
-            return false;
-        }
+                mNextPeriodEndMs >= release.getDate().getTime();
     }
 
     private boolean tryPutInPeriodOther(Release release) {
         //data specificata e nel periodo altro
-        if (release.getDate() != null &&
-                release.getDate().getTime() > mNextPeriodEndMs) {
-            return true;
-        } else {
-            return false;
-        }
+        return release.getDate() != null &&
+                release.getDate().getTime() > mNextPeriodEndMs;
     }
 
     private boolean tryPutInExpired(Release release) {
         //non acquisati, data specificata e < oggi
-        if (!release.isPurchased() && release.getDate() != null &&
-                release.getDate().getTime() < mTodayMs) {
-            return true;
-        } else {
-            return false;
-        }
+        return !release.isPurchased() && release.getDate() != null &&
+                release.getDate().getTime() < mTodayMs;
     }
 
     private boolean tryPutInLost(Release release) {
         //non acquistati, data specificata e < start_period
-        if (!release.isPurchased() && release.getDate() != null &&
-                release.getDate().getTime() < mPeriodStartMs) {
-            return true;
-        } else {
-            return false;
-        }
+        return !release.isPurchased() && release.getDate() != null &&
+                release.getDate().getTime() < mPeriodStartMs;
     }
 
     private boolean tryPutInWishlist(Release release) {
         //non acquistati, data non specificata
-        if (!release.isPurchased() && release.isWishlist()) {
-            return true;
-        } else {
-            return false;
-        }
+        return !release.isPurchased() && release.isWishlist();
     }
 
     private boolean tryPutInToPurchase(Release release) {
-        if (!release.isPurchased()) {
-            return true;
-        } else {
-            return false;
-        }
+        return !release.isPurchased();
     }
 
     private boolean tryPutInPurchased(Release release) {
-        if (release.isPurchased()) {
-            return true;
-        } else {
-            return false;
-        }
+        return release.isPurchased();
     }
 
     private int getGroup(Release release) {
@@ -214,19 +175,61 @@ public class ReleaseGroupHelper {
      * @param releases
      */
     public void addReleases(Release... releases) {
+//A0041
+//        int group;
+//        boolean releasedToday, expired;
+//        //filtro i dati e inserisco le release in un gruppo
+//        for (Release rel : releases) {
+//            group = getGroup(rel);
+//            if (group != GROUP_UNKNOWN) {
+//                releasedToday = (group == GROUP_TO_PURCHASE || group == GROUP_PERIOD) &&
+//                        rel.getDate() != null &&
+//                        mTodayMs == rel.getDate().getTime();
+//                expired = (group == GROUP_TO_PURCHASE || group == GROUP_PERIOD) &&
+//                        rel.getDate() != null &&
+//                        mTodayMs > rel.getDate().getTime();
+//                mList.add(new ReleaseInfo(group, releasedToday, expired, rel));
+//            }
+//        }
+        addReleases(false, releases);
+    }
+
+    /**
+     * Si da per scontato che tutte le release siano relative al medesimo comics
+     *
+     * @param uniqueWishlist    se true tutte le wishlist sono raggruppate in un'unica release
+     * @param releases
+     */
+    public void addReleases(boolean uniqueWishlist, Release... releases) {
+        MultiReleaseInfo multiWishlistRelease = null;
         int group;
         boolean releasedToday, expired;
         //filtro i dati e inserisco le release in un gruppo
         for (Release rel : releases) {
             group = getGroup(rel);
             if (group != GROUP_UNKNOWN) {
-                releasedToday = (group == GROUP_TO_PURCHASE || group == GROUP_PERIOD) &&
-                        rel.getDate() != null &&
-                        mTodayMs == rel.getDate().getTime();
-                expired = (group == GROUP_TO_PURCHASE || group == GROUP_PERIOD) &&
-                        rel.getDate() != null &&
-                        mTodayMs > rel.getDate().getTime();
-                mList.add(new ReleaseInfo(group, releasedToday, expired, rel));
+                if (uniqueWishlist && group == GROUP_WISHLIST) {
+                    if (multiWishlistRelease == null) {
+                        multiWishlistRelease = new MultiReleaseInfo(group, rel);
+                    } else {
+                        multiWishlistRelease.addInnerRelease(rel);
+                    }
+                } else {
+                    releasedToday = (group == GROUP_TO_PURCHASE || group == GROUP_PERIOD) &&
+                            rel.getDate() != null &&
+                            mTodayMs == rel.getDate().getTime();
+                    expired = (group == GROUP_TO_PURCHASE || group == GROUP_PERIOD) &&
+                            rel.getDate() != null &&
+                            mTodayMs > rel.getDate().getTime();
+                    mList.add(new ReleaseInfo(group, releasedToday, expired, rel));
+                }
+            }
+        }
+        if (multiWishlistRelease != null) {
+            if (multiWishlistRelease.size() == 1) {
+                mList.add(new ReleaseInfo(multiWishlistRelease.getGroup(), multiWishlistRelease.getRelease()));
+            } else {
+                mList.add(multiWishlistRelease);
             }
         }
     }

@@ -3,7 +3,7 @@ package it.amonshore.comikkua.data;
 /**
  * Created by Narsenico on 23/05/2015.
  */
-public final class ReleaseInfo {
+public class ReleaseInfo {
 
     private int group;
     private boolean releasedToday;
@@ -38,6 +38,10 @@ public final class ReleaseInfo {
      * @return
      */
     public boolean isExpired() { return expired; }
+
+    protected void setRelease(Release release) {
+        this.release = release;
+    }
 
     /**
      *

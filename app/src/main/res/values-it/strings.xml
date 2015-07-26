@@ -88,4 +88,5 @@
     <string name="share_data">Condividi tutti i dati</string>
     <string name="title_activity_info">Informazioni</string>
     <string name="selected_item">%1d selezionato</string>
+    <string name="also_releases">Altro: %1s</string>
 </resources>

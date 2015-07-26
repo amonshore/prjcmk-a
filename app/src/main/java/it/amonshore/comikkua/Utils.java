@@ -81,6 +81,40 @@ public class Utils {
     }
 
     /**
+     *
+     * @param separator separatore valori non sequenziali
+     * @param sequenceSeparator separatore per sequenze
+     * @param values    elenco valori
+     * @return  stringa formattata
+     */
+    public static StringBuffer formatInterval(StringBuffer buffer, String separator, String sequenceSeparator, int... values) {
+        if (buffer == null) buffer = new StringBuffer();
+        if (values.length == 0) return buffer;
+
+        int last = values[0];
+        int count = 0;
+        buffer.append(last);
+        for (int ii=1; ii<values.length; ii++) {
+            if (values[ii] == last+1) {
+                last = values[ii];
+                count++;
+            } else {
+                if (count > 0) {
+                    buffer.append(sequenceSeparator).append(last);
+                }
+                last = values[ii];
+                count = 0;
+                buffer.append(separator).append(last);
+            }
+        }
+        if (count > 0) {
+            buffer.append(sequenceSeparator).append(last);
+        }
+
+        return buffer;
+    }
+
+    /**
      * Log.d(LOG_TAG, msg)
      *
      * @param msg

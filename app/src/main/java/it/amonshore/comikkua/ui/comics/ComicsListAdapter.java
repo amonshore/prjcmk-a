@@ -67,7 +67,7 @@ public class ComicsListAdapter extends BaseAdapter implements SectionIndexer {
     public void setOrder(int order) {
         if (order != mOrder) {
             mOrder = order;
-            //TODO impostare il mComparator in base all'ordine
+            //imposto il mComparator in base all'ordine
             if (order == ORDER_BY_NAME) {
                 mComparator = new NameComparator();
             } else {
