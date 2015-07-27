@@ -1,5 +1,6 @@
 package it.amonshore.comikkua;
 
+import android.content.Context;
 import android.text.TextUtils;
 import android.util.Log;
 
@@ -7,6 +8,9 @@ import java.io.File;
 import java.io.FileInputStream;
 import java.io.FileOutputStream;
 import java.io.IOException;
+import java.text.SimpleDateFormat;
+import java.util.Date;
+import java.util.Locale;
 
 import hirondelle.date4j.DateTime;
 
@@ -16,6 +20,28 @@ import hirondelle.date4j.DateTime;
 public class Utils {
 
     public final static String LOG_TAG = "COMIKKU-A";
+
+    private static SimpleDateFormat SDF_COMICS;
+    private static SimpleDateFormat SDF_RELEASE;
+    private static SimpleDateFormat SDF_RELEASE_LONG;
+
+    public static void init(Context context) {
+        SDF_COMICS = new SimpleDateFormat(context.getString(R.string.format_comics_date), Locale.getDefault());
+        SDF_RELEASE = new SimpleDateFormat(context.getString(R.string.format_release_date), Locale.getDefault());
+        SDF_RELEASE_LONG = new SimpleDateFormat(context.getString(R.string.format_release_longdate), Locale.getDefault());
+    }
+
+    public static String formatComicsDate(Date date) {
+        return SDF_COMICS.format(date);
+    }
+
+    public static String formatReleaseDate(Date date) {
+        return SDF_RELEASE.format(date);
+    }
+
+    public static String formatReleaseLongDate(Date date) {
+        return SDF_RELEASE_LONG.format(date);
+    }
 
     public static int indexOf(String[] array, String value, int def) {
         for (int ii = 0; ii < array.length; ii++) {

@@ -12,6 +12,13 @@
     <string name="action_comics_sort_by_release">Sort by release</string>
     <string name="action_comics_edit">Edit</string>
     <string name="action_comics_share">Share</string>
+    <string name="action_comics_search">Search</string>
+
+    <string name="action_release_delete">Remove</string>
+    <string name="action_release_shopping">Shopping list</string>
+    <string name="action_release_calendar">Calendar</string>
+    <string name="action_release_wishlist">Wishlist</string>
+    <string name="action_release_share">Share</string>
 
     <string name="title_activity_comics_new">New comics</string>
     <string name="title_activity_comics_edit">Edit comics</string>
@@ -116,7 +123,4 @@
     <string name="editor_release_notes">Notes</string>
     <string name="editor_release_purchased">Purchased</string>
     <string name="editor_release_ordered">Ordered</string>
-    <string name="action_release_shopping">Shopping list</string>
-    <string name="action_release_calendar">Calendar</string>
-    <string name="action_release_wishlist">Wishlist</string>
 </resources>

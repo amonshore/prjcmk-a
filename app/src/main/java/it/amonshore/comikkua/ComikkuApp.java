@@ -27,15 +27,17 @@ public class ComikkuApp extends Application {
 //                .setValue(value).build());
 //    }
 
-//    @Override
-//    public void onCreate() {
-//        super.onCreate();
-//
+    @Override
+    public void onCreate() {
+        super.onCreate();
+
+        Utils.init(this);
+
 //        analytics = GoogleAnalytics.getInstance(this);
 //        analytics.setLocalDispatchPeriod(1800);
 //        tracker = analytics.newTracker("UA-59687686-2");
 //        tracker.enableExceptionReporting(true);
 //        tracker.enableAdvertisingIdCollection(true);
 //        tracker.enableAutoActivityTracking(true);
-//    }
+    }
 }

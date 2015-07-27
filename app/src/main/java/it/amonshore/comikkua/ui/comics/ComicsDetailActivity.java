@@ -1,6 +1,7 @@
 package it.amonshore.comikkua.ui.comics;
 
 import android.app.Activity;
+import android.app.SearchManager;
 import android.content.Intent;
 import android.content.res.Configuration;
 import android.graphics.Color;
@@ -110,6 +111,7 @@ public class ComicsDetailActivity extends ActionBarActivity {
             showComicsEditor(mComics);
             return true;
         } else if (id == R.id.action_comics_share) {
+            //A0034
             Intent sendIntent = new Intent();
             sendIntent.setAction(Intent.ACTION_SEND);
             sendIntent.putExtra(Intent.EXTRA_TEXT, Utils.join("\n", true,
@@ -119,6 +121,13 @@ public class ComicsDetailActivity extends ActionBarActivity {
                     mComics.getNotes()));
             sendIntent.setType("text/plain");
             startActivity(Intent.createChooser(sendIntent, getResources().getText(R.string.share)));
+            return true;
+        } else if (id == R.id.action_comics_search) {
+            //A0042
+            String query = Utils.join(" ", true, mComics.getName(), mComics.getAuthors());
+            Intent intent = new Intent(Intent.ACTION_WEB_SEARCH);
+            intent.putExtra(SearchManager.QUERY, query);
+            startActivity(intent);
             return true;
         }
 

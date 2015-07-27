@@ -1,15 +1,16 @@
 <?xml version="1.0" encoding="utf-8"?>
 <menu xmlns:android="http://schemas.android.com/apk/res/android"
     xmlns:app="http://schemas.android.com/apk/res-auto">
-
     <item android:id="@+id/action_comics_edit"
         android:title="@string/action_comics_edit"
         android:icon="@drawable/ic_edit"
         android:orderInCategory="10" app:showAsAction="always" />
-
     <item android:id="@+id/action_comics_share"
         android:title="@string/action_comics_share"
         android:icon="@drawable/ic_share_variant"
         android:orderInCategory="100" app:showAsAction="ifRoom" />
-
+    <item android:id="@+id/action_comics_search"
+        android:title="@string/action_comics_search"
+        android:icon="@drawable/ic_magnify"
+        android:orderInCategory="110" app:showAsAction="ifRoom" />
 </menu>

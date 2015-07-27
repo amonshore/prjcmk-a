@@ -39,7 +39,6 @@ public class ComicsListAdapter extends BaseAdapter implements SectionIndexer {
     private ArrayList<Long> mSortedIds;
     private Comparator<Long> mComparator;
     private int mOrder;
-    private SimpleDateFormat mDateFormat;
 
     private HashMap<String, Integer> mMapFastScrollSections;
     private String[] mFastScrollSections;
@@ -48,7 +47,6 @@ public class ComicsListAdapter extends BaseAdapter implements SectionIndexer {
         mContext = context;
         mDataManager = DataManager.getDataManager();
         mSortedIds = new ArrayList<>();
-        mDateFormat = new SimpleDateFormat(context.getString(R.string.format_comics_date), Locale.getDefault());
         setOrder(order);
     }
 
@@ -197,7 +195,7 @@ public class ComicsListAdapter extends BaseAdapter implements SectionIndexer {
             Release bestRelease = bestReleaseInfo.getRelease();
             String relDate = mContext.getString(R.string.placeholder_wishlist);
             if (bestRelease.getDate() != null) {
-                relDate = mDateFormat.format(bestRelease.getDate());
+                relDate = Utils.formatComicsDate(bestRelease.getDate());
             }
             holder.txtNumber.setText(Integer.toString(bestRelease.getNumber()));
             holder.txtDate.setText(relDate);

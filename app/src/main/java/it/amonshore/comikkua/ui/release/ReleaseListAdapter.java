@@ -7,11 +7,9 @@ import android.view.ViewGroup;
 import android.widget.BaseAdapter;
 import android.widget.TextView;
 
-import java.text.SimpleDateFormat;
 import java.util.ArrayList;
 import java.util.Arrays;
 import java.util.List;
-import java.util.Locale;
 
 import it.amonshore.comikkua.R;
 import it.amonshore.comikkua.data.Comics;
@@ -34,7 +32,6 @@ public class ReleaseListAdapter extends BaseAdapter implements StickyListHeaders
     private DataManager mDataManager;
     private List<ReleaseInfo> mReleaseInfos;
     private LayoutInflater mInflater;
-    private SimpleDateFormat mDateFormat;
     private boolean mGroupByMonth;
     private View.OnClickListener mOnNumberViewClickListener;
     private boolean mUseSingleComicsLayout;
@@ -99,14 +96,12 @@ public class ReleaseListAdapter extends BaseAdapter implements StickyListHeaders
         ReleaseGroupHelper helper = new ReleaseGroupHelper(mode, groupByMonth, weekStartOnMonday);
         if (comics == null) {
             mUseSingleComicsLayout = false;
-            mDateFormat = new SimpleDateFormat(mContext.getString(R.string.format_release_date), Locale.getDefault());
             for (long comicsId : mDataManager.getComics()) {
                 //A0041 raggruppo tutte le wishlist in un'unica release
                 helper.addReleases(true, mDataManager.getComics(comicsId).getReleases());
             }
         } else {
             mUseSingleComicsLayout = true;
-            mDateFormat = new SimpleDateFormat(mContext.getString(R.string.format_release_longdate), Locale.getDefault());
             helper.addReleases(comics.getReleases());
         }
         mReleaseInfos = new ArrayList<>(Arrays.asList(helper.getReleaseInfos()));
@@ -175,7 +170,11 @@ public class ReleaseListAdapter extends BaseAdapter implements StickyListHeaders
         Comics comics = mDataManager.getComics(release.getComicsId());
         String relDate = "";
         if (release.getDate() != null) {
-            relDate = mDateFormat.format(release.getDate());
+            if (mUseSingleComicsLayout) {
+                relDate = Utils.formatReleaseLongDate(release.getDate());
+            } else {
+                relDate = Utils.formatReleaseDate(release.getDate());
+            }
         }
         if (!mUseSingleComicsLayout) {
             holder.txtName.setText(comics.getName());

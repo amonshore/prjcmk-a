@@ -89,4 +89,7 @@
     <string name="title_activity_info">Informazioni</string>
     <string name="selected_item">%1d selezionato</string>
     <string name="also_releases">Altro: %1s</string>
+    <string name="action_comics_search">Cerca</string>
+    <string name="action_release_delete">Rimuovi</string>
+    <string name="action_release_share">Condividi</string>
 </resources>

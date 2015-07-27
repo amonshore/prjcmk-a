@@ -1,6 +1,7 @@
 package it.amonshore.comikkua.ui.comics;
 
 import android.app.Activity;
+import android.app.SearchManager;
 import android.content.Intent;
 import android.content.SharedPreferences;
 import android.os.AsyncTask;
@@ -141,16 +142,25 @@ public class ComicsListFragment extends AFragment {
                     finishActionMode();
                     return true;
                 } else if (menuId == R.id.action_comics_share) {
+                    //A0034
                     long[] ags = mListView.getCheckedItemIds();
-                    String[] names = new String[ags.length];
-                    for (int ii = 0; ii < names.length; ii++) {
-                        names[ii] = getDataManager().getComics(ags[ii]).getName();
+                    String[] rows = new String[ags.length];
+                    for (int ii = 0; ii < rows.length; ii++) {
+                        rows[ii] = getDataManager().getComics(ags[ii]).getName();
                     }
                     Intent sendIntent = new Intent();
                     sendIntent.setAction(Intent.ACTION_SEND);
-                    sendIntent.putExtra(Intent.EXTRA_TEXT, Utils.join("\n", false, names));
+                    sendIntent.putExtra(Intent.EXTRA_TEXT, Utils.join("\n", false, rows));
                     sendIntent.setType("text/plain");
                     startActivity(Intent.createChooser(sendIntent, getResources().getText(R.string.share)));
+                    return true;
+                } else if (menuId == R.id.action_comics_search) {
+                    //A0042 cerco solo il primo elemento selezionato
+                    Comics comics = getDataManager().getComics(mListView.getCheckedItemIds()[0]);
+                    String query = Utils.join(" ", true, comics.getName(), comics.getAuthors());
+                    Intent intent = new Intent(Intent.ACTION_WEB_SEARCH);
+                    intent.putExtra(SearchManager.QUERY, query);
+                    startActivity(intent);
                     return true;
                 } else {
                     return false;

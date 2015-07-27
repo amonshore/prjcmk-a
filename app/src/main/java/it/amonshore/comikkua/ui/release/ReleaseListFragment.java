@@ -217,10 +217,25 @@ public class ReleaseListFragment extends AFragment {
                     //visto che l'adapter considera come id la posizione dell'elemento
                     //posso usare l'id come posizione per rimuoverli dall'adapter
                     for (int ii = ags.length - 1; ii >= 0; ii--) {
-                        mAdapter.remove((int)ags[ii]);
+                        mAdapter.remove((int) ags[ii]);
                     }
                     getDataManager().notifyChanged(DataManager.CAUSE_RELEASE_REMOVED);
                     finishActionMode();
+                    return true;
+                } else if (menuId == R.id.action_release_share) {
+                    //A0034
+                    long[] ags = mListView.getCheckedItemIds();
+                    String[] rows = new String[ags.length];
+                    for (int ii = 0; ii < rows.length; ii++) {
+                        ReleaseInfo ri = (ReleaseInfo) mAdapter.getItem((int) ags[ii]);
+                        rows[ii] = getDataManager().getComics(ri.getRelease().getComicsId()).getName() +
+                                " #" + ri.getRelease().getNumber() + (ri.getRelease().isWishlist() ? "" : " - " + Utils.formatReleaseLongDate(ri.getRelease().getDate()));
+                    }
+                    Intent sendIntent = new Intent();
+                    sendIntent.setAction(Intent.ACTION_SEND);
+                    sendIntent.putExtra(Intent.EXTRA_TEXT, Utils.join("\n", false, rows));
+                    sendIntent.setType("text/plain");
+                    startActivity(Intent.createChooser(sendIntent, getResources().getText(R.string.share)));
                     return true;
                 } else {
                     return false;
