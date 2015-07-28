@@ -157,7 +157,8 @@ public class ComicsListFragment extends AFragment {
                 } else if (menuId == R.id.action_comics_search) {
                     //A0042 cerco solo il primo elemento selezionato
                     Comics comics = getDataManager().getComics(mListView.getCheckedItemIds()[0]);
-                    String query = Utils.join(" ", true, comics.getName(), comics.getAuthors());
+                    String query = Utils.join(" ", true, comics.getName(), comics.getAuthors(),
+                            comics.getPublisher());
                     Intent intent = new Intent(Intent.ACTION_WEB_SEARCH);
                     intent.putExtra(SearchManager.QUERY, query);
                     startActivity(intent);

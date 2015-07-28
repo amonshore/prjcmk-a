@@ -124,7 +124,8 @@ public class ComicsDetailActivity extends ActionBarActivity {
             return true;
         } else if (id == R.id.action_comics_search) {
             //A0042
-            String query = Utils.join(" ", true, mComics.getName(), mComics.getAuthors());
+            String query = Utils.join(" ", true, mComics.getName(), mComics.getAuthors(),
+                    mComics.getPublisher());
             Intent intent = new Intent(Intent.ACTION_WEB_SEARCH);
             intent.putExtra(SearchManager.QUERY, query);
             startActivity(intent);

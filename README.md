@@ -14,3 +14,6 @@ Versione: v1.0.0-alpha (4)
 
 Versione: v1.0.0-alpha (6)
 - wishlist raggruppate
+
+Versione: v1.0.0-alpha (7)
+- ricerca web del fumetto selezionato
