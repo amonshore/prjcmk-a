@@ -2,6 +2,7 @@
 <resources>
     <!-- http://www.google.com/design/spec/style/color.html#color-color-palette -->
 
+    <!-- yellow theme
     <color name="comikku_primary_color">#FBC02D</color>
     <color name="comikku_primary_color_dark">#F9A825</color>
 
@@ -16,8 +17,25 @@
     <color name="comikku_primary_color_800">#F9A825</color>
     <color name="comikku_primary_color_900">#F57F17</color>
 
-    <!-- colori controlli -->
     <color name="comikku_control_activated_color">#FBC02D</color>
+    -->
+
+    <!-- blue theme -->
+    <color name="comikku_primary_color">#1976D2</color>
+    <color name="comikku_primary_color_dark">#1565C0</color>
+
+    <color name="comikku_primary_color_50">#E3F2FD</color>
+    <color name="comikku_primary_color_100">#BBDEFB</color>
+    <color name="comikku_primary_color_200">#90CAF9</color>
+    <color name="comikku_primary_color_300">#64B5F6</color>
+    <color name="comikku_primary_color_400">#42A5F5</color>
+    <color name="comikku_primary_color_500">#2196F3</color>
+    <color name="comikku_primary_color_600">#1E88E5</color>
+    <color name="comikku_primary_color_700">#1976D2</color>
+    <color name="comikku_primary_color_800">#1565C0</color>
+    <color name="comikku_primary_color_900">#0D47A1</color>
+
+    <color name="comikku_control_activated_color">#1565C0</color>
 
     <!-- colori per i pulsanti circolari -->
     <color name="comikku_fab_normal_color">#0288D1</color>
