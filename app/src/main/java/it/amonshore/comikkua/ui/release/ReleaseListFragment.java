@@ -43,7 +43,7 @@ import se.emilsjolander.stickylistheaders.StickyListHeadersListView;
 public class ReleaseListFragment extends AFragment {
 
     //usato per lo stato dell'istanza
-    private final static String STATE_MODE = " stateMode";
+    public final static String STATE_GROUP_MODE = " stateMode";
     //public final static String ARG_MODE = "arg_mode";
     //public final static String ARG_COMICS_ID = "arg_comics_id";
 
@@ -96,11 +96,11 @@ public class ReleaseListFragment extends AFragment {
 //        }
         if (savedInstanceState != null) {
             //recupero la modalità in precedenza e salvato alla chiusura dell'activity
-            mGroupMode = savedInstanceState.getInt(STATE_MODE, ReleaseGroupHelper.MODE_CALENDAR);
+            mGroupMode = savedInstanceState.getInt(STATE_GROUP_MODE, ReleaseGroupHelper.MODE_CALENDAR);
         } else {
             //recupero la modalità dalle preferenze
             SharedPreferences settings = getActivity().getSharedPreferences(MainActivity.PREFS_NAME, 0);
-            mGroupMode = settings.getInt(STATE_MODE, ReleaseGroupHelper.MODE_CALENDAR);
+            mGroupMode = settings.getInt(STATE_GROUP_MODE, ReleaseGroupHelper.MODE_CALENDAR);
 //A0040
 //            //traccio quale vista è usata
 //            ComikkuApp.trackEvent(ComikkuApp.CATEGORY_UI,
@@ -113,7 +113,7 @@ public class ReleaseListFragment extends AFragment {
     @Override
     public void onSaveInstanceState(Bundle savedInstanceState) {
         //salvo la modalità
-        savedInstanceState.putInt(STATE_MODE, mGroupMode);
+        savedInstanceState.putInt(STATE_GROUP_MODE, mGroupMode);
         //
         super.onSaveInstanceState(savedInstanceState);
     }
@@ -126,7 +126,7 @@ public class ReleaseListFragment extends AFragment {
         if (mComics == null) {
             SharedPreferences settings = getActivity().getSharedPreferences(MainActivity.PREFS_NAME, 0);
             SharedPreferences.Editor editor = settings.edit();
-            editor.putInt(STATE_MODE, mGroupMode);
+            editor.putInt(STATE_GROUP_MODE, mGroupMode);
             editor.apply();
         }
     }

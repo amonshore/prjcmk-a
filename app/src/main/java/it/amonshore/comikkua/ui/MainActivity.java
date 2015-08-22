@@ -2,7 +2,7 @@ package it.amonshore.comikkua.ui;
 
 import android.content.Intent;
 import android.content.SharedPreferences;
-import android.os.AsyncTask;
+import android.os.Handler;
 import android.preference.PreferenceManager;
 import android.support.v4.view.ViewPager;
 import android.support.v7.app.ActionBarActivity;
@@ -15,7 +15,6 @@ import com.google.samples.apps.iosched.ui.widget.SlidingTabLayout;
 
 import it.amonshore.comikkua.R;
 import it.amonshore.comikkua.Utils;
-import it.amonshore.comikkua.data.Comics;
 import it.amonshore.comikkua.data.ComicsObserver;
 import it.amonshore.comikkua.data.DataManager;
 import it.amonshore.comikkua.data.ReleaseGroupHelper;
@@ -101,7 +100,23 @@ public class MainActivity extends ActionBarActivity implements SharedPreferences
     @Override
     protected void onPostResume() {
         super.onPostResume();
-        new ReadDataAsyncTask().execute();
+        //A0040 new ReadDataAsyncTask().execute();
+        Utils.d("A0040 onPostResume");
+        Handler mh = new Handler(getMainLooper());
+        Runnable runnable = new Runnable() {
+            @Override
+            public void run() {
+                try {
+                    mDataManager.readComics();
+                    //forzo l'aggiornamento del titolo della tab
+                    onChanged(DataManager.CAUSE_RELEASES_MODE_CHANGED);
+                    mDataManager.notifyChanged(DataManager.CAUSE_LOADING);
+                } catch (Exception ex) {
+                    Utils.e("A0040 read comics", ex);
+                }
+            }
+        };
+        mh.post(runnable);
     }
 
     @Override
@@ -153,8 +168,12 @@ public class MainActivity extends ActionBarActivity implements SharedPreferences
             case DataManager.CAUSE_RELEASES_MODE_CHANGED:
                 ReleaseListFragment fragment = (ReleaseListFragment)mTabPageAdapter.getItem(1);
                 SlidingTabLayout slidingTabLayout = (SlidingTabLayout) findViewById(R.id.sliding_tabs);
-                //slidingTabLayout.setPageTitle(1, "MODE " + fragment.getGroupMode());
-                switch (fragment.getGroupMode()) {
+                int groupMode = fragment.getGroupMode();
+                if (groupMode == 0) {
+                    SharedPreferences settings = getSharedPreferences(MainActivity.PREFS_NAME, 0);
+                    groupMode = settings.getInt(ReleaseListFragment.STATE_GROUP_MODE, ReleaseGroupHelper.MODE_CALENDAR);
+                }
+                switch (groupMode) {
                     case ReleaseGroupHelper.MODE_LAW:
                         slidingTabLayout.setPageTitle(1, getString(R.string.title_page_wishlist));
                         break;
@@ -183,24 +202,25 @@ public class MainActivity extends ActionBarActivity implements SharedPreferences
         }
     }
 
-    /**
-     * Task asincrono per la lettura dei dati
-     */
-    private class ReadDataAsyncTask extends AsyncTask<Void, Comics, Integer> {
-        @Override
-        protected Integer doInBackground(Void... params) {
-            Utils.d(this.getClass(), "readComics");
-            MainActivity.this.mDataManager.readComics();
-            return DataManager.CAUSE_LOADING;
-        }
-
-        @Override
-        protected void onPostExecute(Integer result) {
-            //forzo l'aggiornamento del titolo della tab
-            MainActivity.this.onChanged(DataManager.CAUSE_RELEASES_MODE_CHANGED);
-            //
-            MainActivity.this.mDataManager.notifyChanged(result);
-        }
-    }
+//    A0040
+//    /**
+//     * Task asincrono per la lettura dei dati
+//     */
+//    private class ReadDataAsyncTask extends AsyncTask<Void, Comics, Integer> {
+//        @Override
+//        protected Integer doInBackground(Void... params) {
+//            Utils.d(this.getClass(), "readComics");
+//            MainActivity.this.mDataManager.readComics();
+//            return DataManager.CAUSE_LOADING;
+//        }
+//
+//        @Override
+//        protected void onPostExecute(Integer result) {
+//            //forzo l'aggiornamento del titolo della tab
+//            MainActivity.this.onChanged(DataManager.CAUSE_RELEASES_MODE_CHANGED);
+//            //
+//            MainActivity.this.mDataManager.notifyChanged(result);
+//        }
+//    }
 
 }

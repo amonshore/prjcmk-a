@@ -6,6 +6,7 @@ import android.content.Intent;
 import android.content.SharedPreferences;
 import android.os.AsyncTask;
 import android.os.Bundle;
+import android.os.Handler;
 import android.view.ActionMode;
 import android.view.LayoutInflater;
 import android.view.Menu;
@@ -134,11 +135,16 @@ public class ComicsListFragment extends AFragment {
                 long menuId = item.getItemId();
                 if (menuId == R.id.action_comics_delete) {
                     long[] ags = mListView.getCheckedItemIds();
-                    Long[] lgs = new Long[ags.length];
-                    for (int ii = 0; ii < ags.length; ii++) {
-                        lgs[ii] = ags[ii];
+//A0040
+//                    Long[] lgs = new Long[ags.length];
+//                    for (int ii = 0; ii < ags.length; ii++) {
+//                        lgs[ii] = ags[ii];
+//                    }
+//                    new RemoveComicsAsyncTask().execute(lgs);
+                    for (int ii = ags.length - 1; ii >= 0; ii--) {
+                        mAdapter.remove((int) ags[ii]);
                     }
-                    new RemoveComicsAsyncTask().execute(lgs);
+                    getDataManager().notifyChanged(DataManager.CAUSE_COMICS_REMOVED);
                     finishActionMode();
                     return true;
                 } else if (menuId == R.id.action_comics_share) {
@@ -317,7 +323,28 @@ public class ComicsListFragment extends AFragment {
         if (cause != DataManager.CAUSE_RELEASES_MODE_CHANGED) {
             //se la causa è il cambio pagina aggiorno i dati solo se l'adapter è vuoto
             if ((cause & DataManager.CAUSE_PAGE_CHANGED) != DataManager.CAUSE_PAGE_CHANGED || mAdapter.isEmpty()) {
-                new UpdateListAsyncTask().execute();
+                //A0040 new UpdateListAsyncTask().execute();
+                Handler mh = new Handler(getActivity().getMainLooper());
+                Runnable runnable = new Runnable() {
+                    @Override
+                    public void run() {
+                        try {
+                            mAdapter.refresh();
+                            mAdapter.notifyDataSetChanged();
+                            if (mAdapter.getOrder() == ComicsListAdapter.ORDER_BY_NAME) {
+                                mListView.setFastScrollEnabled(true);
+                                mListView.setFastScrollAlwaysVisible(true);
+                            } else {
+                                mListView.setFastScrollEnabled(false);
+                                mListView.setFastScrollAlwaysVisible(false);
+                            }
+                        } catch (Exception ex) {
+                            Utils.e("A0040 update comics list", ex);
+                        }
+                    }
+                };
+                mh.post(runnable);
+
             }
         }
     }
@@ -334,52 +361,54 @@ public class ComicsListFragment extends AFragment {
         startActivity(intent);
     }
 
-    /**
-     * Task asincrono per aggiornamento della lista
-     */
-    private class UpdateListAsyncTask extends AsyncTask<Void, Comics, Integer> {
-        @Override
-        protected Integer doInBackground(Void... params) {
-            return ComicsListFragment.this.mAdapter.refresh();
-        }
+//    A0040
+//    /**
+//     * Task asincrono per aggiornamento della lista
+//     */
+//    private class UpdateListAsyncTask extends AsyncTask<Void, Comics, Integer> {
+//        @Override
+//        protected Integer doInBackground(Void... params) {
+//            return ComicsListFragment.this.mAdapter.refresh();
+//        }
+//
+//        @Override
+//        protected void onPostExecute(Integer result) {
+//            ComicsListFragment.this.mAdapter.notifyDataSetChanged();
+//            if (mAdapter.getOrder() == ComicsListAdapter.ORDER_BY_NAME) {
+////                Utils.d(this.getClass(), "sect fast enable");
+//                mListView.setFastScrollEnabled(true);
+//                mListView.setFastScrollAlwaysVisible(true);
+//            } else {
+//                mListView.setFastScrollEnabled(false);
+//                mListView.setFastScrollAlwaysVisible(false);
+//            }
+//        }
+//    }
 
-        @Override
-        protected void onPostExecute(Integer result) {
-            ComicsListFragment.this.mAdapter.notifyDataSetChanged();
-            if (mAdapter.getOrder() == ComicsListAdapter.ORDER_BY_NAME) {
-//                Utils.d(this.getClass(), "sect fast enable");
-                mListView.setFastScrollEnabled(true);
-                mListView.setFastScrollAlwaysVisible(true);
-            } else {
-                mListView.setFastScrollEnabled(false);
-                mListView.setFastScrollAlwaysVisible(false);
-            }
-        }
-    }
-
-    /**
-     * Task asincrono per la rimoazione dei dati
-     */
-    private class RemoveComicsAsyncTask extends AsyncTask<Long, Long, Integer> {
-        @Override
-        protected Integer doInBackground(Long... params) {
-            for (Long id : params) {
-                publishProgress(id);
-            }
-            return params.length;
-        }
-
-        @Override
-        protected void onProgressUpdate(Long... values) {
-//            boolean res =
-              ComicsListFragment.this.mAdapter.remove(values[0]);
-//            Utils.d("delete comics " + values[0] + " -> " + res);
-        }
-
-        @Override
-        protected void onPostExecute(Integer integer) {
-            ComicsListFragment.this.getDataManager().notifyChanged(DataManager.CAUSE_COMICS_REMOVED);
-        }
-    }
+//    A0040
+//    /**
+//     * Task asincrono per la rimoazione dei dati
+//     */
+//    private class RemoveComicsAsyncTask extends AsyncTask<Long, Long, Integer> {
+//        @Override
+//        protected Integer doInBackground(Long... params) {
+//            for (Long id : params) {
+//                publishProgress(id);
+//            }
+//            return params.length;
+//        }
+//
+//        @Override
+//        protected void onProgressUpdate(Long... values) {
+////            boolean res =
+//              ComicsListFragment.this.mAdapter.remove(values[0]);
+////            Utils.d("delete comics " + values[0] + " -> " + res);
+//        }
+//
+//        @Override
+//        protected void onPostExecute(Integer integer) {
+//            ComicsListFragment.this.getDataManager().notifyChanged(DataManager.CAUSE_COMICS_REMOVED);
+//        }
+//    }
 
 }
