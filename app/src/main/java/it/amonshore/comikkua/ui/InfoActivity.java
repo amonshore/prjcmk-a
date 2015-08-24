@@ -8,6 +8,7 @@ import android.widget.ListView;
 
 import it.amonshore.comikkua.BuildConfig;
 import it.amonshore.comikkua.R;
+import it.amonshore.comikkua.data.DataManager;
 
 /**
  * Created by Narsenico on 13/06/2015.
@@ -23,12 +24,11 @@ public class InfoActivity extends ActionBarActivity {
         setSupportActionBar(toolbar);
         getSupportActionBar().setDisplayHomeAsUpEnabled(true);
         //
-        String[] infos = new String[] {
-                String.format("Version: %s (%s)", BuildConfig.VERSION_NAME, BuildConfig.VERSION_CODE),
-                "Author: narsenico"
-        };
         ArrayAdapter<String> adapter = new ArrayAdapter<>(this,
-                android.R.layout.simple_list_item_1, infos);
+                android.R.layout.simple_list_item_1);
+        adapter.add(String.format("Version: %s (%s)", BuildConfig.VERSION_NAME, BuildConfig.VERSION_CODE));
+        adapter.add("Author: narsenico");
+        adapter.add("Count: " + DataManager.getDataManager().getComics().size());
         ListView list = (ListView) findViewById(android.R.id.list);
         list.setAdapter(adapter);
     }

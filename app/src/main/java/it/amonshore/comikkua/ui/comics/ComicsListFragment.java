@@ -142,7 +142,7 @@ public class ComicsListFragment extends AFragment {
 //                    }
 //                    new RemoveComicsAsyncTask().execute(lgs);
                     for (int ii = ags.length - 1; ii >= 0; ii--) {
-                        mAdapter.remove((int) ags[ii]);
+                        mAdapter.remove(ags[ii]);
                     }
                     getDataManager().notifyChanged(DataManager.CAUSE_COMICS_REMOVED);
                     finishActionMode();
