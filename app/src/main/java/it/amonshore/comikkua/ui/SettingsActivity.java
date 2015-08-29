@@ -3,17 +3,13 @@ package it.amonshore.comikkua.ui;
 import android.os.Bundle;
 import android.preference.Preference;
 import android.preference.PreferenceFragment;
-import android.preference.PreferenceScreen;
 import android.support.v7.app.ActionBarActivity;
 import android.support.v7.widget.Toolbar;
 import android.widget.Toast;
 
-import java.text.DateFormat;
-import java.text.SimpleDateFormat;
 import java.util.Date;
 
 import it.amonshore.comikkua.R;
-import it.amonshore.comikkua.Utils;
 import it.amonshore.comikkua.data.DataManager;
 
 public class SettingsActivity extends ActionBarActivity {

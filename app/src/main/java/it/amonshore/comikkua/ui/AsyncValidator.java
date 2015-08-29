@@ -102,6 +102,6 @@ public class AsyncValidator {
      *
      */
     public interface OnValidateListener {
-        public void onValidate(TextView target, CharSequence text);
+        void onValidate(TextView target, CharSequence text);
     }
 }

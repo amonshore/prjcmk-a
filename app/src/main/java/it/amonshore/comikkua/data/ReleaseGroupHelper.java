@@ -68,10 +68,10 @@ public class ReleaseGroupHelper {
      */
     public final static int GROUP_UNKNOWN = -1;
 
-    private int mMode;
-    private ArrayList<ReleaseInfo> mList;
+    private final int mMode;
+    private final ArrayList<ReleaseInfo> mList;
     //
-    private long mTodayMs, mPeriodStartMs, mPeriodEndMs,
+    private final long mTodayMs, mPeriodStartMs, mPeriodEndMs,
             mNextPeriodStartMs, mNextPeriodEndMs;
 
     public ReleaseGroupHelper(int mode, boolean groupByMonth, boolean weekStartOnMonday) {
@@ -252,7 +252,7 @@ public class ReleaseGroupHelper {
                         res = ldt.compareTo(rdt);
                     } else if (ldt == null && rdt != null) {
                         res = -1;
-                    } else if (ldt != null && rdt == null) {
+                    } else if (ldt != null) {
                         res = 1;
                     }
 

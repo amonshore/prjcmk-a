@@ -8,13 +8,11 @@ import android.widget.BaseAdapter;
 import android.widget.SectionIndexer;
 import android.widget.TextView;
 
-import java.text.SimpleDateFormat;
 import java.util.ArrayList;
 import java.util.Collections;
 import java.util.Comparator;
 import java.util.HashMap;
 import java.util.LinkedHashMap;
-import java.util.Locale;
 
 import it.amonshore.comikkua.R;
 import it.amonshore.comikkua.data.Comics;
@@ -34,9 +32,9 @@ public class ComicsListAdapter extends BaseAdapter implements SectionIndexer {
     public final static int ORDER_BY_NAME = 2;
     public final static int ORDER_BY_BEST_RELEASE = 4;
 
-    private Context mContext;
-    private DataManager mDataManager;
-    private ArrayList<Long> mSortedIds;
+    private final Context mContext;
+    private final DataManager mDataManager;
+    private final ArrayList<Long> mSortedIds;
     private Comparator<Long> mComparator;
     private int mOrder;
 
@@ -76,25 +74,25 @@ public class ComicsListAdapter extends BaseAdapter implements SectionIndexer {
         }
     }
 
-    /**
-     *
-     * @param comics
-     * @return ritorna la posizione dell'elemento
-     */
-    public int insertOrUpdate(Comics comics) {
-        if (mDataManager.put(comics)) {
-            //è un nuovo elemento
-            mSortedIds.add(comics.getId());
-            Collections.sort(mSortedIds, mComparator);
-            prepareFastScrollSections();
-            return mSortedIds.indexOf(comics.getId());
-        } else {
-            //è un elemento già esistente
-            Collections.sort(mSortedIds, mComparator);
-            prepareFastScrollSections();
-            return mSortedIds.indexOf(comics.getId());
-        }
-    }
+//    /**
+//     *
+//     * @param comics
+//     * @return ritorna la posizione dell'elemento
+//     */
+//    public int insertOrUpdate(Comics comics) {
+//        if (mDataManager.put(comics)) {
+//            //è un nuovo elemento
+//            mSortedIds.add(comics.getId());
+//            Collections.sort(mSortedIds, mComparator);
+//            prepareFastScrollSections();
+//            return mSortedIds.indexOf(comics.getId());
+//        } else {
+//            //è un elemento già esistente
+//            Collections.sort(mSortedIds, mComparator);
+//            prepareFastScrollSections();
+//            return mSortedIds.indexOf(comics.getId());
+//        }
+//    }
 
     /**
      *
@@ -283,9 +281,9 @@ public class ComicsListAdapter extends BaseAdapter implements SectionIndexer {
             int res;
             if (lrer.getDate() != null && rrer.getDate() != null) {
                 res = lrer.getDate().compareTo(rrer.getDate());
-            } else if (lrer.getDate() != null && rrer.getDate() == null) {
+            } else if (lrer.getDate() != null) {
                 res = -1;
-            } else if (lrer.getDate() == null && rrer.getDate() != null) {
+            } else if (rrer.getDate() != null) {
                 res = 1;
             } else if (lrer.getNumber() == rrer.getNumber()) {
                 res = lco.getName().compareToIgnoreCase(rco.getName());

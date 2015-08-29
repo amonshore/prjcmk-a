@@ -89,7 +89,7 @@ public class Utils {
      * @param texts
      * @return
      */
-    public final static String join(String delimiter, boolean excludeEmpty, CharSequence... texts) {
+    public static String join(String delimiter, boolean excludeEmpty, CharSequence... texts) {
         if (texts.length == 0) return "";
         StringBuilder sb = new StringBuilder();
         boolean firstTime = true;
@@ -201,16 +201,6 @@ public class Utils {
             else day--;
         }
         return date.minusDays(day);
-    }
-
-    /**
-     * Calcola l'ultimo giorno della settimana
-     * @param date
-     * @param weekStartOnMonday
-     * @return ultimo giorno della settimana
-     */
-    public static DateTime getEndOfWeek(DateTime date, boolean weekStartOnMonday) {
-        return getStartOfWeek(date, weekStartOnMonday).plusDays(6);
     }
 
     /**

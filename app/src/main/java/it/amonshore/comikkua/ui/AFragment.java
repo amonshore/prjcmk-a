@@ -15,16 +15,8 @@ public abstract class AFragment extends Fragment implements ComicsObserver {
     private DataManager mDataManager;
     private int mChangedCause;
 
-    public DataManager getDataManager() {
+    protected DataManager getDataManager() {
         return mDataManager;
-    }
-
-    /**
-     *
-     * @return
-     */
-    public boolean isChanged() {
-        return mChangedCause == 0;
     }
 
     /**
@@ -32,7 +24,7 @@ public abstract class AFragment extends Fragment implements ComicsObserver {
      * @param cause
      * @param wasPosponed
      */
-    public abstract void onDataChanged(int cause, boolean wasPosponed);
+    protected abstract void onDataChanged(int cause, boolean wasPosponed);
 
     /**
      *

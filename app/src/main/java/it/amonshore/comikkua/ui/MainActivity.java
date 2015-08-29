@@ -28,7 +28,6 @@ public class MainActivity extends ActionBarActivity implements SharedPreferences
     public final static String PREFS_NAME = "ComikkuPrefs";
 
     private TabPageAdapter mTabPageAdapter;
-    private ViewPager mViewPager;
     private DataManager mDataManager;
     //salvo la page/fragment precedente
     private int mPreviousPage;
@@ -40,8 +39,8 @@ public class MainActivity extends ActionBarActivity implements SharedPreferences
         //l'action bar è fornita dalla super classe
         //setContentView(R.layout.activity_main);
         setContentView(R.layout.activity_main_sliding);
-        //TODO recuperare il nome utente dalle preferenze
-        mDataManager = DataManager.init(this.getApplicationContext(), null);
+        //mDataManager = DataManager.init(this.getApplicationContext(), null); -> inizializzo in ComikkuApp
+        mDataManager = DataManager.getDataManager();
         Utils.d(this.getClass(), "*********** MAIN onCreate -> register observer and start WH");
         mDataManager.registerObserver(this);
         mDataManager.startWriteHandler();
@@ -56,8 +55,8 @@ public class MainActivity extends ActionBarActivity implements SharedPreferences
         setSupportActionBar(toolbar);
         //l'adapter fornisce i fragment che comporranno la vista a tab
         mTabPageAdapter = new TabPageAdapter(this, getSupportFragmentManager());
-        mViewPager = (ViewPager)findViewById(R.id.pager);
-        mViewPager.setAdapter(mTabPageAdapter);
+        ViewPager viewPager = (ViewPager)findViewById(R.id.pager);
+        viewPager.setAdapter(mTabPageAdapter);
         mPreviousPage = 0;
         // Give the SlidingTabLayout the ViewPager
         SlidingTabLayout slidingTabLayout = (SlidingTabLayout) findViewById(R.id.sliding_tabs);
@@ -85,7 +84,7 @@ public class MainActivity extends ActionBarActivity implements SharedPreferences
                 }
             }
         });
-        slidingTabLayout.setViewPager(mViewPager);
+        slidingTabLayout.setViewPager(viewPager);
     }
 
     @Override
@@ -101,7 +100,6 @@ public class MainActivity extends ActionBarActivity implements SharedPreferences
     protected void onPostResume() {
         super.onPostResume();
         //A0040 new ReadDataAsyncTask().execute();
-        Utils.d("A0040 onPostResume");
         Handler mh = new Handler(getMainLooper());
         Runnable runnable = new Runnable() {
             @Override

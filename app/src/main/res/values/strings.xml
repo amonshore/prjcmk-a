@@ -79,7 +79,7 @@
     <string name="title_release_group_expired">Expired</string>
     <string name="title_release_group_to_purchase">To purchase</string>
     <string name="title_release_group_purchased">Purchased</string>
-    <string name="title_release_group_unknown">Unknown %1</string>
+    <string name="title_release_group_unknown">Unknown %1s</string>
 
     <!-- periodicity -->
     <string name="periodicity_unknown">Nothing</string>

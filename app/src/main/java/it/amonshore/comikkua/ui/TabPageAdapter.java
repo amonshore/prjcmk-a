@@ -15,12 +15,12 @@ import it.amonshore.comikkua.ui.comics.ComicsListFragment;
 import it.amonshore.comikkua.ui.release.ReleaseListFragment;
 
 /**
- * Created by Calgia on 06/05/2015.
+ * Created by Narsenico on 06/05/2015.
  */
 public class TabPageAdapter extends FragmentStatePagerAdapter {
 
-    private Context mContext;
-    private ArrayList<AFragment> mPages;
+    private final Context mContext;
+    private final ArrayList<AFragment> mPages;
 
     public TabPageAdapter(Context context, FragmentManager fm) {
         super(fm);

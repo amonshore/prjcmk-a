@@ -43,7 +43,6 @@ public class ReleaseEditorActivity extends ActionBarActivity {
     private Comics mComics;
     private Release mRelease;
     private boolean mIsNew;
-    private DataManager mDataManager;
 
     private FloatingLabelEditText mTxtNumber, mTxtPrice, mTxtNotes;
     private FloatingLabelDatePicker<JavaDateInstant> mTxtDate;
@@ -53,13 +52,11 @@ public class ReleaseEditorActivity extends ActionBarActivity {
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
         setContentView(R.layout.activity_release_editor);
-        //uso il contesto dell'applicazione, usato anche nell'Activity principale
-        mDataManager = DataManager.getDataManager();
         //leggo i parametri
         Intent intent = getIntent();
         long comicsId = intent.getLongExtra(EXTRA_COMICS_ID, COMICS_ID_NONE);
         int releaseNumber = intent.getIntExtra(EXTRA_RELEASE_NUMBER, RELEASE_NEW);
-        mComics = mDataManager.getComics(comicsId);
+        mComics = DataManager.getDataManager().getComics(comicsId);
         setTitle(mComics.getName());
         if (releaseNumber == RELEASE_NEW) {
             mIsNew = true;

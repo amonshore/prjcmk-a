@@ -11,7 +11,7 @@ import it.amonshore.comikkua.Utils;
  */
 public class MultiReleaseInfo extends ReleaseInfo implements Iterable<Release> {
 
-    private ArrayList<Release> mInnerReleases;
+    private final ArrayList<Release> mInnerReleases;
 
     public MultiReleaseInfo(int group, Release release) {
         this(group, false, false, release);

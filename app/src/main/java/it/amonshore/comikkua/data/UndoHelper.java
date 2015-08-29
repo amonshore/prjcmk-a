@@ -10,8 +10,8 @@ import java.util.Stack;
 public class UndoHelper<E> {
 
     private int mLastTag;
-    private ArrayList<E> mElements;
-    private HashMap<Integer, Stack<E>> mRetainedElements;
+    private final ArrayList<E> mElements;
+    private final HashMap<Integer, Stack<E>> mRetainedElements;
 
     protected UndoHelper() {
         mLastTag = 0;

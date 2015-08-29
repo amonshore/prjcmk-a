@@ -9,7 +9,7 @@ import java.util.Date;
  */
 public class Release {
 
-    private long comicsId;
+    private final long comicsId;
     private int number;
     private Date date;
     private double price;

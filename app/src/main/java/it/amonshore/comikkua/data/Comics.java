@@ -7,7 +7,7 @@ import java.util.Calendar;
 import java.util.GregorianCalendar;
 
 /**
- * Created by Calgia on 07/05/2015.
+ * Created by Narsenico on 07/05/2015.
  */
 public class Comics {
 
@@ -20,7 +20,7 @@ public class Comics {
     public final static String PERIODICITY_MONTHLY_X6 = "M6";
     public final static String PERIODICITY_YEARLY = "Y1";
 
-    private long id;
+    private final long id;
     private String name;
     private String series;
     private String publisher;
@@ -29,23 +29,15 @@ public class Comics {
     private String periodicity;
     private boolean reserved;
     private String notes;
-    private ArrayList<Release> releases;
-
-    protected Comics() {
-        releases = new ArrayList<>();
-    }
+    private final ArrayList<Release> releases;
 
     public Comics(long id) {
-        this();
+        releases = new ArrayList<>();
         this.id = id;
     }
 
     public long getId() {
         return id;
-    }
-
-    protected void setId(long id) {
-        this.id = id;
     }
 
     public String getName() {
@@ -188,28 +180,13 @@ public class Comics {
      * @param number
      * @return la release rimossa oppure null se non viene trovata
      */
-    protected Release removeRelease(int number) {
+    Release removeRelease(int number) {
         int index = indexOf(number);
         if (index >= 0) {
             return releases.remove(index);
         } else {
             return null;
         }
-    }
-
-    /**
-     *
-     */
-    protected void removeAllReleases() {
-        releases.clear();
-    }
-
-    /**
-     *
-     * @return
-     */
-    public int getReleaseCount() {
-        return releases.size();
     }
 
     /**

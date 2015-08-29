@@ -5,9 +5,9 @@ package it.amonshore.comikkua.data;
  */
 public class ReleaseInfo {
 
-    private int group;
-    private boolean releasedToday;
-    private boolean expired;
+    private final int group;
+    private final boolean releasedToday;
+    private final boolean expired;
     private Release release;
 
     public ReleaseInfo(int group, Release release) {

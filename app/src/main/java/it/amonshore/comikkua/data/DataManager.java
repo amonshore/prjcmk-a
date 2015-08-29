@@ -30,7 +30,7 @@ import java.util.concurrent.TimeUnit;
 import it.amonshore.comikkua.Utils;
 
 /**
- * Created by Calgia on 07/05/2015.
+ * Created by Narsenico on 07/05/2015.
  */
 public class DataManager extends Observable<ComicsObserver> {
 
@@ -98,21 +98,21 @@ public class DataManager extends Observable<ComicsObserver> {
         return instance;
     }
 
-    private String mUserName;
+    private final String mUserName;
     private long mLastComicsId;
-    private boolean mExternalStorage;
-    private Context mContext;
+    private final boolean mExternalStorage;
+    private final Context mContext;
     private boolean mDataLoaded;
     //
     private TreeMap<Long, Comics> mComicsCache;
     //
-    private UndoHelper<Comics> mUndoComics;
-    private UndoHelper<Release> mUndoRelease;
+    private final UndoHelper<Comics> mUndoComics;
+    private final UndoHelper<Release> mUndoRelease;
     //contiene un elenco di tutti gli editori
     private HashSet<String> mPublishers;
     //contiene la best release per ogni comics
     private TreeMap<Long, ReleaseInfo> mBestReleases;
-    private SimpleDateFormat mDateFormat;
+    private final SimpleDateFormat mDateFormat;
     //
     private AsyncWriteHandler mWriteHandler;
 
@@ -171,9 +171,8 @@ public class DataManager extends Observable<ComicsObserver> {
     }
 
     private Comics json2comics(JSONObject obj) throws JSONException {
-        Comics comics = new Comics();
         //nella versione ionic l'id è una stringa, devo convertirla in long
-        comics.setId(tryGetId(obj));
+        Comics comics = new Comics(tryGetId(obj));
         comics.setName(obj.getString(FIELD_NAME));
         comics.setSeries(tryGetString(obj, FIELD_SERIES));
         comics.setPublisher(tryGetString(obj, FIELD_PUBLISHER));
@@ -454,9 +453,9 @@ public class DataManager extends Observable<ComicsObserver> {
                 Utils.d("readComics " + file.getAbsolutePath());
                 if (file.exists()) {
                     try {
-                        StringBuffer sb = new StringBuffer();
+                        StringBuilder sb = new StringBuilder();
                         br = new BufferedReader(new FileReader(file));
-                        String line = null;
+                        String line;
                         while ((line = br.readLine()) != null) {
                             sb.append(line);
                             sb.append(System.lineSeparator());
@@ -472,6 +471,7 @@ public class DataManager extends Observable<ComicsObserver> {
                         if (br != null) try {
                             br.close();
                         } catch (IOException ioex) {
+                            //
                         }
                     }
                 }
@@ -517,14 +517,6 @@ public class DataManager extends Observable<ComicsObserver> {
      */
     public long getLastModifiedBackupFile() {
         return getBackupDataFile().lastModified();
-    }
-
-    /**
-     *
-     * @return
-     */
-    public Uri getDataFileUri() {
-        return Uri.fromFile(getDataFile());
     }
 
     /**
@@ -629,14 +621,9 @@ public class DataManager extends Observable<ComicsObserver> {
 
         private Semaphore mMainLoopHandler;
         private Semaphore mNoLongerHandler;
-        private long mTimeout = 1000;
+        private final long mTimeout = 1000;
         private boolean mCancel;
         private boolean mFlush;
-        private boolean mHasPendingRequest;
-
-        public boolean hasPendingRequest() {
-            return mHasPendingRequest;
-        }
 
         public void appendRequest() {
             appendRequest(false);
@@ -671,14 +658,12 @@ public class DataManager extends Observable<ComicsObserver> {
                             mMainLoopHandler.acquire();
 //                            Utils.d(this.getClass(), "*** aquired");
                             //finchè ci sono richieste ciclo
-                            mHasPendingRequest = true;
                             while (!mFlush && !mCancel && mNoLongerHandler.tryAcquire(mTimeout, TimeUnit.MILLISECONDS)) {
                             }
                             mFlush = false;
                             Utils.d(this.getClass(), "*** saving");
                             //quando scade salvo
                             DataManager.this.save();
-                            mHasPendingRequest = false;
                         }
                     } catch (InterruptedException iex) {
                         Utils.e("async save main loop", iex);

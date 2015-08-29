@@ -3,20 +3,13 @@ package it.amonshore.comikkua.ui.comics;
 import android.app.Activity;
 import android.app.SearchManager;
 import android.content.Intent;
-import android.content.res.Configuration;
-import android.graphics.Color;
-import android.os.Build;
 import android.os.Bundle;
 import android.support.v7.app.ActionBarActivity;
 import android.support.v7.widget.Toolbar;
 import android.view.Menu;
 import android.view.MenuItem;
 import android.view.View;
-import android.view.Window;
-import android.view.WindowManager;
 import android.widget.TextView;
-
-import com.github.clans.fab.FloatingActionButton;
 
 import it.amonshore.comikkua.R;
 import it.amonshore.comikkua.Utils;
@@ -35,9 +28,7 @@ public class ComicsDetailActivity extends ActionBarActivity {
 
     private Comics mComics;
     private DataManager mDataManager;
-    private ReleaseListFragment mReleaseListFragment;
     private TextView mTxtName, mTxtAuthors, mTxtNotes;
-    private FloatingActionButton mBtnAdd;
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
@@ -67,15 +58,15 @@ public class ComicsDetailActivity extends ActionBarActivity {
         mTxtNotes = ((TextView)findViewById(R.id.txt_detail_comics_notes));
         updateHeader();
         //listener fab
-        mBtnAdd = ((FloatingActionButton)findViewById(R.id.fab_release_add));
-        mBtnAdd.setOnClickListener(new View.OnClickListener() {
+        findViewById(R.id.fab_release_add).setOnClickListener(new View.OnClickListener() {
             @Override
             public void onClick(View v) {
-                showReleaseEditor(mComics.getId(), ReleaseEditorActivity.RELEASE_NEW);
+                showReleaseEditor(mComics.getId());
             }
         });
         //
-        mReleaseListFragment = ((ReleaseListFragment)getSupportFragmentManager().findFragmentById(R.id.frg_release_list));
+        ReleaseListFragment mReleaseListFragment = ((ReleaseListFragment)getSupportFragmentManager()
+                .findFragmentById(R.id.frg_release_list));
         mReleaseListFragment.setComics(mComics, ReleaseGroupHelper.MODE_COMICS);
         mReleaseListFragment.onDataChanged(DataManager.CAUSE_LOADING);
     }
@@ -139,9 +130,8 @@ public class ComicsDetailActivity extends ActionBarActivity {
         mTxtName.setText(mComics.getName());
         mTxtAuthors.setText(Utils.join(" - ", true, mComics.getPublisher(), mComics.getAuthors()));
         mTxtNotes.setText(Utils.nvl(mComics.getNotes(), ""));
-        if (mComics.isReserved()) {
-            //TODO impostare icona "reserved" alla destra delle note
-        }
+        //TODO impostare icona "reserved" alla destra delle note
+//        if (mComics.isReserved()) { ... }
     }
 
     private void showComicsEditor(Comics comics) {
@@ -150,10 +140,10 @@ public class ComicsDetailActivity extends ActionBarActivity {
         startActivityForResult(intent, ComicsEditorActivity.EDIT_COMICS_REQUEST);
     }
 
-    private void showReleaseEditor(long comicsId, int number) {
+    private void showReleaseEditor(long comicsId) {
         Intent intent = new Intent(this, ReleaseEditorActivity.class);
         intent.putExtra(ReleaseEditorActivity.EXTRA_COMICS_ID, comicsId);
-        intent.putExtra(ReleaseEditorActivity.EXTRA_RELEASE_NUMBER, number);
+        intent.putExtra(ReleaseEditorActivity.EXTRA_RELEASE_NUMBER, ReleaseEditorActivity.RELEASE_NEW);
         startActivityForResult(intent, ReleaseEditorActivity.EDIT_RELEASE_REQUEST);
     }
 

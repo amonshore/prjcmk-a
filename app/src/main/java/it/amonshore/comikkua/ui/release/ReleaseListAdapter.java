@@ -28,10 +28,10 @@ import se.emilsjolander.stickylistheaders.StickyListHeadersAdapter;
  */
 public class ReleaseListAdapter extends BaseAdapter implements StickyListHeadersAdapter {
 
-    private Context mContext;
-    private DataManager mDataManager;
+    private final Context mContext;
+    private final DataManager mDataManager;
     private List<ReleaseInfo> mReleaseInfos;
-    private LayoutInflater mInflater;
+    private final LayoutInflater mInflater;
     private boolean mGroupByMonth;
     private View.OnClickListener mOnNumberViewClickListener;
     private boolean mUseSingleComicsLayout;
@@ -45,15 +45,6 @@ public class ReleaseListAdapter extends BaseAdapter implements StickyListHeaders
         mDataManager = DataManager.getDataManager();
         mInflater = LayoutInflater.from(context);
    }
-
-    /**
-     *
-     * @param comics
-     * @return
-     */
-    public Release createNewRelease(Comics comics) {
-        return comics.createRelease(true);
-    }
 
     /**
      *
@@ -106,10 +97,6 @@ public class ReleaseListAdapter extends BaseAdapter implements StickyListHeaders
         }
         mReleaseInfos = new ArrayList<>(Arrays.asList(helper.getReleaseInfos()));
         return mReleaseInfos.size();
-    }
-
-    public View.OnClickListener getOnNumberViewClickListener() {
-        return mOnNumberViewClickListener;
     }
 
     /**

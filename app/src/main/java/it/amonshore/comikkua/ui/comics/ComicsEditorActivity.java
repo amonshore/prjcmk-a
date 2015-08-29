@@ -77,7 +77,7 @@ public class ComicsEditorActivity extends ActionBarActivity implements ItemPicke
         //
         mTxtPublisher = (FloatingLabelAutoCompleteTextView)findViewById(R.id.txt_editor_comics_publisher);
         mTxtPublisher.setInputWidgetText(mComics.getPublisher());
-        mTxtPublisher.setInputWidgetAdapter(new ArrayAdapter<String>(this,
+        mTxtPublisher.setInputWidgetAdapter(new ArrayAdapter<>(this,
                 android.R.layout.simple_list_item_1,
                 mDataManager.getPublishers()));
         //
@@ -107,7 +107,7 @@ public class ComicsEditorActivity extends ActionBarActivity implements ItemPicke
                         getString(android.R.string.cancel),
                         false,
                         source.getSelectedIndices(),
-                        new ArrayList<String>((Collection<String>) source.getAvailableItems()));
+                        new ArrayList<>(source.getAvailableItems()));
 
                 // Optionally, you can set a target fragment to get the notifications
                 // pickerFragment.setTargetFragment(MyFragment.this, 0);

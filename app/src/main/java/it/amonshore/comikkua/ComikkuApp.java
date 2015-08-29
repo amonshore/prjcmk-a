@@ -2,6 +2,8 @@ package it.amonshore.comikkua;
 
 import android.app.Application;
 
+import it.amonshore.comikkua.data.DataManager;
+
 //import com.google.android.gms.analytics.GoogleAnalytics;
 //import com.google.android.gms.analytics.HitBuilders;
 //import com.google.android.gms.analytics.Tracker;
@@ -32,6 +34,9 @@ public class ComikkuApp extends Application {
         super.onCreate();
 
         Utils.init(this);
+        //inizializzo il data manager e leggo i dati dal file
+        DataManager.init(this, null)
+            .readComics();
 
 //        analytics = GoogleAnalytics.getInstance(this);
 //        analytics.setLocalDispatchPeriod(1800);
