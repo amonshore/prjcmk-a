@@ -17,11 +17,20 @@ android {
     }
     buildTypes {
         release {
-            minifyEnabled false
+            minifyEnabled true
             proguardFiles getDefaultProguardFile('proguard-android.txt'), 'proguard-rules.pro'
         }
     }
     productFlavors {
+        beta {
+            minSdkVersion 19
+            applicationId 'it.amonshore.comikkua'
+            targetSdkVersion 21
+            versionCode 9
+            versionName 'v1.0.0-beta'
+        }
+        alpha {
+        }
     }
 }
 
