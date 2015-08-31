@@ -83,4 +83,7 @@
 
     <color name="comikku_empty_color_primary_dark">#E0E0E0</color>
 
+    <!-- colore divisore elementi lista -->
+    <color name="comikku_list_divider_color">#DDDDDD</color>
+
 </resources>

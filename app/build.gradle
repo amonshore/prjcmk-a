@@ -12,7 +12,7 @@ android {
         applicationId "it.amonshore.comikkua"
         minSdkVersion 19
         targetSdkVersion 21
-        versionCode 9
+        versionCode 10
         versionName 'v1.0.0-alpha'
     }
     buildTypes {
@@ -30,6 +30,11 @@ android {
             versionName 'v1.0.0-beta'
         }
         alpha {
+            minSdkVersion 19
+            applicationId 'it.amonshore.comikkua'
+            targetSdkVersion 21
+            versionCode 10
+            versionName 'v1.0.0-alpha'
         }
     }
 }
