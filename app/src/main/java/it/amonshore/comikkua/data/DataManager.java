@@ -23,10 +23,12 @@ import java.text.SimpleDateFormat;
 import java.util.Date;
 import java.util.HashSet;
 import java.util.Set;
+import java.util.TimeZone;
 import java.util.TreeMap;
 import java.util.concurrent.Semaphore;
 import java.util.concurrent.TimeUnit;
 
+import hirondelle.date4j.DateTime;
 import it.amonshore.comikkua.Utils;
 
 /**
@@ -115,6 +117,8 @@ public class DataManager extends Observable<ComicsObserver> {
     private final SimpleDateFormat mDateFormat;
     //
     private AsyncWriteHandler mWriteHandler;
+    //A0038
+    private long mLastReadDate;
 
     private DataManager(Context context, String userName) {
         mContext = context;
@@ -418,6 +422,17 @@ public class DataManager extends Observable<ComicsObserver> {
 
     /**
      *
+     */
+    public void updateBestRelease() {
+        synchronized (mSyncObj) {
+            for (long id : getComics()) {
+                updateBestRelease(id);
+            }
+        }
+    }
+
+    /**
+     *
      * @param id
      * @return
      */
@@ -476,6 +491,19 @@ public class DataManager extends Observable<ComicsObserver> {
                     }
                 }
                 mDataLoaded = true;
+                final TimeZone timeZone = TimeZone.getDefault();
+                mLastReadDate = DateTime.today(timeZone).getStartOfDay().getMilliseconds(timeZone);
+            }
+        } else {
+            //Utils.d("readComics: already loaded");
+            //A0038 rispetto all'ultima volta che ho letto i dati, è cambiato giorno?
+            //  se si è meglio aggiornare le best release
+            final TimeZone timeZone = TimeZone.getDefault();
+            final long today = DateTime.today(timeZone).getStartOfDay().getMilliseconds(timeZone);
+            if (today != mLastReadDate) {
+                //Utils.d("readComics: best release update needed!");
+                updateBestRelease();
+                mLastReadDate = today;
             }
         }
         return mComicsCache.size();
