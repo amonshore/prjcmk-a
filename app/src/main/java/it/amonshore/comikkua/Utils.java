@@ -146,7 +146,8 @@ public class Utils {
      * @param msg
      */
     public static void d(String msg) {
-        Log.d(LOG_TAG, msg);
+        if (BuildConfig.DEBUG)
+            Log.d(LOG_TAG, msg);
     }
 
     /**
@@ -155,7 +156,8 @@ public class Utils {
      * @param msg
      */
     public static void d(Class aClass, String msg) {
-        Log.d(aClass.getName(), msg);
+        if (BuildConfig.DEBUG)
+            Log.d(aClass.getName(), msg);
     }
 
     /**
@@ -164,7 +166,8 @@ public class Utils {
      * @param msg
      */
     public static void w(String msg) {
-        Log.w(LOG_TAG, msg);
+        if (BuildConfig.DEBUG)
+            Log.w(LOG_TAG, msg);
     }
 
     /**
@@ -174,7 +177,8 @@ public class Utils {
      * @param err
      */
     public static void e (String msg, Throwable err) {
-        Log.e(LOG_TAG, msg, err);
+        if (BuildConfig.DEBUG)
+            Log.e(LOG_TAG, msg, err);
     }
 
     /**
@@ -184,7 +188,8 @@ public class Utils {
      * @param err
      */
     public static void e(Class aClass, String msg, Throwable err) {
-        Log.e(aClass.getName(), msg, err);
+        if (BuildConfig.DEBUG)
+            Log.e(aClass.getName(), msg, err);
     }
 
     /**

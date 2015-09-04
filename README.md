@@ -17,3 +17,6 @@ Versione: v1.0.0-alpha (6)
 
 Versione: v1.0.0-alpha (7)
 - ricerca web del fumetto selezionato
+
+Versione: v1.0.0 (11)
+- produzione
