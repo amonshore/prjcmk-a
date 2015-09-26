@@ -45,6 +45,7 @@
         android:singleLine="false"
         android:ellipsize="end"
         android:layout_alignStart="@+id/txt_list_release_date"
+        android:layout_alignLeft="@+id/txt_list_release_date"
         android:gravity="top"
         android:minHeight="36dp" />
 

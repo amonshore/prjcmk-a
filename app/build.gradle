@@ -10,10 +10,10 @@ android {
     buildToolsVersion "21.1.2"
     defaultConfig {
         applicationId "it.amonshore.comikkua"
-        minSdkVersion 19
+        minSdkVersion 16
         targetSdkVersion 21
-        versionCode 10
-        versionName 'v1.0.0-alpha'
+        versionCode 12
+        versionName 'v1.0.1'
     }
     buildTypes {
         release {
@@ -22,27 +22,6 @@ android {
         }
     }
     productFlavors {
-        beta {
-            minSdkVersion 19
-            applicationId 'it.amonshore.comikkua'
-            targetSdkVersion 21
-            versionCode 10
-            versionName 'v1.0.0-beta'
-        }
-        alpha {
-            minSdkVersion 19
-            applicationId 'it.amonshore.comikkua'
-            targetSdkVersion 21
-            versionCode 10
-            versionName 'v1.0.0-alpha'
-        }
-        prod {
-            minSdkVersion 19
-            applicationId 'it.amonshore.comikkua'
-            targetSdkVersion 21
-            versionCode 11
-            versionName 'v1.0.0'
-        }
     }
 }
 
@@ -54,8 +33,8 @@ repositories {
 
 dependencies {
     compile fileTree(dir: 'libs', include: ['*.jar'])
-    compile 'com.android.support:appcompat-v7:22.0.0'
-    compile 'com.android.support:support-v4:22.0.0'
+    compile 'com.android.support:appcompat-v7:22.1.0'
+    compile 'com.android.support:support-v4:23.0.1'
     compile 'com.darwinsys:hirondelle-date4j:1.5.1'
     compile 'se.emilsjolander:stickylistheaders:2.7.0'
     compile 'com.github.clans:fab:1.5.0'

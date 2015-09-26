@@ -31,6 +31,7 @@
         android:singleLine="true"
         android:layout_alignTop="@+id/txt_list_release_name"
         android:layout_alignParentEnd="true"
+        android:layout_alignParentRight="true"
         android:layout_marginTop="12dp" />
 
     <TextView android:id="@+id/txt_list_release_name"
@@ -57,6 +58,7 @@
         android:singleLine="false"
         android:ellipsize="end"
         android:layout_alignStart="@+id/txt_list_release_name"
+        android:layout_alignLeft="@+id/txt_list_release_name"
         android:gravity="top"
         android:minHeight="36dp" />
 
