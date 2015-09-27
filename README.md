@@ -20,3 +20,7 @@ Versione: v1.0.0-alpha (7)
 
 Versione: v1.0.0 (11)
 - produzione
+
+Versione: v1.0.1 (12)
+- compatibilità con Android 4.1 (API 16)
+- risolti alcuni bug grafici con vecchie versioni di Android
