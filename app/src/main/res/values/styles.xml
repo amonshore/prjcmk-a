@@ -14,9 +14,6 @@
 
         <item name="android:fastScrollOverlayPosition">atThumb</item>
 
-        <!-- Colore di sfondo dell'action mode -->
-        <item name="android:actionModeBackground">@color/comikku_primary_color_dark</item>
-
         <!-- The primary branding color for the app. By default, this is the color applied to the
          action bar background. -->
         <item name="colorPrimary">@color/comikku_primary_color</item>
@@ -43,6 +40,10 @@
 
         <!-- The color applied to framework switch thumbs in their normal state. -->
         <!--<attr name="colorSwitchThumbNormal" format="color" />-->
+
+        <!-- Colore di sfondo dell'action mode -->
+        <item name="actionModeBackground">@color/comikku_primary_color_dark</item>
+        <item name="android:actionModeBackground">@color/comikku_primary_color_dark</item>
     </style>
 
     <!-- Toolbar -->

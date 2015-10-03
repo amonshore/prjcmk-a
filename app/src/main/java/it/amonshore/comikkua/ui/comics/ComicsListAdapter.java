@@ -237,6 +237,9 @@ public class ComicsListAdapter extends BaseAdapter implements SectionIndexer {
 
     @Override
     public long getItemId(int position) {
+        //A0048
+        if (position >= mSortedIds.size())
+            return position;
         return mSortedIds.get(position);
     }
 

@@ -13,6 +13,7 @@
         android:layout_width="wrap_content"
         android:layout_height="wrap_content"
         android:layout_marginStart="?android:attr/listPreferredItemPaddingStart"
+        android:layout_marginLeft="@dimen/list_item_padding_left"
         android:layout_marginTop="16dip"
         android:id="@+id/txt_list_release_header"
         android:textColor="@color/comikku_secondary_text"

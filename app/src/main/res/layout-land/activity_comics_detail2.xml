@@ -52,7 +52,8 @@
                     android:textStyle="bold"
                     android:gravity="right"
                     android:layout_marginBottom="4dp"
-                    android:layout_alignParentStart="true" />
+                    android:layout_alignParentStart="true"
+                    android:layout_alignParentLeft="true"/>
 
                 <TextView
                     android:id="@+id/txt_detail_comics_publisher"
@@ -66,7 +67,9 @@
                     android:singleLine="true"
                     android:gravity="right"
                     android:layout_alignParentStart="true"
+                    android:layout_alignParentLeft="true"
                     android:layout_toStartOf="@+id/txt_detail_comics_authors"
+                    android:layout_toLeftOf="@+id/txt_detail_comics_authors"
                     android:layout_marginRight="4dp" />
 
                 <TextView
@@ -80,7 +83,8 @@
                     android:singleLine="true"
                     android:gravity="right"
                     android:layout_alignTop="@+id/txt_detail_comics_publisher"
-                    android:layout_alignParentEnd="true" />
+                    android:layout_alignParentEnd="true"
+                    android:layout_alignParentRight="true" />
 
                 <TextView
                     android:id="@+id/txt_detail_comics_notes"
@@ -94,7 +98,8 @@
                     android:layout_below="@+id/txt_detail_comics_authors"
                     android:gravity="right"
                     android:singleLine="true"
-                    android:layout_alignParentStart="true" />
+                    android:layout_alignParentStart="true"
+                    android:layout_alignParentLeft="true"/>
 
             </RelativeLayout>
 
@@ -107,6 +112,7 @@
             android:id="@+id/frg_release_list"
             tools:layout="@layout/fragment_releases_list"
             android:layout_alignParentStart="true"
+            android:layout_alignParentLeft="true"
             android:layout_below="@+id/comics_info"
             android:layout_alignParentBottom="true" />
 
