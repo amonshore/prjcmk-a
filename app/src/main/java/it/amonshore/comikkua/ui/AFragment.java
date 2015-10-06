@@ -43,7 +43,7 @@ public abstract class AFragment extends Fragment implements ComicsObserver {
     public void onChanged(int cause) {
         if (this.isResumed() || (cause & DataManager.CAUSE_SAFE) == DataManager.CAUSE_SAFE) {
             onDataChanged(cause, false);
-            mChangedCause = 0;
+            mChangedCause = DataManager.CAUSE_EMPTY;
         } else {
             Utils.d(this.getClass(), "onChanged posponed " + cause);
             mChangedCause = cause;
@@ -74,9 +74,9 @@ public abstract class AFragment extends Fragment implements ComicsObserver {
     @Override
     public void onResume() {
         super.onResume();
-        if (mChangedCause != 0) {
+        if (mChangedCause != DataManager.CAUSE_EMPTY) {
             onDataChanged(mChangedCause, true);
-            mChangedCause = 0;
+            mChangedCause = DataManager.CAUSE_EMPTY;
         }
     }
 

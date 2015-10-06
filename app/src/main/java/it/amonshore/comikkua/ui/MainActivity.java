@@ -190,12 +190,8 @@ public class MainActivity extends ActionBarActivity implements SharedPreferences
             case DataManager.CAUSE_COMICS_CHANGED:
             case DataManager.CAUSE_RELEASE_ADDED:
             case DataManager.CAUSE_RELEASE_CHANGED:
-                Utils.d(this.getClass(), "call writeComics");
-                mDataManager.writeComics();
-                break;
             case DataManager.CAUSE_COMICS_REMOVED:
             case DataManager.CAUSE_RELEASE_REMOVED:
-                //TODO ho paura a gestirle per via dell'undo
                 break;
         }
     }

@@ -79,10 +79,15 @@ public class ComicsDetailActivity extends ActionBarActivity {
         if (resultCode == Activity.RESULT_OK) {
             if (requestCode == ComicsEditorActivity.EDIT_COMICS_REQUEST) {
                 updateHeader();
+                //A0049
+                mDataManager.updateData(DataManager.ACTION_UPD, mComics.getId(), DataManager.NO_RELEASE);
                 mDataManager.notifyChanged(DataManager.CAUSE_COMICS_CHANGED);
             } else if (requestCode == ReleaseEditorActivity.EDIT_RELEASE_REQUEST) {
                 mDataManager.updateBestRelease(mComics.getId());
                 mDataManager.notifyChanged(DataManager.CAUSE_RELEASE_ADDED);
+                //A0049
+                int releaseNumber = data.getIntExtra(ReleaseEditorActivity.EXTRA_RELEASE_NUMBER, DataManager.NO_RELEASE);
+                mDataManager.updateData(DataManager.ACTION_ADD, mComics.getId(), releaseNumber);
             }
         }
     }

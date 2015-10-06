@@ -1,8 +1,9 @@
 package it.amonshore.comikkua.data;
 
 import android.content.Context;
+import android.database.Cursor;
 import android.database.Observable;
-import android.net.Uri;
+import android.database.sqlite.SQLiteDatabase;
 import android.os.Environment;
 import android.text.TextUtils;
 import android.util.JsonWriter;
@@ -22,11 +23,12 @@ import java.text.ParseException;
 import java.text.SimpleDateFormat;
 import java.util.Date;
 import java.util.HashSet;
+import java.util.Queue;
 import java.util.Set;
 import java.util.TimeZone;
 import java.util.TreeMap;
+import java.util.concurrent.ConcurrentLinkedQueue;
 import java.util.concurrent.Semaphore;
-import java.util.concurrent.TimeUnit;
 
 import hirondelle.date4j.DateTime;
 import it.amonshore.comikkua.Utils;
@@ -36,6 +38,11 @@ import it.amonshore.comikkua.Utils;
  */
 public class DataManager extends Observable<ComicsObserver> {
 
+    public final static int ACTION_ADD = 1;
+    public final static int ACTION_UPD = 2;
+    public final static int ACTION_DEL = 3;
+
+    public static final int CAUSE_EMPTY = 0;
     public static final int CAUSE_SAFE = 1;
     public static final int CAUSE_LOADING = 1 << 1;
     public static final int CAUSE_SETTINGS_CHANGED = 1 << 2;
@@ -49,6 +56,9 @@ public class DataManager extends Observable<ComicsObserver> {
     public static final int CAUSE_RELEASE_REMOVED = 1 << 10;
     public static final int CAUSE_RELEASES_MODE_CHANGED = 1 << 11;
     public static final int CAUSE_CREATED = 1 << 12;
+
+    public static final long NO_COMICS = -1;
+    public static final int NO_RELEASE = -1;
 
     private final static String FILE_NAME = "data.json";
     //private final static String FILE_NAME = "USER_backup.json";
@@ -119,6 +129,8 @@ public class DataManager extends Observable<ComicsObserver> {
     private AsyncWriteHandler mWriteHandler;
     //A0038
     private long mLastReadDate;
+    //A0049
+    private DBHelper mDBHelper;
 
     private DataManager(Context context, String userName) {
         mContext = context;
@@ -132,6 +144,8 @@ public class DataManager extends Observable<ComicsObserver> {
         //
         mUndoComics = new UndoHelper<>();
         mUndoRelease = new UndoHelper<>();
+        //
+        mDBHelper = new DBHelper(context);
     }
 
     private boolean isExternalStorageWritable() {
@@ -140,7 +154,7 @@ public class DataManager extends Observable<ComicsObserver> {
     }
 
     private File getDataFile() {
-        String fileName = Utils.nvl(mUserName, "") + FILE_NAME;
+        String fileName = FILE_NAME;
         if (mExternalStorage) {
             return new File(mContext.getExternalFilesDir(null), fileName);
         } else {
@@ -149,7 +163,7 @@ public class DataManager extends Observable<ComicsObserver> {
     }
 
     private File getBackupDataFile() {
-        String fileName = Utils.nvl(mUserName, "") + FILE_BACKUP;
+        String fileName = FILE_BACKUP;
         if (mExternalStorage) {
             return new File(mContext.getExternalFilesDir(null), fileName);
         } else {
@@ -283,7 +297,7 @@ public class DataManager extends Observable<ComicsObserver> {
         writer.endObject();
     }
 
-    private void save() {
+    private void saveComicsToFile() {
         if (!isDataLoaded())
             return;
 
@@ -453,47 +467,91 @@ public class DataManager extends Observable<ComicsObserver> {
     }
 
     /**
-     * Legge i dati
+     * Leggi i dati
      *
      * @return  numero di comics letti
      */
     public int readComics() {
         if (mComicsCache == null || !mDataLoaded) {
-            synchronized (mSyncObj) {
-                BufferedReader br = null;
-                File file = getDataFile();
+            SQLiteDatabase database = null;
+            try {
+                database = mDBHelper.getReadableDatabase();
+                Cursor curComics = null, curReleases = null;
                 mComicsCache = new TreeMap<>();
                 mPublishers = new HashSet<>();
                 mBestReleases = new TreeMap<>();
-                Utils.d("readComics " + file.getAbsolutePath());
-                if (file.exists()) {
-                    try {
-                        StringBuilder sb = new StringBuilder();
-                        br = new BufferedReader(new FileReader(file));
-                        String line;
-                        while ((line = br.readLine()) != null) {
-                            sb.append(line);
-                            sb.append(System.lineSeparator());
+                try {
+                    //estraggo tutti i comics dell'utente
+                    curComics = database.query(DBHelper.ComicsTable.NAME,
+                            //tutte le colonne
+                            DBHelper.ComicsTable.COLUMNS,
+                            //filtro sull'utente
+                            DBHelper.ComicsTable.COL_USER + " = '" + mUserName + "'",
+                            null,
+                            null,
+                            null,
+                            //order by
+                            DBHelper.ComicsTable.COL_ID,
+                            null);
+                    //scorro il cursore dei comics
+                    while (curComics.moveToNext()) {
+                        Comics comics = new Comics(curComics.getLong(DBHelper.ComicsTable.IDX_ID));
+                        comics.setName(curComics.getString(DBHelper.ComicsTable.IDX_NAME));
+                        comics.setSeries(curComics.getString(DBHelper.ComicsTable.IDX_SERIES));
+                        comics.setPublisher(curComics.getString(DBHelper.ComicsTable.IDX_PUBLISHER));
+                        comics.setAuthors(curComics.getString(DBHelper.ComicsTable.IDX_AUTHORS));
+                        comics.setPrice(curComics.getDouble(DBHelper.ComicsTable.IDX_PRICE));
+                        comics.setPeriodicity(curComics.getString(DBHelper.ComicsTable.IDX_PERIODICITY));
+                        comics.setReserved(curComics.getString(DBHelper.ComicsTable.IDX_RESERVED) == TRUE);
+                        comics.setNotes(curComics.getString(DBHelper.ComicsTable.IDX_NOTES));
+                        //estraggo tutte le release per il comics
+                        curReleases = database.query(DBHelper.ReleasesTable.NAME,
+                                //tutte le colonne
+                                DBHelper.ReleasesTable.COLUMNS,
+                                //filtro sull'utente
+                                DBHelper.ReleasesTable.COL_USER + " = '" + mUserName + "' and " +
+                                    DBHelper.ReleasesTable.COL_COMICS_ID + " = " + comics.getId(),
+                                null,
+                                null,
+                                null,
+                                //order by
+                                DBHelper.ReleasesTable.COL_NUMBER,
+                                null);
+                        while (curReleases.moveToNext()) {
+                            Release release = new Release(comics.getId());
+                            release.setNumber(curReleases.getInt(DBHelper.ReleasesTable.IDX_NUMBER));
+                            release.setDate(Utils.parseDbRelease(curReleases.getString(DBHelper.ReleasesTable.IDX_DATA)));
+                            release.setPrice(curReleases.getDouble(DBHelper.ReleasesTable.IDX_PRICE));
+                            release.setFlags(curReleases.getInt(DBHelper.ReleasesTable.IDX_FLAGS));
+                            release.setNotes(curReleases.getString(DBHelper.ReleasesTable.IDX_NOTES));
+                            comics.putRelease(release);
                         }
-                        if (sb.length() > 0) {
-                            parseJSON(sb.toString());
-                        } else {
-                            Utils.w(FILE_NAME + " is empty");
-                        }
-                    } catch (IOException ioex) {
-                        Utils.e("readComics", ioex);
-                    } finally {
-                        if (br != null) try {
-                            br.close();
-                        } catch (IOException ioex) {
-                            //
-                        }
+                        curReleases.close();
+                        curReleases = null;
+                        //
+                        Utils.d(this.getClass(), "A0049 read " + comics.getName() + " -> " + comics.getId());
+                        mComicsCache.put(comics.getId(), comics);
+                        putPublisher(comics.getPublisher());
+                        updateBestRelease(comics.getId());
+                    }
+                } finally {
+                    if (curComics != null) {
+                        curComics.close();
+                    }
+                    if (curReleases != null) {
+                        curReleases.close();
                     }
                 }
-                mDataLoaded = true;
-                final TimeZone timeZone = TimeZone.getDefault();
-                mLastReadDate = DateTime.today(timeZone).getStartOfDay().getMilliseconds(timeZone);
+            } catch (Exception ex) {
+                Utils.e(this.getClass(), "Read data", ex);
+            } finally {
+                if (database != null) {
+                    database.close();
+                }
             }
+            mDataLoaded = true;
+            final TimeZone timeZone = TimeZone.getDefault();
+            mLastReadDate = DateTime.today(timeZone).getStartOfDay().getMilliseconds(timeZone);
         } else {
             //Utils.d("readComics: already loaded");
             //A0038 rispetto all'ultima volta che ho letto i dati, è cambiato giorno?
@@ -505,6 +563,50 @@ public class DataManager extends Observable<ComicsObserver> {
                 updateBestRelease();
                 mLastReadDate = today;
             }
+        }
+        return mComicsCache.size();
+    }
+
+    /**
+     * Legge i dati da file
+     *
+     * @return  numero di comics letti
+     */
+    public int readComicsFromFile() {
+        synchronized (mSyncObj) {
+            BufferedReader br = null;
+            File file = getDataFile();
+            mComicsCache = new TreeMap<>();
+            mPublishers = new HashSet<>();
+            mBestReleases = new TreeMap<>();
+            Utils.d("readComics " + file.getAbsolutePath());
+            if (file.exists()) {
+                try {
+                    StringBuilder sb = new StringBuilder();
+                    br = new BufferedReader(new FileReader(file));
+                    String line;
+                    while ((line = br.readLine()) != null) {
+                        sb.append(line);
+//                            sb.append(System.lineSeparator());
+                    }
+                    if (sb.length() > 0) {
+                        parseJSON(sb.toString());
+                    } else {
+                        Utils.w(FILE_NAME + " is empty");
+                    }
+                } catch (IOException ioex) {
+                    Utils.e("readComics", ioex);
+                } finally {
+                    if (br != null) try {
+                        br.close();
+                    } catch (IOException ioex) {
+                        //
+                    }
+                }
+            }
+            mDataLoaded = true;
+            final TimeZone timeZone = TimeZone.getDefault();
+            mLastReadDate = DateTime.today(timeZone).getStartOfDay().getMilliseconds(timeZone);
         }
         return mComicsCache.size();
     }
@@ -548,24 +650,6 @@ public class DataManager extends Observable<ComicsObserver> {
     }
 
     /**
-     * Salva i dati
-     */
-    public void writeComics() {
-        writeComics(false);
-    }
-
-    /**
-     * Salva i dati
-     *
-     * @param flush se true i dati verranno salvati subito
-     */
-    public void writeComics(boolean flush) {
-        if (mWriteHandler != null) {
-            mWriteHandler.appendRequest(flush);
-        }
-    }
-
-    /**
      *
      * @return
      */
@@ -575,7 +659,7 @@ public class DataManager extends Observable<ComicsObserver> {
 
     /**
      *
-     * @param cause
+     * @param cause la causa del cambiamento (vedi DataManager.CAUSE_xxx)
      */
     public void notifyChanged(int cause) {
         Utils.d(this.getClass(), "notifyChanged " + cause);
@@ -594,8 +678,8 @@ public class DataManager extends Observable<ComicsObserver> {
 
     /**
      *
-     * @param cause
-     * @param source
+     * @param cause la causa del cambiamento (vedi DataManager.CAUSE_xxx)
+     * @param source    per questo osservatore non verrà notificato il cambiamento
      */
     public void notifyChangedButMe(int cause, ComicsObserver source) {
         Utils.d(this.getClass(), "notifyChangedButMe " + cause);
@@ -606,6 +690,14 @@ public class DataManager extends Observable<ComicsObserver> {
                 mObservers.get(i).onChanged(cause);
             }
         }
+    }
+
+    public void updateData(int action, long comicsId, int releaseNumber) {
+        //TODO enqueue action
+        //  attenzione nelle delete: quasi sicuramente a questo punto l'istanza da rimuovere dal DB sarà già stata rimossa dalla cache
+        //  mentre per i nuovi dati dovrebbero già essere presenti nella cache
+        Utils.d(this.getClass(), String.format("A0049 act %s, cid %s, rel %s", action, comicsId, releaseNumber));
+        mWriteHandler.appendRequest(new AsyncActionRequest(action, comicsId, releaseNumber));
     }
 
     /**
@@ -645,35 +737,43 @@ public class DataManager extends Observable<ComicsObserver> {
         stopWriteHandler();
     }
 
+    private static final class AsyncActionRequest {
+        public int Action;
+        public long ComicsId;
+        public int ReleaseNumber;
+
+        public AsyncActionRequest(int action, long comicsId, int releaseNumber) {
+            this.Action = action;
+            this.ComicsId = comicsId;
+            this.ReleaseNumber = releaseNumber;
+        }
+    }
+
     private class AsyncWriteHandler {
 
         private Semaphore mMainLoopHandler;
-        private Semaphore mNoLongerHandler;
-        private final long mTimeout = 1000;
         private boolean mCancel;
-        private boolean mFlush;
+        //A0049
+        private Queue<AsyncActionRequest> mQueue;
 
-        public void appendRequest() {
-            appendRequest(false);
+        public AsyncWriteHandler() {
+            mQueue = new ConcurrentLinkedQueue<>();
         }
 
-        public void appendRequest(boolean flush) {
-            Utils.d(this.getClass(), "appendRequest " + flush);
-            mFlush = flush;
+        public void appendRequest(AsyncActionRequest request) {
+            mQueue.add(request);
             mMainLoopHandler.release();
-            mNoLongerHandler.release();
         }
 
         public void cancel() {
             Utils.d(this.getClass(), "cancel");
             mCancel = true ;
-            appendRequest();
+            mMainLoopHandler.release();
         }
 
         public void start() {
             mCancel = false;
             mMainLoopHandler = new Semaphore(0);
-            mNoLongerHandler = new Semaphore(0);
 
             new Thread(new Runnable() {
                 @Override
@@ -684,14 +784,39 @@ public class DataManager extends Observable<ComicsObserver> {
                             mMainLoopHandler.drainPermits();
                             //attendo un tempo indefinito
                             mMainLoopHandler.acquire();
-//                            Utils.d(this.getClass(), "*** aquired");
-                            //finchè ci sono richieste ciclo
-                            while (!mFlush && !mCancel && mNoLongerHandler.tryAcquire(mTimeout, TimeUnit.MILLISECONDS)) {
-                            }
-                            mFlush = false;
                             Utils.d(this.getClass(), "*** saving");
-                            //quando scade salvo
-                            DataManager.this.save();
+                            SQLiteDatabase database = null;
+                            try {
+                                database = DataManager.this.mDBHelper.getWritableDatabase();
+                                AsyncActionRequest request;
+                                while ((request = mQueue.poll()) != null) {
+                                    if (request.ReleaseNumber == DataManager.NO_RELEASE) {  //comics
+                                        if (request.Action == DataManager.ACTION_ADD) {
+                                            writeComics(database, DataManager.this.getComics(request.ComicsId), true);
+                                        } else if (request.Action == DataManager.ACTION_UPD) {
+                                            writeComics(database, DataManager.this.getComics(request.ComicsId), false);
+                                        } else if (request.Action == DataManager.ACTION_DEL) {
+                                            deleteComics(database, request.ComicsId);
+                                        }
+                                    } else {    //release
+                                        if (request.Action == DataManager.ACTION_ADD) {
+                                            writeRelease(database, DataManager.this.getComics(request.ComicsId)
+                                                    .getRelease(request.ReleaseNumber), true);
+                                        } else if (request.Action == DataManager.ACTION_UPD) {
+                                            writeRelease(database, DataManager.this.getComics(request.ComicsId)
+                                                    .getRelease(request.ReleaseNumber), false);
+                                        } else if (request.Action == DataManager.ACTION_DEL) {
+                                            deleteRelease(database, request.ComicsId, request.ReleaseNumber);
+                                        }
+                                    }
+                                }
+                            } catch (Exception ex) {
+                                Utils.e(this.getClass(), "Write data", ex);
+                            } finally {
+                                if (database != null) {
+                                    database.close();
+                                }
+                            }
                         }
                     } catch (InterruptedException iex) {
                         Utils.e("async save main loop", iex);
@@ -699,6 +824,55 @@ public class DataManager extends Observable<ComicsObserver> {
                 }
             }).start();
         }
+
+        private void writeComics(SQLiteDatabase database, Comics comics, boolean isNew) {
+            if (isNew) {
+                long res = database.insert(DBHelper.ComicsTable.NAME, null,
+                        DBHelper.ComicsTable.getContentValues(comics, DataManager.this.mUserName));
+                Utils.d(this.getClass(), "A0049 write new comics " + comics.getName() + " -> " + (res >= 0));
+                for (Release release : comics.getReleases()) {
+                    writeRelease(database, release, true);
+                }
+            } else {
+                long res = database.replace(DBHelper.ComicsTable.NAME, null,
+                        DBHelper.ComicsTable.getContentValues(comics, DataManager.this.mUserName));
+                Utils.d(this.getClass(), "A0049 write comics " + comics.getName() + " -> " + (res >= 0));
+            }
+        }
+
+        private void deleteComics(SQLiteDatabase database, long comicsId) {
+            int res1 = database.delete(DBHelper.ReleasesTable.NAME,
+                    DBHelper.ReleasesTable.COL_COMICS_ID + " = " + comicsId + " and " +
+                            DBHelper.ReleasesTable.COL_USER + " = '" + DataManager.this.mUserName + "'",
+                    null);
+            int res2 = database.delete(DBHelper.ComicsTable.NAME,
+                    DBHelper.ComicsTable.COL_ID + " = " + comicsId + " and " +
+                        DBHelper.ComicsTable.COL_USER + " = '" + DataManager.this.mUserName + "'",
+                    null);
+            Utils.d(this.getClass(), "A0049 delete comics " + comicsId + " -> " + res2 + "(" + res1 + ")");
+        }
+
+        private void writeRelease(SQLiteDatabase database, Release release, boolean isNew) {
+            if (isNew) {
+                long res = database.insert(DBHelper.ReleasesTable.NAME, null,
+                        DBHelper.ReleasesTable.getContentValues(release, DataManager.this.mUserName));
+                Utils.d(this.getClass(), "A0049 write new release " + release.getNumber() + " -> " + (res >= 0));
+            } else {
+                long res = database.replace(DBHelper.ReleasesTable.NAME, null,
+                        DBHelper.ReleasesTable.getContentValues(release, DataManager.this.mUserName));
+                Utils.d(this.getClass(), "A0049 write comics " + release.getNumber() + " -> " + (res >= 0));
+            }
+        }
+
+        private void deleteRelease(SQLiteDatabase database, long comicsId, int releaseNumber) {
+            int res = database.delete(DBHelper.ReleasesTable.NAME,
+                    DBHelper.ReleasesTable.COL_COMICS_ID + " = " + comicsId + " and " +
+                            DBHelper.ReleasesTable.COL_USER + " = '" + DataManager.this.mUserName + "' and " +
+                            DBHelper.ReleasesTable.COL_NUMBER + " = " + releaseNumber,
+                    null);
+            Utils.d(this.getClass(), "A0049 delete release " + releaseNumber + " -> " + res);
+        }
+
     }
 
 }

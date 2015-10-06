@@ -4,45 +4,21 @@ import android.app.Application;
 
 import it.amonshore.comikkua.data.DataManager;
 
-//import com.google.android.gms.analytics.GoogleAnalytics;
-//import com.google.android.gms.analytics.HitBuilders;
-//import com.google.android.gms.analytics.Tracker;
-
 /**
  * Created by Narsenico on 25/06/2015.
  */
 public class ComikkuApp extends Application {
-//A0040
-//    public final static String CATEGORY_UI = "UI";
-//    public final static String ACTION_RELEASE_VIEW_START = "Release View on Start";
-//    public final static String ACTION_RELEASE_VIEW_CHANGED = "Release View Changed";
-//    public final static String LABEL_RELEASE_VIEW = "Release View";
-//
-//    public static GoogleAnalytics analytics;
-//    public static Tracker tracker;
-
-//    public static void trackEvent(String category, String action, String label, long value) {
-//        tracker.send(new HitBuilders.EventBuilder()
-//                .setCategory(category)
-//                .setAction(action)
-//                .setLabel(label)
-//                .setValue(value).build());
-//    }
 
     @Override
     public void onCreate() {
         super.onCreate();
 
         Utils.init(this);
-        //inizializzo il data manager e leggo i dati dal file
-        DataManager.init(this, null)
+        //inizializzo il data manager e leggo i dati
+        //TODO ricavare il nome dell'utente dalle preferenze, se non c'è usare default
+        DataManager.init(this, "default")
             .readComics();
 
-//        analytics = GoogleAnalytics.getInstance(this);
-//        analytics.setLocalDispatchPeriod(1800);
-//        tracker = analytics.newTracker("UA-59687686-2");
-//        tracker.enableExceptionReporting(true);
-//        tracker.enableAdvertisingIdCollection(true);
-//        tracker.enableAutoActivityTracking(true);
+        //TODO A0049 se il database è vuoto importare i dati da file (se esiste)
     }
 }

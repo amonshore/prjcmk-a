@@ -22,4 +22,8 @@
         android:key="pref_restore_now"
         android:title="@string/pref_restore_now_title" />
 
+    <Preference
+        android:key="pref_load_file"
+        android:title="Read data from file" />
+
 </PreferenceScreen>

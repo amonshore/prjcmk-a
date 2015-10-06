@@ -65,6 +65,15 @@ public class SettingsActivity extends ActionBarActivity {
                     return true;
                 }
             });
+            //
+            findPreference("pref_load_file").setOnPreferenceClickListener(new Preference.OnPreferenceClickListener() {
+                @Override
+                public boolean onPreferenceClick(Preference preference) {
+                    int count = DataManager.getDataManager().readComicsFromFile();
+                    Toast.makeText(getActivity(), "Comics from file: " + count, Toast.LENGTH_SHORT).show();
+                    return true;
+                }
+            });
         }
 
         private void updateBackupFileInfo() {

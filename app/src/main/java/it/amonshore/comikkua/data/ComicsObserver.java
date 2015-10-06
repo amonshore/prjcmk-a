@@ -7,7 +7,7 @@ public interface ComicsObserver {
 
     /**
      *
-     * @param cause
+     * @param cause la causa del cambiamento (vedi DataManager.CAUSE_xxx)
      */
     void onChanged(int cause);
 
