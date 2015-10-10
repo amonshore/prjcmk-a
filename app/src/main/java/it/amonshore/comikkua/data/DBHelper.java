@@ -18,6 +18,9 @@ public class DBHelper extends SQLiteOpenHelper {
     public static final int DATABASE_VERSION = 2;
     public static final String DATABASE_NAME = "comikkua.db";
 
+    public final static String TRUE = "T";
+    public final static String FALSE = "F";
+
     public static final class ComicsTable {
         public static final String NAME = "tComics";
         public static final String COL_ID = "_id";
@@ -61,7 +64,7 @@ public class DBHelper extends SQLiteOpenHelper {
             cv.put(COL_AUTHORS, comics.getAuthors());
             cv.put(COL_PRICE, comics.getPrice());
             cv.put(COL_PERIODICITY, comics.getPeriodicity());
-            cv.put(COL_RESERVED, comics.isReserved() ? "T" : "F");
+            cv.put(COL_RESERVED, comics.isReserved() ? TRUE : FALSE);
             cv.put(COL_NOTES, comics.getNotes());
             return cv;
         }

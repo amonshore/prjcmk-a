@@ -26,4 +26,8 @@
         android:key="pref_load_file"
         android:title="Read data from file" />
 
+    <Preference
+        android:key="pref_clear_data"
+        android:title="Remove all data" />
+
 </PreferenceScreen>

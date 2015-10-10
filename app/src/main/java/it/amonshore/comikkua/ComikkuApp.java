@@ -16,9 +16,8 @@ public class ComikkuApp extends Application {
         Utils.init(this);
         //inizializzo il data manager e leggo i dati
         //TODO ricavare il nome dell'utente dalle preferenze, se non c'è usare default
-        DataManager.init(this, "default")
-            .readComics();
-
-        //TODO A0049 se il database è vuoto importare i dati da file (se esiste)
+        DataManager
+                .init(this, "default")
+                .readComics();
     }
 }

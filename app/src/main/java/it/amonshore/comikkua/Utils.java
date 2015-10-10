@@ -47,7 +47,7 @@ public class Utils {
     }
 
     public static String formatDbRelease(Date date) {
-        return SDF_DB_RELASE.format(date);
+        return date == null ? null : SDF_DB_RELASE.format(date);
     }
 
     public static Date parseDbRelease(String date) {
@@ -228,24 +228,24 @@ public class Utils {
         return date.minusDays(day);
     }
 
-    /**
-     *
-     * @param source
-     * @param dest
-     * @throws IOException
-     */
-    public static void copyFile(File source, File dest) throws IOException {
-        if (source.exists()) {
-            try (FileOutputStream fw = new FileOutputStream(dest)) {
-                try (FileInputStream fr = new FileInputStream(source)) {
-                    byte[] buff = new byte[1024];
-                    int nn;
-                    while ((nn = fr.read(buff, 0, buff.length)) > 0) {
-                        fw.write(buff, 0, nn);
-                    }
-                }
-            }
-        }
-    }
+//    /**
+//     *
+//     * @param source
+//     * @param dest
+//     * @throws IOException
+//     */
+//    public static void copyFile(File source, File dest) throws IOException {
+//        if (source.exists()) {
+//            try (FileOutputStream fw = new FileOutputStream(dest)) {
+//                try (FileInputStream fr = new FileInputStream(source)) {
+//                    byte[] buff = new byte[1024];
+//                    int nn;
+//                    while ((nn = fr.read(buff, 0, buff.length)) > 0) {
+//                        fw.write(buff, 0, nn);
+//                    }
+//                }
+//            }
+//        }
+//    }
 
 }
