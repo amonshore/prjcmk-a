@@ -9,13 +9,16 @@ import java.util.Date;
  */
 public class Release {
 
+    public final static int FLAG_NONE = 0;
+    public final static int FLAG_REMINDER = 1;
+    public final static int FLAG_ORDERED = 2;
+    public final static int FLAG_PURCHASED = 4;
+
     private final long comicsId;
     private int number;
     private Date date;
     private double price;
-    private boolean reminder;
-    private boolean ordered;
-    private boolean purchased;
+    private int flags;
     private String notes;
 
     protected Release(long comicsId) {
@@ -52,31 +55,49 @@ public class Release {
     }
 
     public boolean isReminder() {
-        return reminder;
+        return (flags & FLAG_REMINDER) == FLAG_REMINDER;
     }
 
     public void setReminder(boolean reminder) {
-        this.reminder = reminder;
+        if (reminder)
+            this.flags |= FLAG_REMINDER;
+        else
+            this.flags &= ~FLAG_REMINDER;
     }
 
     public boolean isOrdered() {
-        return ordered;
+        return (flags & FLAG_ORDERED) == FLAG_ORDERED;
     }
 
     public void setOrdered(boolean ordered) {
-        this.ordered = ordered;
+        if (ordered)
+            this.flags |= FLAG_ORDERED;
+        else
+            this.flags &= ~FLAG_ORDERED;
     }
 
     public boolean isPurchased() {
-        return purchased;
+        return (flags & FLAG_PURCHASED) == FLAG_PURCHASED;
     }
 
     public void setPurchased(boolean purchased) {
-        this.purchased = purchased;
+        if (purchased)
+            this.flags |= FLAG_PURCHASED;
+        else
+            this.flags &= ~FLAG_PURCHASED;
     }
 
     public boolean togglePurchased() {
-        return (this.purchased = !this.purchased);
+        setPurchased(!isPurchased());
+        return isPurchased();
+    }
+
+    public int getFlags() {
+        return flags;
+    }
+
+    public void setFlags(int flags) {
+        this.flags = flags;
     }
 
     public String getNotes() {

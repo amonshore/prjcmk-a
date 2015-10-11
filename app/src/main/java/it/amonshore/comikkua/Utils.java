@@ -8,6 +8,7 @@ import java.io.File;
 import java.io.FileInputStream;
 import java.io.FileOutputStream;
 import java.io.IOException;
+import java.text.ParseException;
 import java.text.SimpleDateFormat;
 import java.util.Date;
 import java.util.Locale;
@@ -24,11 +25,13 @@ public class Utils {
     private static SimpleDateFormat SDF_COMICS;
     private static SimpleDateFormat SDF_RELEASE;
     private static SimpleDateFormat SDF_RELEASE_LONG;
+    private static SimpleDateFormat SDF_DB_RELASE;
 
     public static void init(Context context) {
         SDF_COMICS = new SimpleDateFormat(context.getString(R.string.format_comics_date), Locale.getDefault());
         SDF_RELEASE = new SimpleDateFormat(context.getString(R.string.format_release_date), Locale.getDefault());
         SDF_RELEASE_LONG = new SimpleDateFormat(context.getString(R.string.format_release_longdate), Locale.getDefault());
+        SDF_DB_RELASE = new SimpleDateFormat("yyyy-MM-dd");
     }
 
     public static String formatComicsDate(Date date) {
@@ -41,6 +44,23 @@ public class Utils {
 
     public static String formatReleaseLongDate(Date date) {
         return SDF_RELEASE_LONG.format(date);
+    }
+
+    public static String formatDbRelease(Date date) {
+        return date == null ? null : SDF_DB_RELASE.format(date);
+    }
+
+    public static Date parseDbRelease(String date) {
+        if (isNullOrEmpty(date)) {
+            return null;
+        } else {
+            try {
+                return SDF_DB_RELASE.parse(date);
+            } catch (ParseException pex) {
+                Log.e("Utils", "Error parsing " + date, pex);
+                return null;
+            }
+        }
     }
 
     public static int indexOf(String[] array, String value, int def) {
@@ -208,24 +228,24 @@ public class Utils {
         return date.minusDays(day);
     }
 
-    /**
-     *
-     * @param source
-     * @param dest
-     * @throws IOException
-     */
-    public static void copyFile(File source, File dest) throws IOException {
-        if (source.exists()) {
-            try (FileOutputStream fw = new FileOutputStream(dest)) {
-                try (FileInputStream fr = new FileInputStream(source)) {
-                    byte[] buff = new byte[1024];
-                    int nn;
-                    while ((nn = fr.read(buff, 0, buff.length)) > 0) {
-                        fw.write(buff, 0, nn);
-                    }
-                }
-            }
-        }
-    }
+//    /**
+//     *
+//     * @param source
+//     * @param dest
+//     * @throws IOException
+//     */
+//    public static void copyFile(File source, File dest) throws IOException {
+//        if (source.exists()) {
+//            try (FileOutputStream fw = new FileOutputStream(dest)) {
+//                try (FileInputStream fr = new FileInputStream(source)) {
+//                    byte[] buff = new byte[1024];
+//                    int nn;
+//                    while ((nn = fr.read(buff, 0, buff.length)) > 0) {
+//                        fw.write(buff, 0, nn);
+//                    }
+//                }
+//            }
+//        }
+//    }
 
 }

@@ -129,6 +129,7 @@ public class ComicsListFragment extends AFragment {
 
             @Override
             public boolean onActionItemClicked(ActionMode mode, MenuItem item) {
+                final DataManager dataManager = DataManager.getDataManager();
 //                Utils.d("onActionItemClicked " + item.getTitle());
                 //risponde alla selezione di una azione del menu_comics_cab
                 long menuId = item.getItemId();
@@ -142,8 +143,10 @@ public class ComicsListFragment extends AFragment {
 //                    new RemoveComicsAsyncTask().execute(lgs);
                     for (int ii = ags.length - 1; ii >= 0; ii--) {
                         mAdapter.remove(ags[ii]);
+                        //A0049
+                        dataManager.updateData(DataManager.ACTION_DEL, ags[ii], DataManager.NO_RELEASE);
                     }
-                    getDataManager().notifyChanged(DataManager.CAUSE_COMICS_REMOVED);
+                    dataManager.notifyChanged(DataManager.CAUSE_COMICS_REMOVED);
                     finishActionMode();
                     return true;
                 } else if (menuId == R.id.action_comics_share) {
@@ -151,7 +154,7 @@ public class ComicsListFragment extends AFragment {
                     long[] ags = mListView.getCheckedItemIds();
                     String[] rows = new String[ags.length];
                     for (int ii = 0; ii < rows.length; ii++) {
-                        rows[ii] = getDataManager().getComics(ags[ii]).getName();
+                        rows[ii] = dataManager.getComics(ags[ii]).getName();
                     }
                     Intent sendIntent = new Intent();
                     sendIntent.setAction(Intent.ACTION_SEND);
@@ -244,7 +247,11 @@ public class ComicsListFragment extends AFragment {
 //            Comics comics = getDataManager().getComics(comicsId);
 //            int position = mAdapter.insertOrUpdate(comics);
             mAdapter.notifyDataSetChanged();
-            getDataManager().notifyChangedButMe(DataManager.CAUSE_COMICS_CHANGED, this);
+            final DataManager dataManager = DataManager.getDataManager();
+            final long comicsId = data.getLongExtra(ComicsEditorActivity.EXTRA_COMICS_ID, DataManager.NO_COMICS);
+            dataManager.notifyChangedButMe(DataManager.CAUSE_COMICS_CHANGED, this);
+            //A0049
+            dataManager.updateData(DataManager.ACTION_ADD, comicsId, DataManager.NO_RELEASE);
         }
     }
 
@@ -282,6 +289,8 @@ public class ComicsListFragment extends AFragment {
                                     while ((comics = undoComics.pop(tag)) != null) {
 //                                        Utils.d(this.getClass(), "undo " + comics.getName());
                                         dataManager.put(comics);
+                                        //A0049
+                                        dataManager.updateData(DataManager.ACTION_ADD, comics.getId(), DataManager.NO_RELEASE);
                                     }
                                     dataManager.notifyChanged(DataManager.CAUSE_COMICS_ADDED);
                                 }

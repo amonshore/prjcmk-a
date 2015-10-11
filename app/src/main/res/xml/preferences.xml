@@ -22,4 +22,12 @@
         android:key="pref_restore_now"
         android:title="@string/pref_restore_now_title" />
 
+    <Preference
+        android:key="pref_restore_old"
+        android:title="@string/pref_restore_old" />
+
+    <Preference
+        android:key="pref_clear_data"
+        android:title="@string/pref_clear_data" />
+
 </PreferenceScreen>

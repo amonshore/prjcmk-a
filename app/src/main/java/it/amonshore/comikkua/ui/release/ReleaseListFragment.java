@@ -141,15 +141,18 @@ public class ReleaseListFragment extends AFragment {
         mAdapter.setOnNumberViewClickListener(new View.OnClickListener() {
             @Override
             public void onClick(View v) {
-                int position = list.getPositionForView(v);
+                final int position = list.getPositionForView(v);
+                final DataManager dataManager = DataManager.getDataManager();
                 if (position != ListView.INVALID_POSITION) {
                     //Utils.d(this.getClass(), "click number on " + position);
                     Release release = ((ReleaseInfo) mAdapter.getItem(position)).getRelease();
                     release.togglePurchased();
-                    getDataManager().updateBestRelease(release.getComicsId());
+                    dataManager.updateBestRelease(release.getComicsId());
                     //invece di aggionarnare tutta la lista, con conseguente scomparsa degli item (visto che possono cambiare gruppo)
                     //  aggiorno solo l'elemento corrente, così rimarrà nel suo gruppo semplicemente con uno stato diverso
-                    getDataManager().notifyChangedButMe(DataManager.CAUSE_RELEASE_CHANGED, ReleaseListFragment.this);
+                    dataManager.notifyChangedButMe(DataManager.CAUSE_RELEASE_CHANGED, ReleaseListFragment.this);
+                    //A0049
+                    dataManager.updateData(DataManager.ACTION_UPD, release.getComicsId(), release.getNumber());
                     //per aggiornare solo questo item richiamo adapter.getView(...) -> http://stackoverflow.com/questions/4075975/redraw-a-single-row-in-a-listview
                     mAdapter.getView(position, (View) v.getParent(), list);
                 }
@@ -202,6 +205,7 @@ public class ReleaseListFragment extends AFragment {
             @Override
             public boolean onActionItemClicked(ActionMode mode, MenuItem item) {
                 Utils.d("onActionItemClicked " + item.getTitle());
+                final DataManager dataManager = DataManager.getDataManager();
                 //risponde alla selezione di una azione del menu_releases_cab
                 long menuId = item.getItemId();
                 if (menuId == R.id.action_release_delete) {
@@ -217,9 +221,12 @@ public class ReleaseListFragment extends AFragment {
                     //visto che l'adapter considera come id la posizione dell'elemento
                     //posso usare l'id come posizione per rimuoverli dall'adapter
                     for (int ii = ags.length - 1; ii >= 0; ii--) {
+                        //A0049
+                        ReleaseInfo ri = (ReleaseInfo)mAdapter.getItem((int) ags[ii]);
+                        dataManager.updateData(DataManager.ACTION_DEL, ri.getRelease().getComicsId(), ri.getRelease().getNumber());
                         mAdapter.remove((int) ags[ii]);
                     }
-                    getDataManager().notifyChanged(DataManager.CAUSE_RELEASE_REMOVED);
+                    dataManager.notifyChanged(DataManager.CAUSE_RELEASE_REMOVED);
                     finishActionMode();
                     return true;
                 } else if (menuId == R.id.action_release_share) {
@@ -228,7 +235,7 @@ public class ReleaseListFragment extends AFragment {
                     String[] rows = new String[ags.length];
                     for (int ii = 0; ii < rows.length; ii++) {
                         ReleaseInfo ri = (ReleaseInfo) mAdapter.getItem((int) ags[ii]);
-                        rows[ii] = getDataManager().getComics(ri.getRelease().getComicsId()).getName() +
+                        rows[ii] = dataManager.getComics(ri.getRelease().getComicsId()).getName() +
                                 " #" + ri.getRelease().getNumber() + (ri.getRelease().isWishlist() ? "" : " - " + Utils.formatReleaseLongDate(ri.getRelease().getDate()));
                     }
                     Intent sendIntent = new Intent();
@@ -260,11 +267,15 @@ public class ReleaseListFragment extends AFragment {
     public void onActivityResult(int requestCode, int resultCode, Intent data) {
         if (resultCode == Activity.RESULT_OK) {
             if (requestCode == ReleaseEditorActivity.EDIT_RELEASE_REQUEST) {
-                long comicsId = data.getLongExtra(ReleaseEditorActivity.EXTRA_COMICS_ID,
+                final DataManager dataManager = DataManager.getDataManager();
+                final long comicsId = data.getLongExtra(ReleaseEditorActivity.EXTRA_COMICS_ID,
                         ReleaseEditorActivity.COMICS_ID_NONE);
                 if (comicsId != ReleaseEditorActivity.COMICS_ID_NONE) {
-                    getDataManager().updateBestRelease(comicsId);
-                    getDataManager().notifyChanged(DataManager.CAUSE_RELEASE_CHANGED);
+                    dataManager.updateBestRelease(comicsId);
+                    dataManager.notifyChanged(DataManager.CAUSE_RELEASE_CHANGED);
+                    //A0049
+                    final int releaseNumber = data.getIntExtra(ReleaseEditorActivity.EXTRA_RELEASE_NUMBER, DataManager.NO_RELEASE);
+                    dataManager.updateData(DataManager.ACTION_UPD, comicsId, releaseNumber);
                 }
             }
         }
@@ -361,6 +372,8 @@ public class ReleaseListFragment extends AFragment {
 //                                        Utils.d(this.getClass(), "undo " + comics.getName());
                                         dataManager.getComics(release.getComicsId()).putRelease(release);
                                         dataManager.updateBestRelease(release.getComicsId());
+                                        //A0049
+                                        dataManager.updateData(DataManager.ACTION_ADD, release.getComicsId(), release.getNumber());
                                     }
                                     dataManager.notifyChanged(DataManager.CAUSE_RELEASE_ADDED);
                                 }

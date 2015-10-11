@@ -27,3 +27,7 @@ Versione: v1.0.1 (12)
 
 Versione: v1.0.1 (13)
 - corretto bug su rimozione di tutti i comics
+
+Versione: v1.0.2 (14)
+- salvataggio dati in database sqlite
+- creazione backup in cartella Download
