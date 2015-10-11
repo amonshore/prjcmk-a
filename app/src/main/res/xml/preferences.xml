@@ -23,11 +23,11 @@
         android:title="@string/pref_restore_now_title" />
 
     <Preference
-        android:key="pref_load_file"
-        android:title="Read data from file" />
+        android:key="pref_restore_old"
+        android:title="@string/pref_restore_old" />
 
     <Preference
         android:key="pref_clear_data"
-        android:title="Remove all data" />
+        android:title="@string/pref_clear_data" />
 
 </PreferenceScreen>

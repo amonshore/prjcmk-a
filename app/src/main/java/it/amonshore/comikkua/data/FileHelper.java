@@ -255,6 +255,16 @@ public class FileHelper {
 
     /**
      *
+     * @param folderType    il tipo della cartella esterna in cui risiede il file (vedi Enviroment.DIRECTORY_xxx)
+     * @param fileName  nome del file
+     * @return  una istanza di File
+     */
+    public static File getExternalFile(String folderType, String fileName) {
+        return new File(Environment.getExternalStoragePublicDirectory(folderType), fileName);
+    }
+
+    /**
+     *
      * @return true se l'external storage è accessibile in scrittura
      */
     public static boolean isExternalStorageWritable() {

@@ -661,6 +661,18 @@ public class DataManager extends Observable<ComicsObserver> {
         }
     }
 
+    /**
+     *
+     */
+    public void clearData() {
+        synchronized (mSyncObj) {
+            mComicsCache.clear();
+            mPublishers.clear();
+            mBestReleases.clear();
+            updateData(ACTION_CLEAR, NO_COMICS, NO_RELEASE);
+        }
+    }
+
 //    /**
 //     * @return  true se il backup è statao create con successo
 //     */
@@ -749,7 +761,7 @@ public class DataManager extends Observable<ComicsObserver> {
      * @param releaseNumber numero della release su cui operare l'azione (NO_RELEASE per nessuna)
      */
     public void updateData(int action, long comicsId, int releaseNumber) {
-        Utils.d(this.getClass(), String.format("A0049 act %s, cid %s, rel %s", action, comicsId, releaseNumber));
+        //Utils.d(this.getClass(), String.format("A0049 act %s, cid %s, rel %s", action, comicsId, releaseNumber));
         mWriteHandler.appendRequest(new AsyncActionRequest(action, comicsId, releaseNumber));
     }
 
@@ -819,7 +831,7 @@ public class DataManager extends Observable<ComicsObserver> {
         }
 
         public void cancel() {
-            Utils.d(this.getClass(), "cancel");
+//            Utils.d(this.getClass(), "cancel");
             mCancel = true ;
             mMainLoopHandler.release();
         }
@@ -884,14 +896,14 @@ public class DataManager extends Observable<ComicsObserver> {
             if (isNew) {
                 long res = database.insert(DBHelper.ComicsTable.NAME, null,
                         DBHelper.ComicsTable.getContentValues(comics, DataManager.this.mUserName));
-                Utils.d(this.getClass(), "A0049 write new comics " + comics.getName() + " -> " + (res >= 0));
+//                Utils.d(this.getClass(), "A0049 write new comics " + comics.getName() + " -> " + (res >= 0));
                 for (Release release : comics.getReleases()) {
                     writeRelease(database, release, true);
                 }
             } else {
                 long res = database.replace(DBHelper.ComicsTable.NAME, null,
                         DBHelper.ComicsTable.getContentValues(comics, DataManager.this.mUserName));
-                Utils.d(this.getClass(), "A0049 write comics " + comics.getName() + " -> " + (res >= 0));
+//                Utils.d(this.getClass(), "A0049 write comics " + comics.getName() + " -> " + (res >= 0));
             }
         }
 
@@ -904,18 +916,18 @@ public class DataManager extends Observable<ComicsObserver> {
                     DBHelper.ComicsTable.COL_ID + " = " + comicsId + " and " +
                         DBHelper.ComicsTable.COL_USER + " = '" + DataManager.this.mUserName + "'",
                     null);
-            Utils.d(this.getClass(), "A0049 delete comics " + comicsId + " -> " + res2 + "(" + res1 + ")");
+//            Utils.d(this.getClass(), "A0049 delete comics " + comicsId + " -> " + res2 + "(" + res1 + ")");
         }
 
         private void writeRelease(SQLiteDatabase database, Release release, boolean isNew) {
             if (isNew) {
                 long res = database.insert(DBHelper.ReleasesTable.NAME, null,
                         DBHelper.ReleasesTable.getContentValues(release, DataManager.this.mUserName));
-                Utils.d(this.getClass(), "A0049 write new release " + release.getNumber() + " -> " + (res >= 0));
+//                Utils.d(this.getClass(), "A0049 write new release " + release.getNumber() + " -> " + (res >= 0));
             } else {
                 long res = database.replace(DBHelper.ReleasesTable.NAME, null,
                         DBHelper.ReleasesTable.getContentValues(release, DataManager.this.mUserName));
-                Utils.d(this.getClass(), "A0049 write comics " + release.getNumber() + " -> " + (res >= 0));
+//                Utils.d(this.getClass(), "A0049 write comics " + release.getNumber() + " -> " + (res >= 0));
             }
         }
 
@@ -925,7 +937,7 @@ public class DataManager extends Observable<ComicsObserver> {
                             DBHelper.ReleasesTable.COL_USER + " = '" + DataManager.this.mUserName + "' and " +
                             DBHelper.ReleasesTable.COL_NUMBER + " = " + releaseNumber,
                     null);
-            Utils.d(this.getClass(), "A0049 delete release " + releaseNumber + " -> " + res);
+//            Utils.d(this.getClass(), "A0049 delete release " + releaseNumber + " -> " + res);
         }
 
         private void clear(SQLiteDatabase database) {
@@ -935,7 +947,7 @@ public class DataManager extends Observable<ComicsObserver> {
             int res2 = database.delete(DBHelper.ComicsTable.NAME,
                     DBHelper.ComicsTable.COL_USER + " = '" + DataManager.this.mUserName + "'",
                     null);
-            Utils.d(this.getClass(), "A0049 clear -> " + res2 + "(" + res1 + ")");
+//            Utils.d(this.getClass(), "A0049 clear -> " + res2 + "(" + res1 + ")");
         }
 
     }

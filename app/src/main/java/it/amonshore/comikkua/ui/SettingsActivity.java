@@ -1,6 +1,7 @@
 package it.amonshore.comikkua.ui;
 
 import android.os.Bundle;
+import android.os.Environment;
 import android.preference.Preference;
 import android.preference.PreferenceFragment;
 import android.support.v7.app.ActionBarActivity;
@@ -18,6 +19,9 @@ public class SettingsActivity extends ActionBarActivity {
 
     public static final String KEY_PREF_GROUP_BY_MONTH = "pref_group_by_month";
     public static final String KEY_PREF_WEEK_START_ON_MONDAY = "pref_week_start_on_monday";
+
+    private static final String BACKUP_FILE_NAME = "comikku_data.bck";
+    private static final String OLD_FILE_NAME = "data.json";
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
@@ -42,56 +46,68 @@ public class SettingsActivity extends ActionBarActivity {
             addPreferencesFromResource(R.xml.preferences);
             //
             final DataManager dataManager = DataManager.getDataManager();
-            final File file = FileHelper.getExternalFile(getActivity(), "comikku_data.bck");
-            findPreference("pref_backup_now").setOnPreferenceClickListener(new Preference.OnPreferenceClickListener() {
-                @Override
-                public boolean onPreferenceClick(Preference preference) {
-                    //TODO A0021 attendere che non ci siano richieste di salvataggio pendenti
-                    //A0049
-                    if (dataManager.backupToFile(file)) {
-                        Toast.makeText(getActivity(), R.string.toast_backup_created, Toast.LENGTH_SHORT).show();
-                        updateBackupFileInfo(file);
-                    } else {
-                        Toast.makeText(getActivity(), R.string.toast_backup_problem, Toast.LENGTH_SHORT).show();
+            //A0051 final File bckFile = FileHelper.getExternalFile(getActivity(), BACKUP_FILE_NAME);
+            final File bckFile = FileHelper.getExternalFile(Environment.DIRECTORY_DOWNLOADS, BACKUP_FILE_NAME);
+            final File oldFile = FileHelper.getExternalFile(getActivity(), OLD_FILE_NAME);
+            //se non è permessa la scrittura sulla memoria esterna disabilito la gestione del backup locale
+            if (FileHelper.isExternalStorageWritable()) {
+                updateBackupFileInfo(bckFile);
+                //
+                findPreference("pref_backup_now").setOnPreferenceClickListener(new Preference.OnPreferenceClickListener() {
+                    @Override
+                    public boolean onPreferenceClick(Preference preference) {
+                        //TODO A0021 attendere che non ci siano richieste di salvataggio pendenti
+                        //A0049
+                        if (dataManager.backupToFile(bckFile)) {
+                            Toast.makeText(getActivity(), R.string.toast_backup_created, Toast.LENGTH_SHORT).show();
+                            updateBackupFileInfo(bckFile);
+                        } else {
+                            Toast.makeText(getActivity(), R.string.toast_backup_problem, Toast.LENGTH_SHORT).show();
+                        }
+                        return true;
                     }
-                    return true;
-                }
-            });
-            //
-            updateBackupFileInfo(file);
-            findPreference("pref_restore_now").setOnPreferenceClickListener(new Preference.OnPreferenceClickListener() {
-                @Override
-                public boolean onPreferenceClick(Preference preference) {
-                    //A0049
-                    if (dataManager.restoreFromFile(file)) {
-                        Toast.makeText(getActivity(), R.string.toast_backup_restored, Toast.LENGTH_SHORT).show();
-                    } else {
-                        Toast.makeText(getActivity(), R.string.toast_restore_problem, Toast.LENGTH_SHORT).show();
+                });
+                //
+                findPreference("pref_restore_now").setOnPreferenceClickListener(new Preference.OnPreferenceClickListener() {
+                    @Override
+                    public boolean onPreferenceClick(Preference preference) {
+                        //A0049
+                        if (dataManager.restoreFromFile(bckFile)) {
+                            Toast.makeText(getActivity(), R.string.toast_backup_restored, Toast.LENGTH_SHORT).show();
+                        } else {
+                            Toast.makeText(getActivity(), R.string.toast_restore_problem, Toast.LENGTH_SHORT).show();
+                        }
+                        return true;
                     }
-                    return true;
-                }
-            });
-            //
-            findPreference("pref_load_file").setOnPreferenceClickListener(new Preference.OnPreferenceClickListener() {
-                @Override
-                public boolean onPreferenceClick(Preference preference) {
-                    //A0049
-                    File file = FileHelper.getExternalFile(getActivity(), "data.json");
-                    if (dataManager.restoreFromFile(file)) {
-                        Toast.makeText(getActivity(), "imp data.json ok", Toast.LENGTH_SHORT).show();
-                    } else {
-                        Toast.makeText(getActivity(), "imp data.json ERR", Toast.LENGTH_SHORT).show();
+                });
+            } else {
+                findPreference("pref_backup_now").setEnabled(false);
+                findPreference("pref_restore_now").setEnabled(false);
+            }
+            //A0049
+            if (oldFile.exists()) {
+                findPreference("pref_restore_old").setOnPreferenceClickListener(new Preference.OnPreferenceClickListener() {
+                    @Override
+                    public boolean onPreferenceClick(Preference preference) {
+                        //A0049
+                        if (dataManager.restoreFromFile(oldFile)) {
+                            Toast.makeText(getActivity(), R.string.toast_backup_restored, Toast.LENGTH_SHORT).show();
+                        } else {
+                            Toast.makeText(getActivity(), R.string.toast_backup_problem, Toast.LENGTH_SHORT).show();
+                        }
+                        return true;
                     }
-                    return true;
-                }
-            });
+                });
+            } else {
+                findPreference("pref_restore_old").setEnabled(false);
+            }
             //
             findPreference("pref_clear_data").setOnPreferenceClickListener(new Preference.OnPreferenceClickListener() {
                 @Override
                 public boolean onPreferenceClick(Preference preference) {
-                    //TODO A0049 pulire il database e la cache interna
-                    //dataManager.updateData(DataManager.ACTION_CLEAR, DataManager.NO_COMICS, DataManager.NO_RELEASE);
-                    //Toast.makeText(getActivity(), "data cleared", Toast.LENGTH_SHORT).show();
+                    //A0049
+                    dataManager.clearData();
+                    Toast.makeText(getActivity(), R.string.toast_data_cleared, Toast.LENGTH_SHORT).show();
                     return true;
                 }
             });

@@ -54,10 +54,13 @@
     <string name="pref_week_start_on_monday_off">Sunday is the first day of week</string>
     <string name="pref_backup_now_title">Create bakcup</string>
     <string name="pref_restore_now_title">Restore bakcup</string>
+    <string name="pref_clear_data">Remove all data</string>
+    <string name="pref_restore_old">Restore data from old version of Comikku app</string>
     <string name="toast_backup_created">Backup created</string>
     <string name="toast_backup_problem">There was a problem with backup</string>
     <string name="toast_backup_restored">Backup restored</string>
     <string name="toast_restore_problem">There was a problem with restore</string>
+    <string name="toast_data_cleared">Data removed</string>
     <string name="last_restored">Last backup was on %1$tB %1$te, %1$tY at %1$tl:%1$tM %1$tp</string>
 
     <!-- page captions -->
