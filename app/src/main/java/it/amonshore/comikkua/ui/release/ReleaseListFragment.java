@@ -1,8 +1,12 @@
 package it.amonshore.comikkua.ui.release;
 
 import android.app.Activity;
+import android.content.Context;
 import android.content.Intent;
 import android.content.SharedPreferences;
+import android.graphics.Color;
+import android.net.Uri;
+import android.os.AsyncTask;
 import android.os.Bundle;
 import android.os.Handler;
 import android.preference.PreferenceManager;
@@ -15,9 +19,16 @@ import android.view.View;
 import android.view.ViewGroup;
 import android.widget.AbsListView;
 import android.widget.AdapterView;
+import android.widget.ImageView;
 import android.widget.ListView;
 import android.widget.TextView;
 
+import com.bumptech.glide.DrawableRequestBuilder;
+import com.bumptech.glide.Glide;
+import com.bumptech.glide.load.resource.bitmap.CenterCrop;
+import com.bumptech.glide.load.resource.drawable.GlideDrawable;
+import com.bumptech.glide.request.animation.GlideAnimation;
+import com.bumptech.glide.request.target.SimpleTarget;
 import com.nispok.snackbar.Snackbar;
 import com.nispok.snackbar.SnackbarManager;
 import com.nispok.snackbar.listeners.ActionClickListener;
@@ -25,6 +36,7 @@ import com.nispok.snackbar.listeners.ActionClickListener;
 import it.amonshore.comikkua.R;
 import it.amonshore.comikkua.data.Comics;
 import it.amonshore.comikkua.data.DataManager;
+import it.amonshore.comikkua.data.FileHelper;
 import it.amonshore.comikkua.data.MultiReleaseInfo;
 import it.amonshore.comikkua.data.Release;
 import it.amonshore.comikkua.data.ReleaseGroupHelper;
@@ -35,6 +47,9 @@ import it.amonshore.comikkua.ui.AFragment;
 import it.amonshore.comikkua.ui.MainActivity;
 import it.amonshore.comikkua.ui.SettingsActivity;
 import it.amonshore.comikkua.ui.comics.ComicsDetailActivity;
+import jp.wasabeef.glide.transformations.BlurTransformation;
+import jp.wasabeef.glide.transformations.ColorFilterTransformation;
+import jp.wasabeef.glide.transformations.GrayscaleTransformation;
 import se.emilsjolander.stickylistheaders.StickyListHeadersListView;
 
 /**
@@ -74,6 +89,8 @@ public class ReleaseListFragment extends AFragment {
         //se il fragment è caricato nel dettaglio non faccio vedere il menu
         if (mComics != null) {
             setHasOptionsMenu(false);
+            //A0024 carico una immagine di background legata al comics
+//            loadComicsBackground();
         } else {
             setHasOptionsMenu(true);
         }
@@ -453,6 +470,52 @@ public class ReleaseListFragment extends AFragment {
         intent.putExtra(ComicsDetailActivity.EXTRA_COMICS_ID, comicsId);
         startActivity(intent);
     }
+
+//    private void loadComicsBackground() {
+////        //TODO A0024 recuperare l'immagine associata al comics
+////        //getView().setBackground(Utils.convertToGrayscale(getResources().getDrawable(R.drawable.bck_detail)));
+////        //getView().setBackground(getResources().getDrawable(R.drawable.bck_detail));
+////        Context context = getActivity();
+////        Glide.with(context).load(R.drawable.bck_detail)
+////                .bitmapTransform(
+////                        new GrayscaleTransformation(context),
+//////                        new BlurTransformation(context, 12, 2),
+////                        new ColorFilterTransformation(context, Color.parseColor("#AAFFFFFF"))
+////                )
+////                .into(new SimpleTarget<GlideDrawable>() {
+////                    @Override
+////                    public void onResourceReady(GlideDrawable resource, GlideAnimation<? super GlideDrawable> glideAnimation) {
+////                        getView().setBackground(resource);
+////                    }
+////                });
+//
+//        final Context context = getActivity();
+//        final Uri backgroundUri = Uri.fromFile(FileHelper.getExternalFile(context, "20140712_153945.jpg"));
+//        new AsyncTask<Uri, Void, DrawableRequestBuilder<Uri>>() {
+//            @Override
+//            protected DrawableRequestBuilder<Uri> doInBackground(Uri... params) {
+//                return
+//                        Glide.with(context).load(params[0])
+//                                .bitmapTransform(
+//                                        new CenterCrop(context),
+//                                        new GrayscaleTransformation(context),
+////                        new BlurTransformation(this, 12, 2),
+//                                        new ColorFilterTransformation(context, Color.parseColor("#AAFFFFFF"))
+//                                );
+//            }
+//
+//            @Override
+//            protected void onPostExecute(DrawableRequestBuilder<Uri> integerDrawableRequestBuilder) {
+//                integerDrawableRequestBuilder.into(new SimpleTarget<GlideDrawable>() {
+//                    @Override
+//                    public void onResourceReady(GlideDrawable resource, GlideAnimation<? super GlideDrawable> glideAnimation) {
+//                        getView().setBackground(resource);
+//                    }
+//                });
+//            }
+//        }.execute(backgroundUri);
+//    }
+
 
 //A0040 sembra provocare un crash della VM per qualche strana ragione
 //    /**

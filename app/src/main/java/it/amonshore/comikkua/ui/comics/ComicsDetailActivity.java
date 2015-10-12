@@ -2,22 +2,37 @@ package it.amonshore.comikkua.ui.comics;
 
 import android.app.Activity;
 import android.app.SearchManager;
+import android.content.Context;
 import android.content.Intent;
+import android.graphics.Color;
+import android.net.Uri;
+import android.os.AsyncTask;
 import android.os.Bundle;
 import android.support.v7.app.ActionBarActivity;
 import android.support.v7.widget.Toolbar;
 import android.view.Menu;
 import android.view.MenuItem;
 import android.view.View;
+import android.widget.ImageView;
 import android.widget.TextView;
+
+import com.bumptech.glide.DrawableRequestBuilder;
+import com.bumptech.glide.Glide;
+import com.bumptech.glide.load.resource.bitmap.CenterCrop;
+import com.bumptech.glide.load.resource.drawable.GlideDrawable;
+import com.bumptech.glide.request.animation.GlideAnimation;
+import com.bumptech.glide.request.target.SimpleTarget;
 
 import it.amonshore.comikkua.R;
 import it.amonshore.comikkua.Utils;
 import it.amonshore.comikkua.data.Comics;
 import it.amonshore.comikkua.data.DataManager;
+import it.amonshore.comikkua.data.FileHelper;
 import it.amonshore.comikkua.data.ReleaseGroupHelper;
 import it.amonshore.comikkua.ui.release.ReleaseEditorActivity;
 import it.amonshore.comikkua.ui.release.ReleaseListFragment;
+import jp.wasabeef.glide.transformations.ColorFilterTransformation;
+import jp.wasabeef.glide.transformations.GrayscaleTransformation;
 
 /**
  * Created by Narsenico on 20/05/2015.
@@ -69,6 +84,33 @@ public class ComicsDetailActivity extends ActionBarActivity {
                 .findFragmentById(R.id.frg_release_list));
         mReleaseListFragment.setComics(mComics, ReleaseGroupHelper.MODE_COMICS);
         mReleaseListFragment.onDataChanged(DataManager.CAUSE_LOADING);
+
+        //A0024
+        final Context context = this;
+        Uri backgroundUri;
+        if (false /* se non ha immagini associate */) {
+            backgroundUri = Uri.parse("android.resource://it.amonshore.comikkua/" + R.drawable.bck_detail);
+        } else {
+            backgroundUri = Uri.fromFile(FileHelper.getExternalFile(this, "20140712_153945.jpg"));
+        }
+        new AsyncTask<Uri, Void, DrawableRequestBuilder<Uri>>() {
+            @Override
+            protected DrawableRequestBuilder<Uri> doInBackground(Uri... params) {
+                return
+                Glide.with(context).load(params[0])
+                        .bitmapTransform(
+                                new CenterCrop(context),
+                                new GrayscaleTransformation(context),
+//                        new BlurTransformation(this, 12, 2),
+                                new ColorFilterTransformation(context, Color.parseColor("#AA1976D2"))
+                        );
+            }
+
+            @Override
+            protected void onPostExecute(DrawableRequestBuilder<Uri> integerDrawableRequestBuilder) {
+                integerDrawableRequestBuilder.into((ImageView) findViewById(R.id.imageView));
+            }
+        }.execute(backgroundUri);
     }
 
     @Override
