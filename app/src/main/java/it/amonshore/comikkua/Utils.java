@@ -4,6 +4,11 @@ import android.content.Context;
 import android.text.TextUtils;
 import android.util.Log;
 
+import java.io.File;
+import java.io.FileInputStream;
+import java.io.FileOutputStream;
+import java.io.IOException;
+import java.nio.channels.FileChannel;
 import java.text.ParseException;
 import java.text.SimpleDateFormat;
 import java.util.Date;
@@ -223,25 +228,5 @@ public class Utils {
         }
         return date.minusDays(day);
     }
-
-//    /**
-//     *
-//     * @param source
-//     * @param dest
-//     * @throws IOException
-//     */
-//    public static void copyFile(File source, File dest) throws IOException {
-//        if (source.exists()) {
-//            try (FileOutputStream fw = new FileOutputStream(dest)) {
-//                try (FileInputStream fr = new FileInputStream(source)) {
-//                    byte[] buff = new byte[1024];
-//                    int nn;
-//                    while ((nn = fr.read(buff, 0, buff.length)) > 0) {
-//                        fw.write(buff, 0, nn);
-//                    }
-//                }
-//            }
-//        }
-//    }
 
 }

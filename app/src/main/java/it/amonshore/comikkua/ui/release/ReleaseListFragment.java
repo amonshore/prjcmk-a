@@ -1,12 +1,8 @@
 package it.amonshore.comikkua.ui.release;
 
 import android.app.Activity;
-import android.content.Context;
 import android.content.Intent;
 import android.content.SharedPreferences;
-import android.graphics.Color;
-import android.net.Uri;
-import android.os.AsyncTask;
 import android.os.Bundle;
 import android.os.Handler;
 import android.preference.PreferenceManager;
@@ -19,24 +15,17 @@ import android.view.View;
 import android.view.ViewGroup;
 import android.widget.AbsListView;
 import android.widget.AdapterView;
-import android.widget.ImageView;
 import android.widget.ListView;
 import android.widget.TextView;
 
-import com.bumptech.glide.DrawableRequestBuilder;
-import com.bumptech.glide.Glide;
-import com.bumptech.glide.load.resource.bitmap.CenterCrop;
-import com.bumptech.glide.load.resource.drawable.GlideDrawable;
-import com.bumptech.glide.request.animation.GlideAnimation;
-import com.bumptech.glide.request.target.SimpleTarget;
 import com.nispok.snackbar.Snackbar;
 import com.nispok.snackbar.SnackbarManager;
 import com.nispok.snackbar.listeners.ActionClickListener;
 
 import it.amonshore.comikkua.R;
+import it.amonshore.comikkua.RequestCodes;
 import it.amonshore.comikkua.data.Comics;
 import it.amonshore.comikkua.data.DataManager;
-import it.amonshore.comikkua.data.FileHelper;
 import it.amonshore.comikkua.data.MultiReleaseInfo;
 import it.amonshore.comikkua.data.Release;
 import it.amonshore.comikkua.data.ReleaseGroupHelper;
@@ -47,9 +36,6 @@ import it.amonshore.comikkua.ui.AFragment;
 import it.amonshore.comikkua.ui.MainActivity;
 import it.amonshore.comikkua.ui.SettingsActivity;
 import it.amonshore.comikkua.ui.comics.ComicsDetailActivity;
-import jp.wasabeef.glide.transformations.BlurTransformation;
-import jp.wasabeef.glide.transformations.ColorFilterTransformation;
-import jp.wasabeef.glide.transformations.GrayscaleTransformation;
 import se.emilsjolander.stickylistheaders.StickyListHeadersListView;
 
 /**
@@ -89,8 +75,6 @@ public class ReleaseListFragment extends AFragment {
         //se il fragment è caricato nel dettaglio non faccio vedere il menu
         if (mComics != null) {
             setHasOptionsMenu(false);
-            //A0024 carico una immagine di background legata al comics
-//            loadComicsBackground();
         } else {
             setHasOptionsMenu(true);
         }
@@ -283,7 +267,7 @@ public class ReleaseListFragment extends AFragment {
     @Override
     public void onActivityResult(int requestCode, int resultCode, Intent data) {
         if (resultCode == Activity.RESULT_OK) {
-            if (requestCode == ReleaseEditorActivity.EDIT_RELEASE_REQUEST) {
+            if (requestCode == RequestCodes.EDIT_RELEASE_REQUEST) {
                 final DataManager dataManager = DataManager.getDataManager();
                 final long comicsId = data.getLongExtra(ReleaseEditorActivity.EXTRA_COMICS_ID,
                         ReleaseEditorActivity.COMICS_ID_NONE);
@@ -462,7 +446,7 @@ public class ReleaseListFragment extends AFragment {
         Intent intent = new Intent(getActivity(), ReleaseEditorActivity.class);
         intent.putExtra(ReleaseEditorActivity.EXTRA_COMICS_ID, comicsId);
         intent.putExtra(ReleaseEditorActivity.EXTRA_RELEASE_NUMBER, number);
-        startActivityForResult(intent, ReleaseEditorActivity.EDIT_RELEASE_REQUEST);
+        startActivityForResult(intent, RequestCodes.EDIT_RELEASE_REQUEST);
     }
 
     private void showComicsDetail(long comicsId) {

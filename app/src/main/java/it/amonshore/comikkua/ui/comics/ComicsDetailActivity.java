@@ -19,11 +19,13 @@ import android.widget.TextView;
 import com.bumptech.glide.DrawableRequestBuilder;
 import com.bumptech.glide.Glide;
 import com.bumptech.glide.load.resource.bitmap.CenterCrop;
-import com.bumptech.glide.load.resource.drawable.GlideDrawable;
-import com.bumptech.glide.request.animation.GlideAnimation;
-import com.bumptech.glide.request.target.SimpleTarget;
+
+import java.io.File;
+import java.io.IOException;
+import java.util.UUID;
 
 import it.amonshore.comikkua.R;
+import it.amonshore.comikkua.RequestCodes;
 import it.amonshore.comikkua.Utils;
 import it.amonshore.comikkua.data.Comics;
 import it.amonshore.comikkua.data.DataManager;
@@ -84,33 +86,18 @@ public class ComicsDetailActivity extends ActionBarActivity {
                 .findFragmentById(R.id.frg_release_list));
         mReleaseListFragment.setComics(mComics, ReleaseGroupHelper.MODE_COMICS);
         mReleaseListFragment.onDataChanged(DataManager.CAUSE_LOADING);
-
-        //A0024
-        final Context context = this;
-        Uri backgroundUri;
-        if (false /* se non ha immagini associate */) {
-            backgroundUri = Uri.parse("android.resource://it.amonshore.comikkua/" + R.drawable.bck_detail);
-        } else {
-            backgroundUri = Uri.fromFile(FileHelper.getExternalFile(this, "20140712_153945.jpg"));
+        //A0024 gestisco il click sull'immagine per poterne scegliere una dalla libreria
+        findViewById(R.id.imageView).setOnLongClickListener(new View.OnLongClickListener() {
+            @Override
+            public boolean onLongClick(View v) {
+                showImageSelector();
+                return true;
+            }
+        });
+        //A0024 carico l'immagine del comics (se esiste)
+        if (!Utils.isNullOrEmpty(mComics.getImage())) {
+            loadComicsImage();
         }
-        new AsyncTask<Uri, Void, DrawableRequestBuilder<Uri>>() {
-            @Override
-            protected DrawableRequestBuilder<Uri> doInBackground(Uri... params) {
-                return
-                Glide.with(context).load(params[0])
-                        .bitmapTransform(
-                                new CenterCrop(context),
-                                new GrayscaleTransformation(context),
-//                        new BlurTransformation(this, 12, 2),
-                                new ColorFilterTransformation(context, Color.parseColor("#AA1976D2"))
-                        );
-            }
-
-            @Override
-            protected void onPostExecute(DrawableRequestBuilder<Uri> integerDrawableRequestBuilder) {
-                integerDrawableRequestBuilder.into((ImageView) findViewById(R.id.imageView));
-            }
-        }.execute(backgroundUri);
     }
 
     @Override
@@ -124,12 +111,41 @@ public class ComicsDetailActivity extends ActionBarActivity {
                 //A0049
                 mDataManager.updateData(DataManager.ACTION_UPD, mComics.getId(), DataManager.NO_RELEASE);
                 mDataManager.notifyChanged(DataManager.CAUSE_COMICS_CHANGED);
-            } else if (requestCode == ReleaseEditorActivity.EDIT_RELEASE_REQUEST) {
+            } else if (requestCode == RequestCodes.EDIT_RELEASE_REQUEST) {
                 mDataManager.updateBestRelease(mComics.getId());
                 mDataManager.notifyChanged(DataManager.CAUSE_RELEASE_ADDED);
                 //A0049
                 int releaseNumber = data.getIntExtra(ReleaseEditorActivity.EXTRA_RELEASE_NUMBER, DataManager.NO_RELEASE);
                 mDataManager.updateData(DataManager.ACTION_ADD, mComics.getId(), releaseNumber);
+            } else if (requestCode == RequestCodes.LOAD_IMAGES) {
+                //A0024 TODO per le versioni di android inferiori a KitKat non va bene come recupero il path del file dall'uri
+                Uri imageUri = data.getData();
+                File imageFile = FileHelper.getFile(this, imageUri);
+                if (imageFile != null) {
+                    File destFile;
+                    //se esite già un file lo cancello
+                    if (!Utils.isNullOrEmpty(mComics.getImage())) {
+                        destFile = FileHelper.getExternalFile(this, mComics.getImage());
+                        if (destFile.exists()) {
+                            destFile.delete();
+                        }
+                    }
+                    //genero un nuovo nome di file
+                    String destFileName = UUID.randomUUID().toString();
+                    mComics.setImage(destFileName);
+                    mDataManager.updateData(DataManager.ACTION_UPD, mComics.getId(), DataManager.NO_RELEASE);
+                    destFile = FileHelper.getExternalFile(this, destFileName);
+                    //copio il file nella cartella dell'app
+                    try {
+                        boolean res = FileHelper.copyFile(imageFile, destFile);
+                        Utils.d(this.getClass(), "A0024 to " + imageFile + " to " + destFile + " -> " + res);
+                        if (res) {
+                            loadComicsImage();
+                        }
+                    } catch (IOException ioex) {
+                        Utils.e(this.getClass(), "A0024", ioex);
+                    }
+                }
             }
         }
     }
@@ -191,7 +207,43 @@ public class ComicsDetailActivity extends ActionBarActivity {
         Intent intent = new Intent(this, ReleaseEditorActivity.class);
         intent.putExtra(ReleaseEditorActivity.EXTRA_COMICS_ID, comicsId);
         intent.putExtra(ReleaseEditorActivity.EXTRA_RELEASE_NUMBER, ReleaseEditorActivity.RELEASE_NEW);
-        startActivityForResult(intent, ReleaseEditorActivity.EDIT_RELEASE_REQUEST);
+        startActivityForResult(intent, RequestCodes.EDIT_RELEASE_REQUEST);
     }
 
+    private void showImageSelector() {
+        Intent intent = new Intent(Intent.ACTION_GET_CONTENT);
+        intent.setType("image/*");
+        startActivityForResult(Intent.createChooser(intent, "Choose Picture"), RequestCodes.LOAD_IMAGES);
+    }
+
+    private void loadComicsImage() {
+        //A0024 NB: se l'uri dell'immagine è la stessa l'immagine non viene modificata
+        final Context context = this;
+        final File imageFile = FileHelper.getExternalFile(this, mComics.getImage());
+        final Uri backgroundUri;
+        if (imageFile.exists() && imageFile.canRead()) {
+            backgroundUri = Uri.fromFile(imageFile);
+        } else {
+            backgroundUri = Uri.parse("android.resource://it.amonshore.comikkua/" + R.drawable.bck_detail);
+        }
+        final ImageView imageView = (ImageView) findViewById(R.id.imageView);
+        new AsyncTask<Uri, Void, DrawableRequestBuilder<Uri>>() {
+            @Override
+            protected DrawableRequestBuilder<Uri> doInBackground(Uri... params) {
+                return
+                Glide.with(context).load(params[0])
+                        .bitmapTransform(
+                                new CenterCrop(context),
+                                new GrayscaleTransformation(context),
+//                        new BlurTransformation(this, 12, 2),
+                                new ColorFilterTransformation(context, Color.parseColor("#AA1976D2"))
+                        );
+            }
+
+            @Override
+            protected void onPostExecute(DrawableRequestBuilder<Uri> integerDrawableRequestBuilder) {
+                integerDrawableRequestBuilder.into(imageView);
+            }
+        }.execute(backgroundUri);
+    }
 }

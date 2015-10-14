@@ -508,6 +508,7 @@ public class DataManager extends Observable<ComicsObserver> {
                         comics.setPeriodicity(curComics.getString(DBHelper.ComicsTable.IDX_PERIODICITY));
                         comics.setReserved(curComics.getString(DBHelper.ComicsTable.IDX_RESERVED) == DBHelper.TRUE);
                         comics.setNotes(curComics.getString(DBHelper.ComicsTable.IDX_NOTES));
+                        comics.setImage(curComics.getString(DBHelper.ComicsTable.IDX_IMAGE));
                         //
                         mLastComicsId = Math.max(mLastComicsId, comics.getId());
                         //estraggo tutte le release per il comics

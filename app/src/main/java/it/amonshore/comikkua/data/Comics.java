@@ -29,6 +29,7 @@ public class Comics {
     private String periodicity;
     private boolean reserved;
     private String notes;
+    private String image;
     private final ArrayList<Release> releases;
 
     public Comics(long id) {
@@ -102,6 +103,14 @@ public class Comics {
 
     public void setNotes(String notes) {
         this.notes = notes;
+    }
+
+    public String getImage() {
+        return image;
+    }
+
+    public void setImage(String image) {
+        this.image = image;
     }
 
     private int indexOf(int number) {
@@ -208,5 +217,4 @@ public class Comics {
         }
         return  null;
     }
-
 }
