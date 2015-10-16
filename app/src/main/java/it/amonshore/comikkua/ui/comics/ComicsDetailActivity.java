@@ -5,7 +5,6 @@ import android.app.SearchManager;
 import android.content.Context;
 import android.content.Intent;
 import android.graphics.Bitmap;
-import android.graphics.Color;
 import android.net.Uri;
 import android.os.AsyncTask;
 import android.os.Bundle;
@@ -51,6 +50,7 @@ public class ComicsDetailActivity extends ActionBarActivity {
     private Comics mComics;
     private DataManager mDataManager;
     private TextView mTxtName, mTxtAuthors, mTxtNotes;
+    private ImageView mImageView;
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
@@ -92,10 +92,18 @@ public class ComicsDetailActivity extends ActionBarActivity {
         mReleaseListFragment.setComics(mComics, ReleaseGroupHelper.MODE_COMICS);
         mReleaseListFragment.onDataChanged(DataManager.CAUSE_LOADING);
         //A0024 gestisco il click sull'immagine per poterne scegliere una dalla libreria
-        findViewById(R.id.imageView).setOnLongClickListener(new View.OnLongClickListener() {
+
+        mImageView = (ImageView)findViewById(R.id.imageView);
+        mImageView.setOnClickListener(new View.OnClickListener() {
+            @Override
+            public void onClick(View v) {
+                showImageSelector();
+            }
+        });
+        mImageView.setOnLongClickListener(new View.OnLongClickListener() {
             @Override
             public boolean onLongClick(View v) {
-                showImageSelector();
+                removeComicsImage();
                 return true;
             }
         });
@@ -126,10 +134,8 @@ public class ComicsDetailActivity extends ActionBarActivity {
                 //A0024
                 Uri imageUri = data.getData();
                 String destFileName = Comics.getDefaultImageFileName(mComics);
-                if (Utils.isNullOrEmpty(mComics.getImage())) {
-                    mComics.setImage(destFileName);
-                    mDataManager.updateData(DataManager.ACTION_UPD, mComics.getId(), DataManager.NO_RELEASE);
-                }
+                mComics.setImage(destFileName);
+                mDataManager.updateData(DataManager.ACTION_UPD, mComics.getId(), DataManager.NO_RELEASE);
                 //applica i filtri all'immagine, la salva e quindi la carica a video
                 createComicsImageFromUri(imageUri, FileHelper.getExternalFile(this, destFileName));
             }
@@ -212,11 +218,12 @@ public class ComicsDetailActivity extends ActionBarActivity {
                 Glide.with(context).load(params[0])
                         .asBitmap()
                         .transform(
-//                                new CenterCrop(context),
+                                new CenterCrop(context),
                                 new GrayscaleTransformation(context),
-//                        new BlurTransformation(this, 12, 2),
                                 new ColorFilterTransformation(context, getResources().getColor(R.color.comikku_comics_image_color))
-                        );
+                        )
+                        .override(500, 150) //TODO calcolare meglio le dimensioni (e se è più piccola?)
+                        ;
             }
 
             @Override
@@ -225,15 +232,23 @@ public class ComicsDetailActivity extends ActionBarActivity {
                 bitmapRequestBuilder.into(new SimpleTarget<Bitmap>() {
                     @Override
                     public void onResourceReady(Bitmap resource, GlideAnimation<? super Bitmap> glideAnimation) {
+                        OutputStream outputStream = null;
                         try {
-                            OutputStream outputStream = new FileOutputStream(file);
+                            outputStream = new FileOutputStream(file);
                             resource.compress(Bitmap.CompressFormat.JPEG, 80, outputStream);
                             outputStream.close();
+                            outputStream = null;
                             loadComicsImage(file);
-                        } catch (FileNotFoundException e) {
-                            e.printStackTrace();
                         } catch (IOException e) {
                             e.printStackTrace();
+                        } finally {
+                            if (outputStream != null) {
+                                try {
+                                    outputStream.close();
+                                } catch (Exception e) {
+                                    e.printStackTrace();
+                                }
+                            }
                         }
                     }
                 });
@@ -242,13 +257,30 @@ public class ComicsDetailActivity extends ActionBarActivity {
     }
 
     private void loadComicsImage(File file) {
-        if (file.exists()) {
-            ImageView imageView = (ImageView) findViewById(R.id.imageView);
+        if (file == null) {
+            mImageView.setImageResource(R.drawable.bck_detail_lightblue);
+        } else if (file.exists()) {
             //se è stato caricato in precedenza un file con lo stesso, l'imageView non carica quello nuovo
             //  perché l'Uri non è cambiato, è necessario quindi passre null per forzare il refresh
-            imageView.setImageDrawable(null);
-            imageView.setScaleType(ImageView.ScaleType.CENTER_CROP);
-            imageView.setImageURI(Uri.fromFile(file));
+            mImageView.setImageDrawable(null);
+            mImageView.setScaleType(ImageView.ScaleType.CENTER_CROP);
+            mImageView.setImageURI(Uri.fromFile(file));
         }
     }
+
+    private void removeComicsImage() {
+        String fileName = mComics.getImage();
+        if (!Utils.isNullOrEmpty(fileName)) {
+            loadComicsImage(null);
+            //
+            mComics.setImage(null);
+            mDataManager.updateData(DataManager.ACTION_UPD, mComics.getId(), DataManager.NO_RELEASE);
+            //
+            File file = FileHelper.getExternalFile(this, fileName);
+            if (file.exists()) {
+                file.delete();
+            }
+        }
+    }
+
 }
