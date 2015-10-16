@@ -208,13 +208,22 @@ public class Comics {
 
     /**
      *
-     * @param number
-     * @return
+     * @param number    il numero della release
+     * @return  release
      */
     public Release getRelease(int number) {
         for (Release release : releases) {
             if (release.getNumber() == number) return release;
         }
         return  null;
+    }
+
+    /**
+     *
+     * @param comics comics
+     * @return  il nome standard dell'immagine
+     */
+    public static String getDefaultImageFileName(Comics comics) {
+        return "IMG_" + comics.getId() + ".jpg";
     }
 }

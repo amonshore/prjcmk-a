@@ -4,6 +4,7 @@ import android.app.Activity;
 import android.app.SearchManager;
 import android.content.Context;
 import android.content.Intent;
+import android.graphics.Bitmap;
 import android.graphics.Color;
 import android.net.Uri;
 import android.os.AsyncTask;
@@ -16,13 +17,17 @@ import android.view.View;
 import android.widget.ImageView;
 import android.widget.TextView;
 
-import com.bumptech.glide.DrawableRequestBuilder;
+import com.bumptech.glide.BitmapRequestBuilder;
 import com.bumptech.glide.Glide;
 import com.bumptech.glide.load.resource.bitmap.CenterCrop;
+import com.bumptech.glide.request.animation.GlideAnimation;
+import com.bumptech.glide.request.target.SimpleTarget;
 
 import java.io.File;
+import java.io.FileNotFoundException;
+import java.io.FileOutputStream;
 import java.io.IOException;
-import java.util.UUID;
+import java.io.OutputStream;
 
 import it.amonshore.comikkua.R;
 import it.amonshore.comikkua.RequestCodes;
@@ -96,7 +101,7 @@ public class ComicsDetailActivity extends ActionBarActivity {
         });
         //A0024 carico l'immagine del comics (se esiste)
         if (!Utils.isNullOrEmpty(mComics.getImage())) {
-            loadComicsImage();
+            loadComicsImage(FileHelper.getExternalFile(this, mComics.getImage()));
         }
     }
 
@@ -118,34 +123,15 @@ public class ComicsDetailActivity extends ActionBarActivity {
                 int releaseNumber = data.getIntExtra(ReleaseEditorActivity.EXTRA_RELEASE_NUMBER, DataManager.NO_RELEASE);
                 mDataManager.updateData(DataManager.ACTION_ADD, mComics.getId(), releaseNumber);
             } else if (requestCode == RequestCodes.LOAD_IMAGES) {
-                //A0024 TODO per le versioni di android inferiori a KitKat non va bene come recupero il path del file dall'uri
+                //A0024
                 Uri imageUri = data.getData();
-                File imageFile = FileHelper.getFile(this, imageUri);
-                if (imageFile != null) {
-                    File destFile;
-                    //se esite già un file lo cancello
-                    if (!Utils.isNullOrEmpty(mComics.getImage())) {
-                        destFile = FileHelper.getExternalFile(this, mComics.getImage());
-                        if (destFile.exists()) {
-                            destFile.delete();
-                        }
-                    }
-                    //genero un nuovo nome di file
-                    String destFileName = UUID.randomUUID().toString();
+                String destFileName = Comics.getDefaultImageFileName(mComics);
+                if (Utils.isNullOrEmpty(mComics.getImage())) {
                     mComics.setImage(destFileName);
                     mDataManager.updateData(DataManager.ACTION_UPD, mComics.getId(), DataManager.NO_RELEASE);
-                    destFile = FileHelper.getExternalFile(this, destFileName);
-                    //copio il file nella cartella dell'app
-                    try {
-                        boolean res = FileHelper.copyFile(imageFile, destFile);
-                        Utils.d(this.getClass(), "A0024 to " + imageFile + " to " + destFile + " -> " + res);
-                        if (res) {
-                            loadComicsImage();
-                        }
-                    } catch (IOException ioex) {
-                        Utils.e(this.getClass(), "A0024", ioex);
-                    }
                 }
+                //applica i filtri all'immagine, la salva e quindi la carica a video
+                createComicsImageFromUri(imageUri, FileHelper.getExternalFile(this, destFileName));
             }
         }
     }
@@ -216,34 +202,53 @@ public class ComicsDetailActivity extends ActionBarActivity {
         startActivityForResult(Intent.createChooser(intent, "Choose Picture"), RequestCodes.LOAD_IMAGES);
     }
 
-    private void loadComicsImage() {
-        //A0024 NB: se l'uri dell'immagine è la stessa l'immagine non viene modificata
+    private void createComicsImageFromUri(Uri uri, final File file) {
+        //A0024 cambia il colore dell'immagine (scala di grigio + filtro colore) e la salva compressa (jpg)
         final Context context = this;
-        final File imageFile = FileHelper.getExternalFile(this, mComics.getImage());
-        final Uri backgroundUri;
-        if (imageFile.exists() && imageFile.canRead()) {
-            backgroundUri = Uri.fromFile(imageFile);
-        } else {
-            backgroundUri = Uri.parse("android.resource://it.amonshore.comikkua/" + R.drawable.bck_detail);
-        }
-        final ImageView imageView = (ImageView) findViewById(R.id.imageView);
-        new AsyncTask<Uri, Void, DrawableRequestBuilder<Uri>>() {
+        new AsyncTask<Uri, Void, BitmapRequestBuilder<Uri, Bitmap>>() {
             @Override
-            protected DrawableRequestBuilder<Uri> doInBackground(Uri... params) {
+            protected BitmapRequestBuilder<Uri, Bitmap> doInBackground(Uri... params) {
                 return
                 Glide.with(context).load(params[0])
-                        .bitmapTransform(
-                                new CenterCrop(context),
+                        .asBitmap()
+                        .transform(
+//                                new CenterCrop(context),
                                 new GrayscaleTransformation(context),
 //                        new BlurTransformation(this, 12, 2),
-                                new ColorFilterTransformation(context, Color.parseColor("#AA1976D2"))
+                                new ColorFilterTransformation(context, getResources().getColor(R.color.comikku_comics_image_color))
                         );
             }
 
             @Override
-            protected void onPostExecute(DrawableRequestBuilder<Uri> integerDrawableRequestBuilder) {
-                integerDrawableRequestBuilder.into(imageView);
+            protected void onPostExecute(BitmapRequestBuilder<Uri, Bitmap> bitmapRequestBuilder) {
+                //integerDrawableRequestBuilder.into(imageView);
+                bitmapRequestBuilder.into(new SimpleTarget<Bitmap>() {
+                    @Override
+                    public void onResourceReady(Bitmap resource, GlideAnimation<? super Bitmap> glideAnimation) {
+                        try {
+                            OutputStream outputStream = new FileOutputStream(file);
+                            resource.compress(Bitmap.CompressFormat.JPEG, 80, outputStream);
+                            outputStream.close();
+                            loadComicsImage(file);
+                        } catch (FileNotFoundException e) {
+                            e.printStackTrace();
+                        } catch (IOException e) {
+                            e.printStackTrace();
+                        }
+                    }
+                });
             }
-        }.execute(backgroundUri);
+        }.execute(uri);
+    }
+
+    private void loadComicsImage(File file) {
+        if (file.exists()) {
+            ImageView imageView = (ImageView) findViewById(R.id.imageView);
+            //se è stato caricato in precedenza un file con lo stesso, l'imageView non carica quello nuovo
+            //  perché l'Uri non è cambiato, è necessario quindi passre null per forzare il refresh
+            imageView.setImageDrawable(null);
+            imageView.setScaleType(ImageView.ScaleType.CENTER_CROP);
+            imageView.setImageURI(Uri.fromFile(file));
+        }
     }
 }

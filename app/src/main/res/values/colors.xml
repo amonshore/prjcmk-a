@@ -36,6 +36,7 @@
     <color name="comikku_primary_color_900">#0D47A1</color>
 
     <color name="comikku_control_activated_color">#1565C0</color>
+    <color name="comikku_comics_image_color">#AA1976D2</color>
 
     <!-- colori per i pulsanti circolari -->
     <color name="comikku_fab_normal_color">#0288D1</color>
