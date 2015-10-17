@@ -5,6 +5,8 @@ import android.app.SearchManager;
 import android.content.Context;
 import android.content.Intent;
 import android.graphics.Bitmap;
+import android.graphics.Color;
+import android.graphics.Shader;
 import android.net.Uri;
 import android.os.AsyncTask;
 import android.os.Bundle;
@@ -18,12 +20,12 @@ import android.widget.TextView;
 
 import com.bumptech.glide.BitmapRequestBuilder;
 import com.bumptech.glide.Glide;
+import com.bumptech.glide.load.engine.DiskCacheStrategy;
 import com.bumptech.glide.load.resource.bitmap.CenterCrop;
 import com.bumptech.glide.request.animation.GlideAnimation;
 import com.bumptech.glide.request.target.SimpleTarget;
 
 import java.io.File;
-import java.io.FileNotFoundException;
 import java.io.FileOutputStream;
 import java.io.IOException;
 import java.io.OutputStream;
@@ -35,6 +37,7 @@ import it.amonshore.comikkua.data.Comics;
 import it.amonshore.comikkua.data.DataManager;
 import it.amonshore.comikkua.data.FileHelper;
 import it.amonshore.comikkua.data.ReleaseGroupHelper;
+import it.amonshore.comikkua.ui.ComicsImageTransformation;
 import it.amonshore.comikkua.ui.release.ReleaseEditorActivity;
 import it.amonshore.comikkua.ui.release.ReleaseListFragment;
 import jp.wasabeef.glide.transformations.ColorFilterTransformation;
@@ -217,10 +220,16 @@ public class ComicsDetailActivity extends ActionBarActivity {
                 return
                 Glide.with(context).load(params[0])
                         .asBitmap()
+//                        .diskCacheStrategy(DiskCacheStrategy.SOURCE) //TODO da togliere
+//                        .skipMemoryCache(true) //TODO da togliere
                         .transform(
                                 new CenterCrop(context),
                                 new GrayscaleTransformation(context),
-                                new ColorFilterTransformation(context, getResources().getColor(R.color.comikku_comics_image_color))
+                                new ColorFilterTransformation(context, getResources().getColor(R.color.comikku_comics_image_color)),
+
+                                new ComicsImageTransformation(context, 100,
+                                        getResources().getColor(R.color.comikku_primary_color),
+                                        Color.TRANSPARENT) //TODO provare direttamente comikku_comics_image_color in modo
                         )
                         .override(500, 150) //TODO calcolare meglio le dimensioni (e se è più piccola?)
                         ;
