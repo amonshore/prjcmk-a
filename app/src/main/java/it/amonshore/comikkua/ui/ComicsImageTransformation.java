@@ -48,10 +48,7 @@ public class ComicsImageTransformation implements Transformation<Bitmap> {
             bitmap = Bitmap.createBitmap(width, height, config);
         }
 
-        float y = height / 2;
-        float size = mHeight / 2;
-
-        LinearGradient shader = new LinearGradient(0, y - size, 0, y + size,
+        LinearGradient shader = new LinearGradient(0, 0, 0, mHeight,
                 mColor0, mColor1, Shader.TileMode.CLAMP);
 
         Canvas canvas = new Canvas(bitmap);

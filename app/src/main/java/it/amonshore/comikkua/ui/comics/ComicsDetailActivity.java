@@ -225,13 +225,14 @@ public class ComicsDetailActivity extends ActionBarActivity {
                         .transform(
                                 new CenterCrop(context),
                                 new GrayscaleTransformation(context),
-                                new ColorFilterTransformation(context, getResources().getColor(R.color.comikku_comics_image_color)),
-
-                                new ComicsImageTransformation(context, 100,
-                                        getResources().getColor(R.color.comikku_primary_color),
-                                        Color.TRANSPARENT) //TODO provare direttamente comikku_comics_image_color in modo
+                                new ColorFilterTransformation(context, getResources().getColor(R.color.comikku_comics_image_color))
+////                                ,
+//
+////                                new ComicsImageTransformation(context, 100,
+////                                        getResources().getColor(R.color.comikku_primary_color),
+////                                        Color.TRANSPARENT) //TODO provare direttamente comikku_comics_image_color in modo
                         )
-                        .override(500, 150) //TODO calcolare meglio le dimensioni (e se è più piccola?)
+                        .override(500, 195) //TODO considerare le dim. originali dell'immagine e dell view (portrait 1080 * 420)
                         ;
             }
 
@@ -272,8 +273,21 @@ public class ComicsDetailActivity extends ActionBarActivity {
             //se è stato caricato in precedenza un file con lo stesso, l'imageView non carica quello nuovo
             //  perché l'Uri non è cambiato, è necessario quindi passre null per forzare il refresh
             mImageView.setImageDrawable(null);
-            mImageView.setScaleType(ImageView.ScaleType.CENTER_CROP);
+//            mImageView.setScaleType(ImageView.ScaleType.CENTER_CROP);
             mImageView.setImageURI(Uri.fromFile(file));
+
+//            final int height = 10;
+//            final Context context = this;
+//            Glide.with(this).load(file)
+////                    .diskCacheStrategy(DiskCacheStrategy.SOURCE) //TODO da togliere
+////                    .skipMemoryCache(true) //TODO da togliere
+//                    .bitmapTransform(
+//                            new CenterCrop(context),
+//                            new ComicsImageTransformation(context, height,
+//                                    getResources().getColor(R.color.comikku_primary_color),
+////                                Color.TRANSPARENT) //TODO provare direttamente comikku_comics_image_color in modo
+//                                    getResources().getColor(R.color.comikku_comics_image_color))
+//                    ).into(mImageView);
         }
     }
 

@@ -5,6 +5,7 @@ import android.text.TextUtils;
 import java.util.ArrayList;
 import java.util.Calendar;
 import java.util.GregorianCalendar;
+import java.util.UUID;
 
 /**
  * Created by Narsenico on 07/05/2015.
@@ -224,6 +225,7 @@ public class Comics {
      * @return  il nome standard dell'immagine
      */
     public static String getDefaultImageFileName(Comics comics) {
-        return "IMG_" + comics.getId() + ".jpg";
+//        return "IMG_" + comics.getId() + ".jpg";
+        return UUID.randomUUID().toString() + ".jpg";
     }
 }
