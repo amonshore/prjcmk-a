@@ -131,6 +131,7 @@ public class ComicsDetailActivity extends ActionBarActivity {
                 mDataManager.updateData(DataManager.ACTION_ADD, mComics.getId(), releaseNumber);
             } else if (requestCode == RequestCodes.LOAD_IMAGES) {
                 //A0024
+                //elimino il file precedente
                 Uri imageUri = data.getData();
                 String destFileName = Comics.getDefaultImageFileName(mComics);
                 mComics.setImage(destFileName);

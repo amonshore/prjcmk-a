@@ -225,7 +225,7 @@ public class Comics {
      * @return  il nome standard dell'immagine
      */
     public static String getDefaultImageFileName(Comics comics) {
-//        return "IMG_" + comics.getId() + ".jpg";
-        return UUID.randomUUID().toString() + ".jpg";
+        return "IMG_" + comics.getId() + ".jpg";
+//        return UUID.randomUUID().toString() + ".jpg";
     }
 }
