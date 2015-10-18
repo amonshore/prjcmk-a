@@ -31,3 +31,6 @@ Versione: v1.0.1 (13)
 Versione: v1.0.2 (14)
 - salvataggio dati in database sqlite
 - creazione backup in cartella Download
+
+Versione: v1.0.2 (15)
+- immagine per comics

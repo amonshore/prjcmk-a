@@ -95,4 +95,6 @@
     <string name="pref_clear_data">Rimuovi tutti i dati</string>
     <string name="pref_restore_old">Ripristina i dati da una versione meno recente di Comikku</string>
     <string name="toast_data_cleared">Dati rimossi</string>
+    <string name="comics_detail_image_change">Cambia immagine</string>
+    <string name="comics_detail_image_remove">Rimuovi immagine</string>
 </resources>

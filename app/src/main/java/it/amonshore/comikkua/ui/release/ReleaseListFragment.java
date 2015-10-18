@@ -23,6 +23,7 @@ import com.nispok.snackbar.SnackbarManager;
 import com.nispok.snackbar.listeners.ActionClickListener;
 
 import it.amonshore.comikkua.R;
+import it.amonshore.comikkua.RequestCodes;
 import it.amonshore.comikkua.data.Comics;
 import it.amonshore.comikkua.data.DataManager;
 import it.amonshore.comikkua.data.MultiReleaseInfo;
@@ -266,7 +267,7 @@ public class ReleaseListFragment extends AFragment {
     @Override
     public void onActivityResult(int requestCode, int resultCode, Intent data) {
         if (resultCode == Activity.RESULT_OK) {
-            if (requestCode == ReleaseEditorActivity.EDIT_RELEASE_REQUEST) {
+            if (requestCode == RequestCodes.EDIT_RELEASE_REQUEST) {
                 final DataManager dataManager = DataManager.getDataManager();
                 final long comicsId = data.getLongExtra(ReleaseEditorActivity.EXTRA_COMICS_ID,
                         ReleaseEditorActivity.COMICS_ID_NONE);
@@ -445,7 +446,7 @@ public class ReleaseListFragment extends AFragment {
         Intent intent = new Intent(getActivity(), ReleaseEditorActivity.class);
         intent.putExtra(ReleaseEditorActivity.EXTRA_COMICS_ID, comicsId);
         intent.putExtra(ReleaseEditorActivity.EXTRA_RELEASE_NUMBER, number);
-        startActivityForResult(intent, ReleaseEditorActivity.EDIT_RELEASE_REQUEST);
+        startActivityForResult(intent, RequestCodes.EDIT_RELEASE_REQUEST);
     }
 
     private void showComicsDetail(long comicsId) {
@@ -453,6 +454,52 @@ public class ReleaseListFragment extends AFragment {
         intent.putExtra(ComicsDetailActivity.EXTRA_COMICS_ID, comicsId);
         startActivity(intent);
     }
+
+//    private void loadComicsBackground() {
+////        //TODO A0024 recuperare l'immagine associata al comics
+////        //getView().setBackground(Utils.convertToGrayscale(getResources().getDrawable(R.drawable.bck_detail)));
+////        //getView().setBackground(getResources().getDrawable(R.drawable.bck_detail));
+////        Context context = getActivity();
+////        Glide.with(context).load(R.drawable.bck_detail)
+////                .bitmapTransform(
+////                        new GrayscaleTransformation(context),
+//////                        new BlurTransformation(context, 12, 2),
+////                        new ColorFilterTransformation(context, Color.parseColor("#AAFFFFFF"))
+////                )
+////                .into(new SimpleTarget<GlideDrawable>() {
+////                    @Override
+////                    public void onResourceReady(GlideDrawable resource, GlideAnimation<? super GlideDrawable> glideAnimation) {
+////                        getView().setBackground(resource);
+////                    }
+////                });
+//
+//        final Context context = getActivity();
+//        final Uri backgroundUri = Uri.fromFile(FileHelper.getExternalFile(context, "20140712_153945.jpg"));
+//        new AsyncTask<Uri, Void, DrawableRequestBuilder<Uri>>() {
+//            @Override
+//            protected DrawableRequestBuilder<Uri> doInBackground(Uri... params) {
+//                return
+//                        Glide.with(context).load(params[0])
+//                                .bitmapTransform(
+//                                        new CenterCrop(context),
+//                                        new GrayscaleTransformation(context),
+////                        new BlurTransformation(this, 12, 2),
+//                                        new ColorFilterTransformation(context, Color.parseColor("#AAFFFFFF"))
+//                                );
+//            }
+//
+//            @Override
+//            protected void onPostExecute(DrawableRequestBuilder<Uri> integerDrawableRequestBuilder) {
+//                integerDrawableRequestBuilder.into(new SimpleTarget<GlideDrawable>() {
+//                    @Override
+//                    public void onResourceReady(GlideDrawable resource, GlideAnimation<? super GlideDrawable> glideAnimation) {
+//                        getView().setBackground(resource);
+//                    }
+//                });
+//            }
+//        }.execute(backgroundUri);
+//    }
+
 
 //A0040 sembra provocare un crash della VM per qualche strana ragione
 //    /**

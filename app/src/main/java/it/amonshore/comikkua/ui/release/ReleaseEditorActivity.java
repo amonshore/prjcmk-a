@@ -33,8 +33,6 @@ import it.amonshore.comikkua.data.Release;
 
 public class ReleaseEditorActivity extends ActionBarActivity {
 
-    public final static int EDIT_RELEASE_REQUEST = 2001;
-
     public final static String EXTRA_COMICS_ID = "comicsId";
     public final static String EXTRA_RELEASE_NUMBER = "releaseNumber";
     public final static long COMICS_ID_NONE = 0;

@@ -7,13 +7,15 @@ android {
         }
     }
     compileSdkVersion 21
-    buildToolsVersion "21.1.2"
+    buildToolsVersion '23.0.1'
     defaultConfig {
         applicationId "it.amonshore.comikkua"
         minSdkVersion 16
         targetSdkVersion 21
-        versionCode 14
+        versionCode 15
         versionName 'v1.0.2'
+        renderscriptTargetApi 23
+        renderscriptSupportModeEnabled true
     }
     buildTypes {
         release {
@@ -41,4 +43,6 @@ dependencies {
     compile 'com.marvinlabs:android-floatinglabel-widgets:1.6.1@aar'
     compile 'com.github.citux:datetimepicker:0.1.2'
     compile 'com.nispok:snackbar:2.10.10'
+    compile 'com.github.bumptech.glide:glide:3.6.1'
+    compile 'jp.wasabeef:glide-transformations:1.2.1'
 }

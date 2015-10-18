@@ -15,7 +15,7 @@ import it.amonshore.comikkua.Utils;
  */
 public class DBHelper extends SQLiteOpenHelper {
 
-    public static final int DATABASE_VERSION = 2;
+    public static final int DATABASE_VERSION = 3;
     public static final String DATABASE_NAME = "comikkua.db";
 
     public final static String TRUE = "T";
@@ -33,6 +33,7 @@ public class DBHelper extends SQLiteOpenHelper {
         public static final String COL_PERIODICITY = "periodicity";
         public static final String COL_RESERVED = "reserved";
         public static final String COL_NOTES = "notes";
+        public static final String COL_IMAGE = "image";
 
         public static final int IDX_ID = 0;
         public static final int IDX_USER = 1;
@@ -44,15 +45,17 @@ public class DBHelper extends SQLiteOpenHelper {
         public static final int IDX_PERIODICITY = 7;
         public static final int IDX_RESERVED = 8;
         public static final int IDX_NOTES = 9;
+        public static final int IDX_IMAGE = 10;
 
         public static final String[] COLUMNS = {COL_ID, COL_USER, COL_NAME,
                 COL_SERIES, COL_PUBLISHER, COL_AUTHORS, COL_PRICE,
-                COL_PERIODICITY, COL_RESERVED, COL_NOTES};
+                COL_PERIODICITY, COL_RESERVED, COL_NOTES, COL_IMAGE};
 
         public static final String SQL_CREATE = "create table " + NAME +
                 " (_id INTEGER NOT NULL, " +
                 "user TEXT NOT NULL, name TEXT NOT NULL, series TEXT, publisher TEXT, authors TEXT, " +
-                "price REAL, periodicity TEXT, reserved TEXT, notes TEXT, PRIMARY KEY(_id, user))";
+                "price REAL, periodicity TEXT, reserved TEXT, notes TEXT, image TEXT, " +
+                "PRIMARY KEY(_id, user))";
 
         public static ContentValues getContentValues(Comics comics, String user) {
             ContentValues cv = new ContentValues();
@@ -66,6 +69,7 @@ public class DBHelper extends SQLiteOpenHelper {
             cv.put(COL_PERIODICITY, comics.getPeriodicity());
             cv.put(COL_RESERVED, comics.isReserved() ? TRUE : FALSE);
             cv.put(COL_NOTES, comics.getNotes());
+            cv.put(COL_IMAGE, comics.getImage());
             return cv;
         }
     }
@@ -127,5 +131,8 @@ public class DBHelper extends SQLiteOpenHelper {
     @Override
     public void onUpgrade(SQLiteDatabase db, int oldVersion, int newVersion) {
         //da usare per aggiornare il database ad una nuova versione
+        if (oldVersion < 3) {
+            db.execSQL("alter table tComics add column image text");
+        }
     }
 }

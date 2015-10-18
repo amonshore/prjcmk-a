@@ -126,4 +126,12 @@
     <string name="editor_release_notes">Notes</string>
     <string name="editor_release_purchased">Purchased</string>
     <string name="editor_release_ordered">Ordered</string>
+
+    <!-- comics editor -->
+    <string name="comics_detail_image_change">Change image</string>
+    <string name="comics_detail_image_remove">Remove image</string>
+    <string-array name="comics_detail_image_choose">
+        <item>@string/comics_detail_image_change</item>
+        <item>@string/comics_detail_image_remove</item>
+    </string-array>
 </resources>
