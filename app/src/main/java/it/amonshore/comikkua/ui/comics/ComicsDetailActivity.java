@@ -1,12 +1,12 @@
 package it.amonshore.comikkua.ui.comics;
 
 import android.app.Activity;
+import android.app.AlertDialog;
 import android.app.SearchManager;
 import android.content.Context;
+import android.content.DialogInterface;
 import android.content.Intent;
 import android.graphics.Bitmap;
-import android.graphics.Color;
-import android.graphics.Shader;
 import android.net.Uri;
 import android.os.AsyncTask;
 import android.os.Bundle;
@@ -20,7 +20,6 @@ import android.widget.TextView;
 
 import com.bumptech.glide.BitmapRequestBuilder;
 import com.bumptech.glide.Glide;
-import com.bumptech.glide.load.engine.DiskCacheStrategy;
 import com.bumptech.glide.load.resource.bitmap.CenterCrop;
 import com.bumptech.glide.request.animation.GlideAnimation;
 import com.bumptech.glide.request.target.SimpleTarget;
@@ -37,7 +36,6 @@ import it.amonshore.comikkua.data.Comics;
 import it.amonshore.comikkua.data.DataManager;
 import it.amonshore.comikkua.data.FileHelper;
 import it.amonshore.comikkua.data.ReleaseGroupHelper;
-import it.amonshore.comikkua.ui.ComicsImageTransformation;
 import it.amonshore.comikkua.ui.release.ReleaseEditorActivity;
 import it.amonshore.comikkua.ui.release.ReleaseListFragment;
 import jp.wasabeef.glide.transformations.ColorFilterTransformation;
@@ -97,16 +95,14 @@ public class ComicsDetailActivity extends ActionBarActivity {
         //A0024 gestisco il click sull'immagine per poterne scegliere una dalla libreria
 
         mImageView = (ImageView)findViewById(R.id.imageView);
-        mImageView.setOnClickListener(new View.OnClickListener() {
-            @Override
-            public void onClick(View v) {
-                showImageSelector();
-            }
-        });
         mImageView.setOnLongClickListener(new View.OnLongClickListener() {
             @Override
             public boolean onLongClick(View v) {
-                removeComicsImage();
+                if (!Utils.isNullOrEmpty(mComics.getImage())) {
+                    showComicsImageDialog();
+                } else {
+                    showComicsImageSelector();
+                }
                 return true;
             }
         });
@@ -205,7 +201,7 @@ public class ComicsDetailActivity extends ActionBarActivity {
         startActivityForResult(intent, RequestCodes.EDIT_RELEASE_REQUEST);
     }
 
-    private void showImageSelector() {
+    private void showComicsImageSelector() {
         Intent intent = new Intent(Intent.ACTION_GET_CONTENT);
         intent.setType("image/*");
         startActivityForResult(Intent.createChooser(intent, "Choose Picture"), RequestCodes.LOAD_IMAGES);
@@ -238,7 +234,6 @@ public class ComicsDetailActivity extends ActionBarActivity {
 
             @Override
             protected void onPostExecute(BitmapRequestBuilder<Uri, Bitmap> bitmapRequestBuilder) {
-                //integerDrawableRequestBuilder.into(imageView);
                 bitmapRequestBuilder.into(new SimpleTarget<Bitmap>() {
                     @Override
                     public void onResourceReady(Bitmap resource, GlideAnimation<? super Bitmap> glideAnimation) {
@@ -248,6 +243,7 @@ public class ComicsDetailActivity extends ActionBarActivity {
                             resource.compress(Bitmap.CompressFormat.JPEG, 80, outputStream);
                             outputStream.close();
                             outputStream = null;
+                            //
                             loadComicsImage(file);
                         } catch (IOException e) {
                             e.printStackTrace();
@@ -304,6 +300,22 @@ public class ComicsDetailActivity extends ActionBarActivity {
                 file.delete();
             }
         }
+    }
+
+    private void showComicsImageDialog() {
+        AlertDialog.Builder builder = new AlertDialog.Builder(this);
+        builder.setItems(R.array.comics_detail_image_choose,
+                new DialogInterface.OnClickListener() {
+                    @Override
+                    public void onClick(DialogInterface dialog, int which) {
+                        if (which == 0) {
+                            showComicsImageSelector();
+                        } else {
+                            removeComicsImage();
+                        }
+                    }
+                });
+        builder.create().show();
     }
 
 }
