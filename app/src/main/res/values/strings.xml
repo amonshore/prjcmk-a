@@ -56,6 +56,9 @@
     <string name="pref_restore_now_title">Restore bakcup</string>
     <string name="pref_clear_data">Remove all data</string>
     <string name="pref_restore_old">Restore data from old version of Comikku app</string>
+    <string name="pref_last_purchased_title">Show last release purchased</string>
+    <string name="pref_last_purchased_on">The last number purchased is shown in the list comics</string>
+    <string name="pref_last_purchased_off">The next issue that must be purchased is shown in the comics list</string>
     <string name="toast_backup_created">Backup created</string>
     <string name="toast_backup_problem">There was a problem with backup</string>
     <string name="toast_backup_restored">Backup restored</string>

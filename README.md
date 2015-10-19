@@ -34,3 +34,5 @@ Versione: v1.0.2 (14)
 
 Versione: v1.0.2 (15)
 - immagine per comics
+
+Versione: v1.0.2 (16)

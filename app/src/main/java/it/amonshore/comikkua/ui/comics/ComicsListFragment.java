@@ -30,6 +30,7 @@ import it.amonshore.comikkua.data.DataManager;
 import it.amonshore.comikkua.data.UndoHelper;
 import it.amonshore.comikkua.ui.AFragment;
 import it.amonshore.comikkua.ui.MainActivity;
+import it.amonshore.comikkua.ui.ScrollToTopListener;
 
 /**
  * A fragment representing a list of Items.
@@ -38,12 +39,12 @@ import it.amonshore.comikkua.ui.MainActivity;
  * with a GridView.
  * <p/>
  */
-public class ComicsListFragment extends AFragment {
+public class ComicsListFragment extends AFragment implements ScrollToTopListener {
 
     //usato per lo stato dell'istanza
     private final static String STATE_ORDER = " stateOrder";
 
-    private AbsListView mListView;
+    private ListView mListView;
     private ComicsListAdapter mAdapter;
     private ActionMode mActionMode;
     private FloatingActionButton mBtnAdd;
@@ -91,7 +92,7 @@ public class ComicsListFragment extends AFragment {
         View view = inflater.inflate(R.layout.fragment_comics_list, container, false);
 
         // Set the adapter
-        mListView = (AbsListView) view.findViewById(android.R.id.list);
+        mListView = (ListView) view.findViewById(android.R.id.list);
         mListView.setAdapter(mAdapter);
         //A0022
         TextView emptyView = (TextView)view.findViewById(android.R.id.empty);
@@ -352,7 +353,6 @@ public class ComicsListFragment extends AFragment {
                     }
                 };
                 mh.post(runnable);
-
             }
         }
     }
@@ -367,6 +367,14 @@ public class ComicsListFragment extends AFragment {
         Intent intent = new Intent(getActivity(), ComicsDetailActivity.class);
         intent.putExtra(ComicsDetailActivity.EXTRA_COMICS_ID, comicsId);
         startActivity(intent);
+    }
+
+    @Override
+    public void scrollToTop() {
+        //A0053
+        if (mAdapter.getCount() > 0) {
+            mListView.smoothScrollToPosition(0);
+        }
     }
 
 //    A0040

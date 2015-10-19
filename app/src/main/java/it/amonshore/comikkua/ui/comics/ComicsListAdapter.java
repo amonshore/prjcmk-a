@@ -74,26 +74,6 @@ public class ComicsListAdapter extends BaseAdapter implements SectionIndexer {
         }
     }
 
-//    /**
-//     *
-//     * @param comics
-//     * @return ritorna la posizione dell'elemento
-//     */
-//    public int insertOrUpdate(Comics comics) {
-//        if (mDataManager.put(comics)) {
-//            //è un nuovo elemento
-//            mSortedIds.add(comics.getId());
-//            Collections.sort(mSortedIds, mComparator);
-//            prepareFastScrollSections();
-//            return mSortedIds.indexOf(comics.getId());
-//        } else {
-//            //è un elemento già esistente
-//            Collections.sort(mSortedIds, mComparator);
-//            prepareFastScrollSections();
-//            return mSortedIds.indexOf(comics.getId());
-//        }
-//    }
-
     /**
      *
      * @param id
@@ -213,13 +193,16 @@ public class ComicsListAdapter extends BaseAdapter implements SectionIndexer {
                 case ReleaseGroupHelper.GROUP_PERIOD:
                 case ReleaseGroupHelper.GROUP_PERIOD_NEXT:
                 case ReleaseGroupHelper.GROUP_PERIOD_OTHER:
-                case ReleaseGroupHelper.GROUP_PURCHASED:
                     holder.txtNumber.setTextColor(mContext.getResources().getColor(R.color.comikku_to_purchase_color_primary));
                     holder.leftView.setBackgroundResource(R.drawable.border_comics_to_purchase);
                     break;
                 case ReleaseGroupHelper.GROUP_WISHLIST:
                     holder.txtNumber.setTextColor(mContext.getResources().getColor(R.color.comikku_wishlist_color_primary));
                     holder.leftView.setBackgroundResource(R.drawable.border_comics_wishlist);
+                    break;
+                case ReleaseGroupHelper.GROUP_PURCHASED:    //A0046
+                    holder.txtNumber.setTextColor(mContext.getResources().getColor(R.color.comikku_purchased_color_primary));
+                    holder.leftView.setBackgroundResource(R.drawable.border_comics_purchased);
                     break;
             }
             bestReleaseNotes = bestRelease.getNotes();

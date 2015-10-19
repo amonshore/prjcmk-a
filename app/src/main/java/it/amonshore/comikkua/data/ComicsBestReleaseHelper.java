@@ -1,5 +1,9 @@
 package it.amonshore.comikkua.data;
 
+import android.content.Context;
+import android.content.SharedPreferences;
+import android.preference.PreferenceManager;
+
 import java.util.Arrays;
 import java.util.Collections;
 import java.util.Comparator;
@@ -8,6 +12,7 @@ import java.util.List;
 import java.util.TimeZone;
 
 import hirondelle.date4j.DateTime;
+import it.amonshore.comikkua.ui.SettingsActivity;
 
 /**
  * Created by Narsenico on 24/05/2015.
@@ -15,11 +20,42 @@ import hirondelle.date4j.DateTime;
 public class ComicsBestReleaseHelper {
 
     /**
+     * A0046
      *
-     * @param comics
-     * @return
+     * @param context   utilizzato per recuperare le preferenze
+     * @param comics    comics per cui leggere la best release
+     * @return la prima uscita da comprare o l'ultima comprata in base alle preferenze
      */
-    public static ReleaseInfo getComicsBestRelease(Comics comics) {
+    public static ReleaseInfo getComicsBestRelease(Context context, Comics comics) {
+        //TODO non mi piace molto che si debba recuperare ogni volta il flag dalle preferenze
+        SharedPreferences sharedPref = PreferenceManager.getDefaultSharedPreferences(context);
+        boolean showLastPurchased = sharedPref.getBoolean(SettingsActivity.KEY_PREF_LAST_PURCHASED, false);
+        if (showLastPurchased) {
+            return getLastReleasePurchased(comics);
+        } else {
+            return getFirstReleaseToPurchase(comics);
+        }
+    }
+
+    private static ReleaseInfo getLastReleasePurchased(Comics comics) {
+        Release lastPurchased = null;
+        for (Release release : comics.getReleases()) {
+            if (!release.isPurchased()) continue;
+            if (lastPurchased == null) {
+                lastPurchased = release;
+            } else if (lastPurchased.getNumber() < release.getNumber()) {
+                lastPurchased = release;
+            }
+        }
+
+        if (lastPurchased == null) {
+            return null;
+        } else {
+            return new ReleaseInfo(ReleaseGroupHelper.GROUP_PURCHASED, lastPurchased);
+        }
+    }
+
+    private static ReleaseInfo getFirstReleaseToPurchase(Comics comics) {
         //imposto le date
         final TimeZone timeZone = TimeZone.getDefault();
         final long today = DateTime.today(timeZone).getStartOfDay().getMilliseconds(timeZone);

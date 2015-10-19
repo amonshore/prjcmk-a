@@ -4,24 +4,10 @@ import android.content.Context;
 import android.database.Cursor;
 import android.database.Observable;
 import android.database.sqlite.SQLiteDatabase;
-import android.os.Environment;
 import android.text.TextUtils;
-import android.util.JsonWriter;
 
-import org.json.JSONArray;
-import org.json.JSONException;
-import org.json.JSONObject;
-import org.json.JSONTokener;
-
-import java.io.BufferedReader;
 import java.io.File;
-import java.io.FileOutputStream;
-import java.io.FileReader;
 import java.io.IOException;
-import java.io.OutputStreamWriter;
-import java.text.ParseException;
-import java.text.SimpleDateFormat;
-import java.util.Date;
 import java.util.HashSet;
 import java.util.Queue;
 import java.util.Set;
@@ -61,28 +47,6 @@ public class DataManager extends Observable<ComicsObserver> {
     public static final long NO_COMICS = -1;
     public static final int NO_RELEASE = -1;
 
-//    private final static String FILE_NAME = "data.json";
-//    private final static String FILE_BACKUP = "data.bck";
-//    private final static String FIELD_ID = "id";
-//    private final static String FIELD_NAME = "name";
-//    private final static String FIELD_SERIES = "series";
-//    private final static String FIELD_PUBLISHER = "publisher";
-//    private final static String FIELD_AUTHORS = "authors";
-//    private final static String FIELD_PRICE = "price";
-//    private final static String FIELD_PERIODICITY = "periodicity";
-//    private final static String FIELD_RESERVED = "reserved";
-//    private final static String FIELD_NOTES = "notes";
-//    private final static String FIELD_RELEASES = "releases";
-//    private final static String FIELD_NUMBER = "number";
-//    private final static String FIELD_DATE = "date";
-//    private final static String FIELD_REMINDER = "reminder";
-//    private final static String FIELD_PURCHASED = "purchased";
-//    private final static String FIELD_ORDERED = "ordered";
-
-//    private final static String TRUE = "T";
-//    private final static String FALSE = "F";
-
-    //
     private static DataManager instance;
 
     /**
@@ -112,7 +76,6 @@ public class DataManager extends Observable<ComicsObserver> {
 
     private final String mUserName;
     private long mLastComicsId;
-//    private final boolean mExternalStorage;
     private final Context mContext;
     private boolean mDataLoaded;
     //
@@ -124,7 +87,6 @@ public class DataManager extends Observable<ComicsObserver> {
     private HashSet<String> mPublishers;
     //contiene la best release per ogni comics
     private TreeMap<Long, ReleaseInfo> mBestReleases;
-//    private final SimpleDateFormat mDateFormat;
     //
     private AsyncWriteHandler mWriteHandler;
     //A0038
@@ -137,12 +99,6 @@ public class DataManager extends Observable<ComicsObserver> {
     private DataManager(Context context, String userName) {
         mContext = context;
         mUserName = userName;
-//        mLastComicsId = System.currentTimeMillis();
-        //controllo che la memoria esternza sia disponibile
-//        mExternalStorage = isExternalStorageWritable();
-//        Utils.d("isExternalStorageWritable " + mExternalStorage);
-        //date format non localizzata
-//        mDateFormat = new SimpleDateFormat("yyyy-MM-dd");
         //
         mComicsCache = new TreeMap<>();
         mPublishers = new HashSet<>();
@@ -152,187 +108,6 @@ public class DataManager extends Observable<ComicsObserver> {
         //
         mDBHelper = new DBHelper(context);
     }
-
-//    private boolean isExternalStorageWritable() {
-//        String state = Environment.getExternalStorageState();
-//        return Environment.MEDIA_MOUNTED.equals(state);
-//    }
-
-//    private File getDataFile() {
-//        String fileName = FILE_NAME;
-//        if (mExternalStorage) {
-//            return new File(mContext.getExternalFilesDir(null), fileName);
-//        } else {
-//            return new File(mContext.getFilesDir(), fileName);
-//        }
-//    }
-
-//    private File getBackupDataFile() {
-//        String fileName = FILE_BACKUP;
-//        if (mExternalStorage) {
-//            return new File(mContext.getExternalFilesDir(null), fileName);
-//        } else {
-//            return new File(mContext.getFilesDir(), fileName);
-//        }
-//    }
-
-//    private void parseJSON(String json) {
-//        try {
-//            //TODO attualmente i dati sono strutturati come un array, modificarlo in modo che la struttura sia questa { lastUpdate: <timestamp>, data: <array> }
-//            JSONArray arr = (JSONArray) new JSONTokener(json).nextValue();
-//            for (int ii = 0; ii < arr.length(); ii++) {
-//                JSONObject obj = arr.getJSONObject(ii);
-//                Comics comics = json2comics(obj);
-//                mComicsCache.put(comics.getId(), comics);
-//                putPublisher(comics.getPublisher());
-//                updateBestRelease(comics.getId());
-//            }
-//            //TODO parse json
-//        } catch (JSONException jsonex) {
-//            Utils.e("parseComics", jsonex);
-//        }
-//    }
-
-//    private Comics json2comics(JSONObject obj) throws JSONException {
-//        //nella versione ionic l'id è una stringa, devo convertirla in long
-//        Comics comics = new Comics(tryGetId(obj));
-//        comics.setName(obj.getString(FIELD_NAME));
-//        comics.setSeries(tryGetString(obj, FIELD_SERIES));
-//        comics.setPublisher(tryGetString(obj, FIELD_PUBLISHER));
-//        comics.setAuthors(tryGetString(obj, FIELD_AUTHORS));
-//        comics.setPrice(tryGetDouble(obj, FIELD_PRICE));
-//        comics.setPeriodicity(tryGetString(obj, FIELD_PERIODICITY));
-//        comics.setReserved(tryGetBoolean(obj, FIELD_RESERVED));
-//        comics.setNotes(tryGetString(obj, FIELD_NOTES));
-//        //prelevo le release
-//        JSONArray arrReleases = obj.getJSONArray(FIELD_RELEASES);
-//        for (int ii = 0; ii < arrReleases.length(); ii++) {
-//            comics.putRelease(json2release(comics.createRelease(false), arrReleases.getJSONObject(ii)));
-//        }
-//
-//        return comics;
-//    }
-
-//    private Release json2release(Release release, JSONObject obj) throws JSONException {
-//        release.setNumber(obj.getInt(FIELD_NUMBER));
-//        release.setDate(tryGetDate(obj, FIELD_DATE));
-//        release.setPrice(tryGetDouble(obj, FIELD_PRICE));
-//        release.setReminder(tryGetBoolean(obj, FIELD_REMINDER));
-//        release.setOrdered(tryGetBoolean(obj, FIELD_ORDERED));
-//        release.setPurchased(tryGetBoolean(obj, FIELD_PURCHASED));
-//        release.setNotes(tryGetString(obj, FIELD_NOTES));
-//        return release;
-//    }
-//
-//    private long tryGetId(JSONObject obj) {
-//        try {
-//            return obj.getLong(FIELD_ID);
-//        } catch (JSONException jsonex) {
-//            return (++mLastComicsId) * -1;
-//        }
-//    }
-//
-//    private String tryGetString(JSONObject obj, String field) throws JSONException {
-//        return obj.isNull(field) ? null : obj.getString(field);
-//    }
-//
-//    private double tryGetDouble(JSONObject obj, String field) throws JSONException {
-//        return obj.isNull(field) ? 0.0d : obj.getDouble(field);
-//    }
-//
-//    private boolean tryGetBoolean(JSONObject obj, String field) throws JSONException {
-//        String str = obj.optString(field);
-//        return !FALSE.equals(str) && (TRUE.equals(str) || obj.optBoolean(field, false));
-//    }
-//
-//    private Date tryGetDate(JSONObject obj, String field) throws JSONException {
-//        if (obj.isNull(field)) {
-//            return null;
-//        } else {
-//            String str = obj.getString(field);
-//            if (TextUtils.isEmpty(str)) {
-//                return null;
-//            } else {
-//                try {
-//                    return mDateFormat.parse(str);
-//                } catch (ParseException pex) {
-//                    //Utils.e("DataManager.tryGateDate " + str, pex);
-//                    return null;
-//                }
-//            }
-//        }
-//    }
-
-//    private void writeJson(JsonWriter writer, Comics comics) throws IOException {
-//        writer.beginObject();
-//        writer.name(FIELD_ID).value(comics.getName());
-//        writer.name(FIELD_NAME).value(comics.getName());
-//        writer.name(FIELD_SERIES).value(comics.getSeries());
-//        writer.name(FIELD_PUBLISHER).value(comics.getPublisher());
-//        writer.name(FIELD_AUTHORS).value(comics.getAuthors());
-//        writer.name(FIELD_PRICE).value(comics.getPrice());
-//        writer.name(FIELD_PERIODICITY).value(comics.getPeriodicity());
-//        writer.name(FIELD_RESERVED).value(comics.isReserved() ? TRUE : FALSE);
-//        writer.name(FIELD_NOTES).value(comics.getNotes());
-//        writer.name(FIELD_RELEASES);
-//        writer.beginArray();
-//        for (Release release : comics.getReleases()) {
-//            writeJson(writer, release);
-//        }
-//        writer.endArray();
-//        writer.endObject();
-//    }
-//
-//    private void writeJson(JsonWriter writer, Release release) throws IOException {
-//        writer.beginObject();
-//        writer.name(FIELD_NUMBER).value(release.getNumber());
-//        writer.name(FIELD_DATE);
-//        if (release.getDate() == null) {
-//            writer.nullValue();
-//        } else {
-//            writer.value(mDateFormat.format(release.getDate()));
-//        }
-//        writer.name(FIELD_PRICE).value(release.getPrice());
-//        writer.name(FIELD_REMINDER).value(release.isReminder() ? TRUE : FALSE);
-//        writer.name(FIELD_ORDERED).value(release.isOrdered() ? TRUE : FALSE);
-//        writer.name(FIELD_PURCHASED).value(release.isPurchased() ? TRUE : FALSE);
-//        writer.name(FIELD_NOTES).value(release.getNotes());
-//        writer.endObject();
-//    }
-
-//    private void saveComicsToFile() {
-//        if (!isDataLoaded())
-//            return;
-//
-//        synchronized (mSyncObj) {
-//            FileOutputStream fos = null;
-//            try {
-//                File file = getDataFile();
-//                Utils.d(this.getClass(), "start writing...");
-//                fos = new FileOutputStream(file);
-//                JsonWriter writer = new JsonWriter(new OutputStreamWriter(fos, "UTF-8"));
-//                writer.setIndent("  ");
-//                writer.beginArray();
-//                for (Long comicsId : mComicsCache.keySet()) {
-//                    writeJson(writer, mComicsCache.get(comicsId));
-//                }
-//                writer.endArray();
-//                writer.close();
-//                fos = null;
-//                Utils.d(this.getClass(), "... end writing");
-//            } catch (IOException ioex) {
-//                Utils.e("save data", ioex);
-//            } finally {
-//                if (fos != null) {
-//                    try {
-//                        fos.close();
-//                    } catch (IOException ioex) {
-//                        Utils.e(this.getClass(), "save", ioex);
-//                    }
-//                }
-//            }
-//        }
-//    }
 
     private void putPublisher(String publisher) {
         if (publisher != null && TextUtils.getTrimmedLength(publisher) > 0) {
@@ -455,7 +230,7 @@ public class DataManager extends Observable<ComicsObserver> {
      */
     public ReleaseInfo updateBestRelease(long id) {
         Comics comics = getComics(id);
-        ReleaseInfo ri = ComicsBestReleaseHelper.getComicsBestRelease(comics);
+        ReleaseInfo ri = ComicsBestReleaseHelper.getComicsBestRelease(mContext, comics);
         mBestReleases.put(comics.getId(), ri);
         return ri;
     }
@@ -574,50 +349,6 @@ public class DataManager extends Observable<ComicsObserver> {
         return mComicsCache.size();
     }
 
-//    /**
-//     * Legge i dati da file
-//     *
-//     * @return  numero di comics letti
-//     */
-//    public int readComicsFromFile() {
-//        synchronized (mSyncObj) {
-//            BufferedReader br = null;
-//            File file = getDataFile();
-//            mComicsCache = new TreeMap<>();
-//            mPublishers = new HashSet<>();
-//            mBestReleases = new TreeMap<>();
-//            Utils.d("readComics " + file.getAbsolutePath());
-//            if (file.exists()) {
-//                try {
-//                    StringBuilder sb = new StringBuilder();
-//                    br = new BufferedReader(new FileReader(file));
-//                    String line;
-//                    while ((line = br.readLine()) != null) {
-//                        sb.append(line);
-////                            sb.append(System.lineSeparator());
-//                    }
-//                    if (sb.length() > 0) {
-//                        parseJSON(sb.toString());
-//                    } else {
-//                        Utils.w(FILE_NAME + " is empty");
-//                    }
-//                } catch (IOException ioex) {
-//                    Utils.e("readComics", ioex);
-//                } finally {
-//                    if (br != null) try {
-//                        br.close();
-//                    } catch (IOException ioex) {
-//                        //
-//                    }
-//                }
-//            }
-//            mDataLoaded = true;
-//            final TimeZone timeZone = TimeZone.getDefault();
-//            mLastReadDate = DateTime.today(timeZone).getStartOfDay().getMilliseconds(timeZone);
-//        }
-//        return mComicsCache.size();
-//    }
-
     /**
      *
      * @param file nome del file dove verrà salvato il backup dei dati
@@ -673,52 +404,6 @@ public class DataManager extends Observable<ComicsObserver> {
             updateData(ACTION_CLEAR, NO_COMICS, NO_RELEASE);
         }
     }
-
-//    /**
-//     * @return  true se il backup è statao create con successo
-//     */
-//    public boolean createBackup() {
-//        try {
-//            Utils.d(this.getClass(), "create backup");
-//            Utils.copyFile(getDataFile(), getBackupDataFile());
-//            return true;
-//        } catch (IOException ioex) {
-//            Utils.e(this.getClass(), "createBackup", ioex);
-//        }
-//        return false;
-//    }
-//
-//    /**
-//     *
-//     * @return
-//     */
-//    public boolean restoreBackup() {
-//        try {
-//            Utils.d(this.getClass(), "restore backup");
-//            Utils.copyFile(getBackupDataFile(), getDataFile());
-//            mDataLoaded = false;
-//            return true;
-//        } catch (IOException ioex) {
-//            Utils.e(this.getClass(), "restoreBackup", ioex);
-//        }
-//        return false;
-//    }
-
-//    /**
-//     *
-//     * @return
-//     */
-//    public long getLastModifiedBackupFile() {
-//        return getBackupDataFile().lastModified();
-//    }
-
-//    /**
-//     *
-//     * @return
-//     */
-//    public boolean isDataLoaded() {
-//        return mDataLoaded;
-//    }
 
     /**
      *

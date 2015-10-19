@@ -97,4 +97,7 @@
     <string name="toast_data_cleared">Dati rimossi</string>
     <string name="comics_detail_image_change">Cambia immagine</string>
     <string name="comics_detail_image_remove">Rimuovi immagine</string>
+    <string name="pref_last_purchased_title">Mostra l\'ultimo numero acquistato</string>
+    <string name="pref_last_purchased_on">Nella lista dei fumetti verrà mostrato l\'ultimo numero acquistato</string>
+    <string name="pref_last_purchased_off">Nella lista dei fumetti verrà mostrato il prossimo numero da acquistare</string>
 </resources>

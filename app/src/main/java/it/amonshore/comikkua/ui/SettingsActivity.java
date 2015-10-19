@@ -19,6 +19,7 @@ public class SettingsActivity extends ActionBarActivity {
 
     public static final String KEY_PREF_GROUP_BY_MONTH = "pref_group_by_month";
     public static final String KEY_PREF_WEEK_START_ON_MONDAY = "pref_week_start_on_monday";
+    public static final String KEY_PREF_LAST_PURCHASED = "pref_last_purchased";
 
     private static final String BACKUP_FILE_NAME = "comikku_data.bck";
     private static final String OLD_FILE_NAME = "data.json";
@@ -27,15 +28,10 @@ public class SettingsActivity extends ActionBarActivity {
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
         setContentView(R.layout.activity_settings);
-        //Toolbar
+        //
         final Toolbar toolbar = (Toolbar)findViewById(R.id.toolbar_actionbar);
         setSupportActionBar(toolbar);
         getSupportActionBar().setDisplayHomeAsUpEnabled(true);
-
-//        //meglio usare un fragment, così l'activity può essere una ActionBarActivity
-//        getFragmentManager().beginTransaction()
-//                .replace(R.id.content_view, new SettingsFragment())
-//                .commit();
     }
 
     public static class SettingsFragment extends PreferenceFragment {
@@ -57,6 +53,7 @@ public class SettingsActivity extends ActionBarActivity {
                     @Override
                     public boolean onPreferenceClick(Preference preference) {
                         //TODO A0021 attendere che non ci siano richieste di salvataggio pendenti
+                        //TODO A0021 troppo pesante per il main thread
                         //A0049
                         if (dataManager.backupToFile(bckFile)) {
                             Toast.makeText(getActivity(), R.string.toast_backup_created, Toast.LENGTH_SHORT).show();
@@ -125,12 +122,7 @@ public class SettingsActivity extends ActionBarActivity {
                 pref.setEnabled(true);
             }
         }
-//
-//        @Override
-//        public boolean onPreferenceTreeClick(PreferenceScreen preferenceScreen, Preference preference) {
-//            Utils.d(this.getClass(), "onPreferenceTreeClick " + preference.getKey());
-//            return super.onPreferenceTreeClick(preferenceScreen, preference);
-//        }
+
     }
 
 }

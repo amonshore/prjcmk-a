@@ -34,6 +34,7 @@ import it.amonshore.comikkua.data.ReleaseInfo;
 import it.amonshore.comikkua.data.UndoHelper;
 import it.amonshore.comikkua.ui.AFragment;
 import it.amonshore.comikkua.ui.MainActivity;
+import it.amonshore.comikkua.ui.ScrollToTopListener;
 import it.amonshore.comikkua.ui.SettingsActivity;
 import it.amonshore.comikkua.ui.comics.ComicsDetailActivity;
 import se.emilsjolander.stickylistheaders.StickyListHeadersListView;
@@ -41,14 +42,14 @@ import se.emilsjolander.stickylistheaders.StickyListHeadersListView;
 /**
  * Created by Narsenico on 15/05/2015.
  */
-public class ReleaseListFragment extends AFragment {
+public class ReleaseListFragment extends AFragment implements ScrollToTopListener {
 
     //usato per lo stato dell'istanza
     public final static String STATE_GROUP_MODE = " stateMode";
     //public final static String ARG_MODE = "arg_mode";
     //public final static String ARG_COMICS_ID = "arg_comics_id";
 
-    private AbsListView mListView;
+    private ListView mListView;
     private ReleaseListAdapter mAdapter;
     private ActionMode mActionMode;
     private Comics mComics;
@@ -453,6 +454,14 @@ public class ReleaseListFragment extends AFragment {
         Intent intent = new Intent(getActivity(), ComicsDetailActivity.class);
         intent.putExtra(ComicsDetailActivity.EXTRA_COMICS_ID, comicsId);
         startActivity(intent);
+    }
+
+    @Override
+    public void scrollToTop() {
+        //A0053
+        if (mAdapter.getCount() > 0) {
+            mListView.smoothScrollToPosition(0);
+        }
     }
 
 //    private void loadComicsBackground() {
