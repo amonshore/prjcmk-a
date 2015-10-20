@@ -118,7 +118,7 @@ public class ComicsDetailActivity extends ActionBarActivity {
         super.onActivityResult(requestCode, resultCode, data);
         //
         if (resultCode == Activity.RESULT_OK) {
-            if (requestCode == ComicsEditorActivity.EDIT_COMICS_REQUEST) {
+            if (requestCode == RequestCodes.EDIT_COMICS_REQUEST) {
                 updateHeader();
                 //A0049
                 mDataManager.updateData(DataManager.ACTION_UPD, mComics.getId(), DataManager.NO_RELEASE);
@@ -192,7 +192,7 @@ public class ComicsDetailActivity extends ActionBarActivity {
     private void showComicsEditor(Comics comics) {
         Intent intent = new Intent(this, ComicsEditorActivity.class);
         intent.putExtra(ComicsEditorActivity.EXTRA_COMICS_ID, comics.getId());
-        startActivityForResult(intent, ComicsEditorActivity.EDIT_COMICS_REQUEST);
+        startActivityForResult(intent, RequestCodes.EDIT_COMICS_REQUEST);
     }
 
     private void showReleaseEditor(long comicsId) {

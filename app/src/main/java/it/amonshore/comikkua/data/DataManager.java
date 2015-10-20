@@ -1,9 +1,11 @@
 package it.amonshore.comikkua.data;
 
 import android.content.Context;
+import android.content.SharedPreferences;
 import android.database.Cursor;
 import android.database.Observable;
 import android.database.sqlite.SQLiteDatabase;
+import android.preference.PreferenceManager;
 import android.text.TextUtils;
 
 import java.io.File;
@@ -46,6 +48,11 @@ public class DataManager extends Observable<ComicsObserver> {
 
     public static final long NO_COMICS = -1;
     public static final int NO_RELEASE = -1;
+
+    public static final String KEY_PREF_GROUP_BY_MONTH = "pref_group_by_month";
+    public static final String KEY_PREF_WEEK_START_ON_MONDAY = "pref_week_start_on_monday";
+    public static final String KEY_PREF_LAST_PURCHASED = "pref_last_purchased";
+    public static final String KEY_PREF_AUTOFILL_RELEASE = "pref_autofill_release";
 
     private static DataManager instance;
 
@@ -94,6 +101,8 @@ public class DataManager extends Observable<ComicsObserver> {
     //A0049
     private DBHelper mDBHelper;
     //
+    private SharedPreferences mPreferences;
+    //
     private final Object mSyncObj = new Object();
 
     private DataManager(Context context, String userName) {
@@ -106,6 +115,8 @@ public class DataManager extends Observable<ComicsObserver> {
         mUndoComics = new UndoHelper<>();
         mUndoRelease = new UndoHelper<>();
         //
+        mPreferences = PreferenceManager.getDefaultSharedPreferences(context);
+        //
         mDBHelper = new DBHelper(context);
     }
 
@@ -113,6 +124,18 @@ public class DataManager extends Observable<ComicsObserver> {
         if (publisher != null && TextUtils.getTrimmedLength(publisher) > 0) {
             mPublishers.add(publisher);
         }
+    }
+
+    /**
+     *
+     * @return
+     */
+    public SharedPreferences getPreferenceManager() {
+        return mPreferences;
+    }
+
+    public boolean getPreference(String key, boolean def) {
+        return mPreferences.getBoolean(key, def);
     }
 
     /**
@@ -230,7 +253,8 @@ public class DataManager extends Observable<ComicsObserver> {
      */
     public ReleaseInfo updateBestRelease(long id) {
         Comics comics = getComics(id);
-        ReleaseInfo ri = ComicsBestReleaseHelper.getComicsBestRelease(mContext, comics);
+        boolean showLastPurchased = mPreferences.getBoolean(KEY_PREF_LAST_PURCHASED, false);
+        ReleaseInfo ri = ComicsBestReleaseHelper.getComicsBestRelease(comics, showLastPurchased);
         mBestReleases.put(comics.getId(), ri);
         return ri;
     }

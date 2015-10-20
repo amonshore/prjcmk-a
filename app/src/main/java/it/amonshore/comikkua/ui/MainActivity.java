@@ -94,7 +94,7 @@ public class MainActivity extends ActionBarActivity implements SharedPreferences
     public void onSharedPreferenceChanged(SharedPreferences sharedPreferences, String key) {
         Utils.d("onSharedPreferenceChanged " + key + " " + sharedPreferences.getBoolean(key, false));
         //A0046 aggiorno le best release di tutti i fumetti
-        if (SettingsActivity.KEY_PREF_LAST_PURCHASED.equals(key)) {
+        if (DataManager.KEY_PREF_LAST_PURCHASED.equals(key)) {
             mDataManager.updateBestRelease();
         }
     }

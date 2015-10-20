@@ -1,9 +1,5 @@
 package it.amonshore.comikkua.data;
 
-import android.content.Context;
-import android.content.SharedPreferences;
-import android.preference.PreferenceManager;
-
 import java.util.Arrays;
 import java.util.Collections;
 import java.util.Comparator;
@@ -12,7 +8,6 @@ import java.util.List;
 import java.util.TimeZone;
 
 import hirondelle.date4j.DateTime;
-import it.amonshore.comikkua.ui.SettingsActivity;
 
 /**
  * Created by Narsenico on 24/05/2015.
@@ -22,14 +17,11 @@ public class ComicsBestReleaseHelper {
     /**
      * A0046
      *
-     * @param context   utilizzato per recuperare le preferenze
      * @param comics    comics per cui leggere la best release
+     * @param showLastPurchased
      * @return la prima uscita da comprare o l'ultima comprata in base alle preferenze
      */
-    public static ReleaseInfo getComicsBestRelease(Context context, Comics comics) {
-        //TODO non mi piace molto che si debba recuperare ogni volta il flag dalle preferenze
-        SharedPreferences sharedPref = PreferenceManager.getDefaultSharedPreferences(context);
-        boolean showLastPurchased = sharedPref.getBoolean(SettingsActivity.KEY_PREF_LAST_PURCHASED, false);
+    public static ReleaseInfo getComicsBestRelease(Comics comics, boolean showLastPurchased) {
         if (showLastPurchased) {
             return getLastReleasePurchased(comics);
         } else {

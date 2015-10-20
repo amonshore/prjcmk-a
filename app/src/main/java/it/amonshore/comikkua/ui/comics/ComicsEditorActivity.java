@@ -29,8 +29,6 @@ import it.amonshore.comikkua.Utils;
 
 public class ComicsEditorActivity extends ActionBarActivity implements ItemPickerListener<String> {
 
-    public final static int EDIT_COMICS_REQUEST = 1001;
-
     public final static String EXTRA_COMICS_ID = "comicsId";
     public final static long COMICS_ID_NEW = 0;
 

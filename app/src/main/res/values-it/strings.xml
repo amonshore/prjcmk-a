@@ -100,4 +100,9 @@
     <string name="pref_last_purchased_title">Mostra l\'ultimo numero acquistato</string>
     <string name="pref_last_purchased_on">Nella lista dei fumetti verrà mostrato l\'ultimo numero acquistato</string>
     <string name="pref_last_purchased_off">Nella lista dei fumetti verrà mostrato il prossimo numero da acquistare</string>
+    <string name="pref_autofill_release_off">I campi di una nuova uscita saranno vuoti</string>
+    <string name="pref_autofill_release_on">I campi di una nuova uscita saranno automaticamente impostati in accordo con quella precedente</string>
+    <string name="pref_autofill_release_title">Imposta i campi di una uscita in automatico</string>
+    <string name="pref_data_settings_title">Dati</string>
+    <string name="pref_main_settings_title">Opzioni</string>
 </resources>

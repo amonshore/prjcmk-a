@@ -71,7 +71,8 @@
     <color name="comikku_purchased_color_primary">#607D8B</color>
     <color name="comikku_purchased_color_secondary">#E0E0E0</color>
     <!--<color name="comikku_purchased_color_primary_dark">#757575</color>-->
-    <color name="comikku_purchased_color_primary_dark">#546E7A</color>
+    <!--<color name="comikku_purchased_color_primary_dark">#546E7A</color>-->
+    <color name="comikku_purchased_color_primary_dark">#90A4AE</color>
     <color name="comikku_purchased_color_text_light">#E0E0E0</color>
 
     <color name="comikku_expired_color_primary">#E53935</color>

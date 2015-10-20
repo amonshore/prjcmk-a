@@ -347,6 +347,7 @@ public class ReleaseListFragment extends AFragment implements ScrollToTopListene
     @Override
     public void onDataChanged(int cause, boolean wasPosponed) {
         Utils.d(this.getClass(), "onDataChanged " + cause);
+        final DataManager dataManager = getDataManager();
         //se è stato posticipato significa che è stato causato dal dettaglio
         // quindi non gestisco l'undo anche qua
         if (cause == DataManager.CAUSE_RELEASE_REMOVED && !wasPosponed) {
@@ -356,7 +357,6 @@ public class ReleaseListFragment extends AFragment implements ScrollToTopListene
             //  quindi una volta visualizzata la snackbar vengono "machiati" gli ultimi elementi eliminati
             //  e la snackbar potrà successivamente gestire (ripristinare o eliminare definitivamente)
             //  solo i suoi elementi (il tag è memorizzato nell'istanza della snackbar)
-            final DataManager dataManager = getDataManager();
             final UndoHelper<Release> undoRelease = dataManager.getUndoRelease();
             SnackbarManager.show(
                     Snackbar
@@ -419,9 +419,8 @@ public class ReleaseListFragment extends AFragment implements ScrollToTopListene
                 Utils.d(this.getClass(), "needDataRefresh ok " + mComics);
                 //A0040 new ReadReleasesAsyncTask().execute();
 
-                SharedPreferences sharedPref = PreferenceManager.getDefaultSharedPreferences(getActivity());
-                mGroupByMonth = sharedPref.getBoolean(SettingsActivity.KEY_PREF_GROUP_BY_MONTH, false);
-                mWeekStartOnMonday = sharedPref.getBoolean(SettingsActivity.KEY_PREF_WEEK_START_ON_MONDAY, false);
+                mGroupByMonth = dataManager.getPreference(DataManager.KEY_PREF_GROUP_BY_MONTH, false);
+                mWeekStartOnMonday = dataManager.getPreference(DataManager.KEY_PREF_WEEK_START_ON_MONDAY, false);
 
                 Handler mh = new Handler(getActivity().getMainLooper());
                 Runnable runnable = new Runnable() {

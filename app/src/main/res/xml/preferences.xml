@@ -1,40 +1,59 @@
 <?xml version="1.0" encoding="utf-8"?>
 <PreferenceScreen xmlns:android="http://schemas.android.com/apk/res/android">
-    <CheckBoxPreference
-        android:key="pref_group_by_month"
-        android:title="@string/pref_group_by_month_title"
-        android:summaryOn="@string/pref_group_by_month_on"
-        android:summaryOff="@string/pref_group_by_month_off"
-        android:defaultValue="false" />
+    <PreferenceCategory
+        android:title="@string/pref_main_settings_title"
+        android:key="pref_key_main_settings">
 
-    <CheckBoxPreference
-        android:key="pref_week_start_on_monday"
-        android:title="@string/pref_week_start_on_monday_title"
-        android:summaryOn="@string/pref_week_start_on_monday_on"
-        android:summaryOff="@string/pref_week_start_on_monday_off"
-        android:defaultValue="true" />
+        <CheckBoxPreference
+            android:key="pref_group_by_month"
+            android:title="@string/pref_group_by_month_title"
+            android:summaryOn="@string/pref_group_by_month_on"
+            android:summaryOff="@string/pref_group_by_month_off"
+            android:defaultValue="false" />
 
-    <CheckBoxPreference
-        android:key="pref_last_purchased"
-        android:title="@string/pref_last_purchased_title"
-        android:summaryOn="@string/pref_last_purchased_on"
-        android:summaryOff="@string/pref_last_purchased_off"
-        android:defaultValue="false" />
+        <CheckBoxPreference
+            android:key="pref_week_start_on_monday"
+            android:title="@string/pref_week_start_on_monday_title"
+            android:summaryOn="@string/pref_week_start_on_monday_on"
+            android:summaryOff="@string/pref_week_start_on_monday_off"
+            android:defaultValue="true" />
 
-    <Preference
-        android:key="pref_backup_now"
-        android:title="@string/pref_backup_now_title" />
+        <CheckBoxPreference
+            android:key="pref_last_purchased"
+            android:title="@string/pref_last_purchased_title"
+            android:summaryOn="@string/pref_last_purchased_on"
+            android:summaryOff="@string/pref_last_purchased_off"
+            android:defaultValue="false" />
 
-    <Preference
-        android:key="pref_restore_now"
-        android:title="@string/pref_restore_now_title" />
+        <CheckBoxPreference
+            android:key="pref_autofill_release"
+            android:title="@string/pref_autofill_release_title"
+            android:summaryOn="@string/pref_autofill_release_on"
+            android:summaryOff="@string/pref_autofill_release_off"
+            android:defaultValue="true" />
 
-    <Preference
-        android:key="pref_restore_old"
-        android:title="@string/pref_restore_old" />
+    </PreferenceCategory>
 
-    <Preference
-        android:key="pref_clear_data"
-        android:title="@string/pref_clear_data" />
+    <PreferenceCategory
+        android:title="@string/pref_data_settings_title"
+        android:key="pref_key_data_settings">
+
+        <Preference
+            android:key="pref_backup_now"
+            android:title="@string/pref_backup_now_title" />
+
+        <Preference
+            android:key="pref_restore_now"
+            android:title="@string/pref_restore_now_title" />
+
+        <Preference
+            android:key="pref_restore_old"
+            android:title="@string/pref_restore_old" />
+
+        <Preference
+            android:key="pref_clear_data"
+            android:title="@string/pref_clear_data" />
+
+    </PreferenceCategory>
 
 </PreferenceScreen>
