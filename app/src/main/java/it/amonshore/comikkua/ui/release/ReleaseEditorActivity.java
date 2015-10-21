@@ -30,6 +30,7 @@ import it.amonshore.comikkua.Utils;
 import it.amonshore.comikkua.data.Comics;
 import it.amonshore.comikkua.data.DataManager;
 import it.amonshore.comikkua.data.Release;
+import it.amonshore.comikkua.ui.SettingsActivity;
 
 public class ReleaseEditorActivity extends ActionBarActivity {
 
@@ -54,11 +55,12 @@ public class ReleaseEditorActivity extends ActionBarActivity {
         Intent intent = getIntent();
         long comicsId = intent.getLongExtra(EXTRA_COMICS_ID, COMICS_ID_NONE);
         int releaseNumber = intent.getIntExtra(EXTRA_RELEASE_NUMBER, RELEASE_NEW);
-        mComics = DataManager.getDataManager().getComics(comicsId);
+        final DataManager dataManager = DataManager.getDataManager();
+        mComics = dataManager.getComics(comicsId);
         setTitle(mComics.getName());
         if (releaseNumber == RELEASE_NEW) {
             mIsNew = true;
-            mRelease = mComics.createRelease(true);
+            mRelease = mComics.createRelease(dataManager.getPreference(DataManager.KEY_PREF_AUTOFILL_RELEASE, true));
         } else {
             mIsNew = false;
             mRelease = mComics.getRelease(releaseNumber);
@@ -71,7 +73,7 @@ public class ReleaseEditorActivity extends ActionBarActivity {
         //
         //imposto i valori e creo i listener
         mTxtNumber = (FloatingLabelEditText)findViewById(R.id.txt_editor_release_number);
-        mTxtNumber.setInputWidgetText(mRelease.getNumber() == 0 ? "" : Integer.toString(mRelease.getNumber()));
+        mTxtNumber.setInputWidgetText(mRelease.getNumber() < 0 ? "" : Integer.toString(mRelease.getNumber()));
         //
         mTxtDate = (FloatingLabelDatePicker<JavaDateInstant>)findViewById(R.id.txt_editor_release_date);
         mTxtDate.setInstantPrinter(new ReleaseDatePrinter());

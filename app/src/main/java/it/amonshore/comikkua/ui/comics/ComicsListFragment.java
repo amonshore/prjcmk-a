@@ -1,7 +1,9 @@
 package it.amonshore.comikkua.ui.comics;
 
 import android.app.Activity;
+import android.app.AlertDialog;
 import android.app.SearchManager;
+import android.content.DialogInterface;
 import android.content.Intent;
 import android.content.SharedPreferences;
 import android.os.Bundle;
@@ -24,12 +26,14 @@ import com.nispok.snackbar.SnackbarManager;
 import com.nispok.snackbar.listeners.ActionClickListener;
 
 import it.amonshore.comikkua.R;
+import it.amonshore.comikkua.RequestCodes;
 import it.amonshore.comikkua.data.Comics;
 import it.amonshore.comikkua.Utils;
 import it.amonshore.comikkua.data.DataManager;
 import it.amonshore.comikkua.data.UndoHelper;
 import it.amonshore.comikkua.ui.AFragment;
 import it.amonshore.comikkua.ui.MainActivity;
+import it.amonshore.comikkua.ui.ScrollToTopListener;
 
 /**
  * A fragment representing a list of Items.
@@ -38,12 +42,12 @@ import it.amonshore.comikkua.ui.MainActivity;
  * with a GridView.
  * <p/>
  */
-public class ComicsListFragment extends AFragment {
+public class ComicsListFragment extends AFragment implements ScrollToTopListener {
 
     //usato per lo stato dell'istanza
     private final static String STATE_ORDER = " stateOrder";
 
-    private AbsListView mListView;
+    private ListView mListView;
     private ComicsListAdapter mAdapter;
     private ActionMode mActionMode;
     private FloatingActionButton mBtnAdd;
@@ -91,7 +95,7 @@ public class ComicsListFragment extends AFragment {
         View view = inflater.inflate(R.layout.fragment_comics_list, container, false);
 
         // Set the adapter
-        mListView = (AbsListView) view.findViewById(android.R.id.list);
+        mListView = (ListView) view.findViewById(android.R.id.list);
         mListView.setAdapter(mAdapter);
         //A0022
         TextView emptyView = (TextView)view.findViewById(android.R.id.empty);
@@ -242,16 +246,16 @@ public class ComicsListFragment extends AFragment {
 
     @Override
     public void onActivityResult(int requestCode, int resultCode, Intent data) {
-        if (resultCode == Activity.RESULT_OK && requestCode == ComicsEditorActivity.EDIT_COMICS_REQUEST) {
-//            long comicsId = data.getLongExtra(ComicsEditorActivity.EXTRA_COMICS_ID, 0);
-//            Comics comics = getDataManager().getComics(comicsId);
-//            int position = mAdapter.insertOrUpdate(comics);
+        if (resultCode == Activity.RESULT_OK && requestCode == RequestCodes.EDIT_COMICS_REQUEST) {
             mAdapter.notifyDataSetChanged();
             final DataManager dataManager = DataManager.getDataManager();
             final long comicsId = data.getLongExtra(ComicsEditorActivity.EXTRA_COMICS_ID, DataManager.NO_COMICS);
             dataManager.notifyChangedButMe(DataManager.CAUSE_COMICS_CHANGED, this);
             //A0049
             dataManager.updateData(DataManager.ACTION_ADD, comicsId, DataManager.NO_RELEASE);
+            //A0047 mostro il dettaglio del comics, mi pare un'idea migliore
+            // rispetto all'editare una nuova release
+            showComicsDetail(comicsId);
         }
     }
 
@@ -352,7 +356,6 @@ public class ComicsListFragment extends AFragment {
                     }
                 };
                 mh.post(runnable);
-
             }
         }
     }
@@ -360,7 +363,7 @@ public class ComicsListFragment extends AFragment {
     private void showComicsEditor() {
         Intent intent = new Intent(getActivity(), ComicsEditorActivity.class);
         intent.putExtra(ComicsEditorActivity.EXTRA_COMICS_ID, ComicsEditorActivity.COMICS_ID_NEW);
-        startActivityForResult(intent, ComicsEditorActivity.EDIT_COMICS_REQUEST);
+        startActivityForResult(intent, RequestCodes.EDIT_COMICS_REQUEST);
     }
 
     private void showComicsDetail(long comicsId) {
@@ -369,54 +372,12 @@ public class ComicsListFragment extends AFragment {
         startActivity(intent);
     }
 
-//    A0040
-//    /**
-//     * Task asincrono per aggiornamento della lista
-//     */
-//    private class UpdateListAsyncTask extends AsyncTask<Void, Comics, Integer> {
-//        @Override
-//        protected Integer doInBackground(Void... params) {
-//            return ComicsListFragment.this.mAdapter.refresh();
-//        }
-//
-//        @Override
-//        protected void onPostExecute(Integer result) {
-//            ComicsListFragment.this.mAdapter.notifyDataSetChanged();
-//            if (mAdapter.getOrder() == ComicsListAdapter.ORDER_BY_NAME) {
-////                Utils.d(this.getClass(), "sect fast enable");
-//                mListView.setFastScrollEnabled(true);
-//                mListView.setFastScrollAlwaysVisible(true);
-//            } else {
-//                mListView.setFastScrollEnabled(false);
-//                mListView.setFastScrollAlwaysVisible(false);
-//            }
-//        }
-//    }
-
-//    A0040
-//    /**
-//     * Task asincrono per la rimoazione dei dati
-//     */
-//    private class RemoveComicsAsyncTask extends AsyncTask<Long, Long, Integer> {
-//        @Override
-//        protected Integer doInBackground(Long... params) {
-//            for (Long id : params) {
-//                publishProgress(id);
-//            }
-//            return params.length;
-//        }
-//
-//        @Override
-//        protected void onProgressUpdate(Long... values) {
-////            boolean res =
-//              ComicsListFragment.this.mAdapter.remove(values[0]);
-////            Utils.d("delete comics " + values[0] + " -> " + res);
-//        }
-//
-//        @Override
-//        protected void onPostExecute(Integer integer) {
-//            ComicsListFragment.this.getDataManager().notifyChanged(DataManager.CAUSE_COMICS_REMOVED);
-//        }
-//    }
+    @Override
+    public void scrollToTop() {
+        //A0053
+        if (mAdapter.getCount() > 0) {
+            mListView.smoothScrollToPosition(0);
+        }
+    }
 
 }

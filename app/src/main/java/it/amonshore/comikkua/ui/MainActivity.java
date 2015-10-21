@@ -81,6 +81,9 @@ public class MainActivity extends ActionBarActivity implements SharedPreferences
                     //aggiorno i dati sulla page corrente causa cambio pagina (quindi se i dati ci sono non fa nulla)
                     ((AFragment) mTabPageAdapter.getItem(position)).onDataChanged(DataManager.CAUSE_PAGE_CHANGED);
                     mPreviousPage = position;
+                } else {
+                    //A0053 scroll top alla selezione della stessa tab
+                    ((ScrollToTopListener) mTabPageAdapter.getItem(position)).scrollToTop();
                 }
             }
         });
@@ -90,10 +93,10 @@ public class MainActivity extends ActionBarActivity implements SharedPreferences
     @Override
     public void onSharedPreferenceChanged(SharedPreferences sharedPreferences, String key) {
         Utils.d("onSharedPreferenceChanged " + key + " " + sharedPreferences.getBoolean(key, false));
-//        if (SettingsActivity.KEY_PREF_GROUP_BY_MONTH.equals(key)) {
-//            ((AFragment)mTabPageAdapter.getItem(TabPageAdapter.PAGE_SHOPPING))
-//                    .needDataRefresh(AFragment.CAUSE_SETTINGS_CHANGED);
-//        }
+        //A0046 aggiorno le best release di tutti i fumetti
+        if (DataManager.KEY_PREF_LAST_PURCHASED.equals(key)) {
+            mDataManager.updateBestRelease();
+        }
     }
 
     @Override
@@ -121,6 +124,8 @@ public class MainActivity extends ActionBarActivity implements SharedPreferences
     protected void onDestroy() {
         super.onDestroy();
         Utils.d(this.getClass(), "*********** MAIN onDestroy -> unregister observer and stop WH");
+        SharedPreferences prefs = PreferenceManager.getDefaultSharedPreferences(this);
+        prefs.unregisterOnSharedPreferenceChangeListener(this);
         mDataManager.unregisterObserver(this);
         mDataManager.stopWriteHandler();
     }

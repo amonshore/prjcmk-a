@@ -18,6 +18,7 @@ public class ComikkuApp extends Application {
         //TODO ricavare il nome dell'utente dalle preferenze, se non c'è usare default
         DataManager
                 .init(this, "default")
-                .readComics();
+                .readComics()
+                .removeDirtyImages(false); //A0055
     }
 }

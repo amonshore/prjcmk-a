@@ -34,6 +34,7 @@ import it.amonshore.comikkua.data.ReleaseInfo;
 import it.amonshore.comikkua.data.UndoHelper;
 import it.amonshore.comikkua.ui.AFragment;
 import it.amonshore.comikkua.ui.MainActivity;
+import it.amonshore.comikkua.ui.ScrollToTopListener;
 import it.amonshore.comikkua.ui.SettingsActivity;
 import it.amonshore.comikkua.ui.comics.ComicsDetailActivity;
 import se.emilsjolander.stickylistheaders.StickyListHeadersListView;
@@ -41,14 +42,14 @@ import se.emilsjolander.stickylistheaders.StickyListHeadersListView;
 /**
  * Created by Narsenico on 15/05/2015.
  */
-public class ReleaseListFragment extends AFragment {
+public class ReleaseListFragment extends AFragment implements ScrollToTopListener {
 
     //usato per lo stato dell'istanza
     public final static String STATE_GROUP_MODE = " stateMode";
     //public final static String ARG_MODE = "arg_mode";
     //public final static String ARG_COMICS_ID = "arg_comics_id";
 
-    private AbsListView mListView;
+    private ListView mListView;
     private ReleaseListAdapter mAdapter;
     private ActionMode mActionMode;
     private Comics mComics;
@@ -346,6 +347,7 @@ public class ReleaseListFragment extends AFragment {
     @Override
     public void onDataChanged(int cause, boolean wasPosponed) {
         Utils.d(this.getClass(), "onDataChanged " + cause);
+        final DataManager dataManager = getDataManager();
         //se è stato posticipato significa che è stato causato dal dettaglio
         // quindi non gestisco l'undo anche qua
         if (cause == DataManager.CAUSE_RELEASE_REMOVED && !wasPosponed) {
@@ -355,7 +357,6 @@ public class ReleaseListFragment extends AFragment {
             //  quindi una volta visualizzata la snackbar vengono "machiati" gli ultimi elementi eliminati
             //  e la snackbar potrà successivamente gestire (ripristinare o eliminare definitivamente)
             //  solo i suoi elementi (il tag è memorizzato nell'istanza della snackbar)
-            final DataManager dataManager = getDataManager();
             final UndoHelper<Release> undoRelease = dataManager.getUndoRelease();
             SnackbarManager.show(
                     Snackbar
@@ -418,9 +419,8 @@ public class ReleaseListFragment extends AFragment {
                 Utils.d(this.getClass(), "needDataRefresh ok " + mComics);
                 //A0040 new ReadReleasesAsyncTask().execute();
 
-                SharedPreferences sharedPref = PreferenceManager.getDefaultSharedPreferences(getActivity());
-                mGroupByMonth = sharedPref.getBoolean(SettingsActivity.KEY_PREF_GROUP_BY_MONTH, false);
-                mWeekStartOnMonday = sharedPref.getBoolean(SettingsActivity.KEY_PREF_WEEK_START_ON_MONDAY, false);
+                mGroupByMonth = dataManager.getPreference(DataManager.KEY_PREF_GROUP_BY_MONTH, false);
+                mWeekStartOnMonday = dataManager.getPreference(DataManager.KEY_PREF_WEEK_START_ON_MONDAY, false);
 
                 Handler mh = new Handler(getActivity().getMainLooper());
                 Runnable runnable = new Runnable() {
@@ -453,6 +453,14 @@ public class ReleaseListFragment extends AFragment {
         Intent intent = new Intent(getActivity(), ComicsDetailActivity.class);
         intent.putExtra(ComicsDetailActivity.EXTRA_COMICS_ID, comicsId);
         startActivity(intent);
+    }
+
+    @Override
+    public void scrollToTop() {
+        //A0053
+        if (mAdapter.getCount() > 0) {
+            mListView.smoothScrollToPosition(0);
+        }
     }
 
 //    private void loadComicsBackground() {

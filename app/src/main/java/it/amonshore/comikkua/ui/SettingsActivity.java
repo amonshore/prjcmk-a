@@ -1,5 +1,7 @@
 package it.amonshore.comikkua.ui;
 
+import android.app.ProgressDialog;
+import android.os.AsyncTask;
 import android.os.Bundle;
 import android.os.Environment;
 import android.preference.Preference;
@@ -17,9 +19,6 @@ import it.amonshore.comikkua.data.FileHelper;
 
 public class SettingsActivity extends ActionBarActivity {
 
-    public static final String KEY_PREF_GROUP_BY_MONTH = "pref_group_by_month";
-    public static final String KEY_PREF_WEEK_START_ON_MONDAY = "pref_week_start_on_monday";
-
     private static final String BACKUP_FILE_NAME = "comikku_data.bck";
     private static final String OLD_FILE_NAME = "data.json";
 
@@ -27,15 +26,10 @@ public class SettingsActivity extends ActionBarActivity {
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
         setContentView(R.layout.activity_settings);
-        //Toolbar
+        //
         final Toolbar toolbar = (Toolbar)findViewById(R.id.toolbar_actionbar);
         setSupportActionBar(toolbar);
         getSupportActionBar().setDisplayHomeAsUpEnabled(true);
-
-//        //meglio usare un fragment, così l'activity può essere una ActionBarActivity
-//        getFragmentManager().beginTransaction()
-//                .replace(R.id.content_view, new SettingsFragment())
-//                .commit();
     }
 
     public static class SettingsFragment extends PreferenceFragment {
@@ -58,12 +52,27 @@ public class SettingsActivity extends ActionBarActivity {
                     public boolean onPreferenceClick(Preference preference) {
                         //TODO A0021 attendere che non ci siano richieste di salvataggio pendenti
                         //A0049
-                        if (dataManager.backupToFile(bckFile)) {
-                            Toast.makeText(getActivity(), R.string.toast_backup_created, Toast.LENGTH_SHORT).show();
-                            updateBackupFileInfo(bckFile);
-                        } else {
-                            Toast.makeText(getActivity(), R.string.toast_backup_problem, Toast.LENGTH_SHORT).show();
-                        }
+                        final ProgressDialog progressDialog = ProgressDialog.show(getActivity(),
+                                getString(R.string.dialog_backup_wait_title),
+                                getString(R.string.dialog_backup_wait_message),
+                                true, false);
+                        new AsyncTask<Void, Void, Boolean>(){
+                            @Override
+                            protected Boolean doInBackground(Void... params) {
+                                return dataManager.backupToFile(bckFile);
+                            }
+
+                            @Override
+                            protected void onPostExecute(Boolean result) {
+                                progressDialog.dismiss();
+                                if (result) {
+                                    Toast.makeText(getActivity(), R.string.toast_backup_created, Toast.LENGTH_SHORT).show();
+                                    updateBackupFileInfo(bckFile);
+                                } else {
+                                    Toast.makeText(getActivity(), R.string.toast_backup_problem, Toast.LENGTH_SHORT).show();
+                                }
+                            }
+                        }.execute();
                         return true;
                     }
                 });
@@ -125,12 +134,7 @@ public class SettingsActivity extends ActionBarActivity {
                 pref.setEnabled(true);
             }
         }
-//
-//        @Override
-//        public boolean onPreferenceTreeClick(PreferenceScreen preferenceScreen, Preference preference) {
-//            Utils.d(this.getClass(), "onPreferenceTreeClick " + preference.getKey());
-//            return super.onPreferenceTreeClick(preferenceScreen, preference);
-//        }
+
     }
 
 }

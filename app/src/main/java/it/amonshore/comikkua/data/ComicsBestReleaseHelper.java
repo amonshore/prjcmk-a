@@ -15,11 +15,39 @@ import hirondelle.date4j.DateTime;
 public class ComicsBestReleaseHelper {
 
     /**
+     * A0046
      *
-     * @param comics
-     * @return
+     * @param comics    comics per cui leggere la best release
+     * @param showLastPurchased
+     * @return la prima uscita da comprare o l'ultima comprata in base alle preferenze
      */
-    public static ReleaseInfo getComicsBestRelease(Comics comics) {
+    public static ReleaseInfo getComicsBestRelease(Comics comics, boolean showLastPurchased) {
+        if (showLastPurchased) {
+            return getLastReleasePurchased(comics);
+        } else {
+            return getFirstReleaseToPurchase(comics);
+        }
+    }
+
+    private static ReleaseInfo getLastReleasePurchased(Comics comics) {
+        Release lastPurchased = null;
+        for (Release release : comics.getReleases()) {
+            if (!release.isPurchased()) continue;
+            if (lastPurchased == null) {
+                lastPurchased = release;
+            } else if (lastPurchased.getNumber() < release.getNumber()) {
+                lastPurchased = release;
+            }
+        }
+
+        if (lastPurchased == null) {
+            return null;
+        } else {
+            return new ReleaseInfo(ReleaseGroupHelper.GROUP_PURCHASED, lastPurchased);
+        }
+    }
+
+    private static ReleaseInfo getFirstReleaseToPurchase(Comics comics) {
         //imposto le date
         final TimeZone timeZone = TimeZone.getDefault();
         final long today = DateTime.today(timeZone).getStartOfDay().getMilliseconds(timeZone);
