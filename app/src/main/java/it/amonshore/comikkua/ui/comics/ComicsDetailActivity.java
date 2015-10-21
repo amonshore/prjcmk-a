@@ -133,7 +133,7 @@ public class ComicsDetailActivity extends ActionBarActivity {
                 //A0024
                 //elimino il file precedente
                 Uri imageUri = data.getData();
-                String destFileName = Comics.getDefaultImageFileName(mComics);
+                String destFileName = Comics.getDefaultImageFileName(mComics.getId());
                 mComics.setImage(destFileName);
                 mDataManager.updateData(DataManager.ACTION_UPD, mComics.getId(), DataManager.NO_RELEASE);
                 //applica i filtri all'immagine, la salva e quindi la carica a video

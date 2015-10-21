@@ -12,6 +12,8 @@ import java.util.UUID;
  */
 public class Comics {
 
+    public final static String IMAGE_PREFIX = "IMG_";
+
     public final static String PERIODICITY_UNKNOWN = "";
     public final static String PERIODICITY_WEEKLY = "W1";
     public final static String PERIODICITY_MONTHLY = "M1";
@@ -221,11 +223,11 @@ public class Comics {
 
     /**
      *
-     * @param comics comics
+     * @param id comics
      * @return  il nome standard dell'immagine
      */
-    public static String getDefaultImageFileName(Comics comics) {
-        return "IMG_" + comics.getId() + ".jpg";
+    public static String getDefaultImageFileName(long id) {
+        return IMAGE_PREFIX + id + ".jpg";
 //        return UUID.randomUUID().toString() + ".jpg";
     }
 }

@@ -257,6 +257,19 @@ public class FileHelper {
 
     /**
      *
+     * @param context
+     * @return
+     */
+    public static File getExternalFolder(Context context) {
+        if (isExternalStorageWritable()) {
+            return context.getExternalFilesDir(null);
+        } else {
+            return context.getFilesDir();
+        }
+    }
+
+    /**
+     *
      * @param folderType    il tipo della cartella esterna in cui risiede il file (vedi Enviroment.DIRECTORY_xxx)
      * @param fileName  nome del file
      * @return  una istanza di File

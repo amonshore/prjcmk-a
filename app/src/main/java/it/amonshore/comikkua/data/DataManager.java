@@ -9,7 +9,9 @@ import android.preference.PreferenceManager;
 import android.text.TextUtils;
 
 import java.io.File;
+import java.io.FilenameFilter;
 import java.io.IOException;
+import java.util.ArrayList;
 import java.util.HashSet;
 import java.util.Queue;
 import java.util.Set;
@@ -17,6 +19,8 @@ import java.util.TimeZone;
 import java.util.TreeMap;
 import java.util.concurrent.ConcurrentLinkedQueue;
 import java.util.concurrent.Semaphore;
+import java.util.regex.Matcher;
+import java.util.regex.Pattern;
 
 import hirondelle.date4j.DateTime;
 import it.amonshore.comikkua.Utils;
@@ -272,9 +276,9 @@ public class DataManager extends Observable<ComicsObserver> {
     /**
      * Leggi i dati
      *
-     * @return  numero di comics letti
+     * @return  this
      */
-    public int readComics() {
+    public DataManager readComics() {
         if (mComicsCache == null || !mDataLoaded) {
             SQLiteDatabase database = null;
             try {
@@ -370,7 +374,7 @@ public class DataManager extends Observable<ComicsObserver> {
                 mLastReadDate = today;
             }
         }
-        return mComicsCache.size();
+        return this;
     }
 
     /**
@@ -418,6 +422,23 @@ public class DataManager extends Observable<ComicsObserver> {
     }
 
     /**
+     * Rimuove i file delle immagini il cui comics è stato rimosso.
+     *
+     * @param removeAll true rimuove l'immagine senza controllare se il comics esiste
+     */
+    public void removeDirtyImages(boolean removeAll) {
+        final Pattern pattern = Pattern.compile(Comics.IMAGE_PREFIX + "(-?\\d+)\\.jpg");
+        File folder = FileHelper.getExternalFolder(mContext);
+        String[] fileNames = folder.list();
+        for (String fileName : fileNames) {
+            Matcher matcher = pattern.matcher(fileName);
+            if (matcher.find() && (removeAll || getComics(Long.parseLong(matcher.group(1))) == null)) {
+                new File(folder, fileName).delete();
+            }
+        }
+    }
+
+    /**
      *
      */
     public void clearData() {
@@ -426,6 +447,7 @@ public class DataManager extends Observable<ComicsObserver> {
             mPublishers.clear();
             mBestReleases.clear();
             updateData(ACTION_CLEAR, NO_COMICS, NO_RELEASE);
+            removeDirtyImages(true); //A0055
         }
     }
 
