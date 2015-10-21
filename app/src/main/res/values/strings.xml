@@ -64,6 +64,8 @@
     <string name="pref_autofill_release_title">Automatically fill release data</string>
     <string name="pref_autofill_release_on">The fields of a new release will be automatically set according to the previous release</string>
     <string name="pref_autofill_release_off">The fields of a new release will be empty</string>
+    <string name="dialog_backup_wait_title">Please wait</string>
+    <string name="dialog_backup_wait_message">Backup data to file...</string>
     <string name="toast_backup_created">Backup created</string>
     <string name="toast_backup_problem">There was a problem with backup</string>
     <string name="toast_backup_restored">Backup restored</string>

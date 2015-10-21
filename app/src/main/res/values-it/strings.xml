@@ -105,4 +105,6 @@
     <string name="pref_autofill_release_title">Imposta i campi di una uscita in automatico</string>
     <string name="pref_data_settings_title">Dati</string>
     <string name="pref_main_settings_title">Opzioni</string>
+    <string name="dialog_backup_wait_title">Attendere prego</string>
+    <string name="dialog_backup_wait_message">Backup dei dati in corso...</string>
 </resources>

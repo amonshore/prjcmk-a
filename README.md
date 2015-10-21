@@ -35,4 +35,8 @@ Versione: v1.0.2 (14)
 Versione: v1.0.2 (15)
 - immagine per comics
 
-Versione: v1.0.2 (16)
+Versione: v1.0.3 (16)
+- scroll veloce all'inizio della lista se viene premuto sul titolo della stessa
+- eliminate immagini non più associate a comics
+- lista fumetti: possibilità di scelta se mostrare ultimo numero comprato o primo da comprare
+- interazione bloccata durante il backup su file

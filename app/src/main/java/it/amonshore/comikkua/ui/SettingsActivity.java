@@ -1,5 +1,6 @@
 package it.amonshore.comikkua.ui;
 
+import android.app.ProgressDialog;
 import android.os.AsyncTask;
 import android.os.Bundle;
 import android.os.Environment;
@@ -51,6 +52,10 @@ public class SettingsActivity extends ActionBarActivity {
                     public boolean onPreferenceClick(Preference preference) {
                         //TODO A0021 attendere che non ci siano richieste di salvataggio pendenti
                         //A0049
+                        final ProgressDialog progressDialog = ProgressDialog.show(getActivity(),
+                                getString(R.string.dialog_backup_wait_title),
+                                getString(R.string.dialog_backup_wait_message),
+                                true, false);
                         new AsyncTask<Void, Void, Boolean>(){
                             @Override
                             protected Boolean doInBackground(Void... params) {
@@ -59,6 +64,7 @@ public class SettingsActivity extends ActionBarActivity {
 
                             @Override
                             protected void onPostExecute(Boolean result) {
+                                progressDialog.dismiss();
                                 if (result) {
                                     Toast.makeText(getActivity(), R.string.toast_backup_created, Toast.LENGTH_SHORT).show();
                                     updateBackupFileInfo(bckFile);
