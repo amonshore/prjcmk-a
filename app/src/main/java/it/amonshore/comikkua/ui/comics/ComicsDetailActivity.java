@@ -27,7 +27,6 @@ import com.bumptech.glide.request.target.SimpleTarget;
 import java.io.File;
 import java.io.FileOutputStream;
 import java.io.IOException;
-import java.io.OutputStream;
 
 import it.amonshore.comikkua.R;
 import it.amonshore.comikkua.RequestCodes;
@@ -129,15 +128,24 @@ public class ComicsDetailActivity extends ActionBarActivity {
                 //A0049
                 int releaseNumber = data.getIntExtra(ReleaseEditorActivity.EXTRA_RELEASE_NUMBER, DataManager.NO_RELEASE);
                 mDataManager.updateData(DataManager.ACTION_ADD, mComics.getId(), releaseNumber);
-            } else if (requestCode == RequestCodes.LOAD_IMAGES) {
+            } else if (requestCode == RequestCodes.LOAD_IMAGE) {
                 //A0024
                 //elimino il file precedente
                 Uri imageUri = data.getData();
+                //A0054 crop immagine
+                Intent cropIntenet = new Intent(this, ComicsCropActivity.class);
+                cropIntenet.putExtra(ComicsCropActivity.EXTRA_COMICS_ID, mComics.getId());
+                cropIntenet.putExtra(ComicsCropActivity.EXTRA_IMAGE_URI, imageUri.toString());
+                startActivityForResult(cropIntenet, RequestCodes.CROP_IMAGE);
+            } else if (requestCode == RequestCodes.CROP_IMAGE) {
+                //A0054 ok cropped bitmap: aggiorno header
+                Uri tempUri = Uri.parse(data.getStringExtra(ComicsCropActivity.EXTRA_TEMP_URI));
+                //TODO A0054 eliminare file temporaneo alla fine del processo
                 String destFileName = Comics.getDefaultImageFileName(mComics.getId());
                 mComics.setImage(destFileName);
                 mDataManager.updateData(DataManager.ACTION_UPD, mComics.getId(), DataManager.NO_RELEASE);
                 //applica i filtri all'immagine, la salva e quindi la carica a video
-                createComicsImageFromUri(imageUri, FileHelper.getExternalFile(this, destFileName));
+                createComicsImageFromUri(tempUri, FileHelper.getExternalFile(this, destFileName));
             }
         }
     }
@@ -205,7 +213,7 @@ public class ComicsDetailActivity extends ActionBarActivity {
     private void showComicsImageSelector() {
         Intent intent = new Intent(Intent.ACTION_GET_CONTENT);
         intent.setType("image/*");
-        startActivityForResult(Intent.createChooser(intent, "Choose Picture"), RequestCodes.LOAD_IMAGES);
+        startActivityForResult(Intent.createChooser(intent, "Choose Picture"), RequestCodes.LOAD_IMAGE);
     }
 
     private void createComicsImageFromUri(Uri uri, final File file) {
@@ -229,7 +237,7 @@ public class ComicsDetailActivity extends ActionBarActivity {
 ////                                        getResources().getColor(R.color.comikku_primary_color),
 ////                                        Color.TRANSPARENT) //TODO provare direttamente comikku_comics_image_color in modo
                         )
-                        .override(500, 195) //TODO considerare le dim. originali dell'immagine e dell view (portrait 1080 * 420)
+//                        .override(500, 195) //TODO considerare le dim. originali dell'immagine e dell view (portrait 1080 * 420)
                         ;
             }
 
@@ -238,12 +246,10 @@ public class ComicsDetailActivity extends ActionBarActivity {
                 bitmapRequestBuilder.into(new SimpleTarget<Bitmap>() {
                     @Override
                     public void onResourceReady(Bitmap resource, GlideAnimation<? super Bitmap> glideAnimation) {
-                        OutputStream outputStream = null;
+                        FileOutputStream outputStream = null;
                         try {
                             outputStream = new FileOutputStream(file);
                             resource.compress(Bitmap.CompressFormat.JPEG, 80, outputStream);
-                            outputStream.close();
-                            outputStream = null;
                             //
                             loadComicsImage(file);
                         } catch (IOException e) {

@@ -90,4 +90,7 @@
     <!-- colore divisore elementi lista -->
     <color name="comikku_list_divider_color">#DDDDDD</color>
 
+    <!-- sfondo scuro -->
+    <color name="comikku_background_dark">#333333</color>
+
 </resources>
