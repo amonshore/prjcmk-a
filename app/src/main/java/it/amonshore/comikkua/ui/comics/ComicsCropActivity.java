@@ -25,7 +25,7 @@ public class ComicsCropActivity extends ActionBarActivity {
 
     public final static String EXTRA_COMICS_ID = "comicsId";
     public final static String EXTRA_IMAGE_URI = "imageUri";
-    public final static String EXTRA_TEMP_URI = "tempUri";
+    public final static String EXTRA_TEMP_FILE = "tempFile";
 
     private CropImageView mCropImageView;
     private Comics mComics;
@@ -34,17 +34,17 @@ public class ComicsCropActivity extends ActionBarActivity {
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
         setContentView(R.layout.activity_comics_crop);
-        //Toolbar
-        final Toolbar toolbar = (Toolbar)findViewById(R.id.toolbar_actionbar);
-        setSupportActionBar(toolbar);
-        getSupportActionBar().setDisplayHomeAsUpEnabled(true);
-        toolbar.setNavigationIcon(R.drawable.ic_close);
         //
         final Intent intent = getIntent();
         final long comicsId = intent.getLongExtra(EXTRA_COMICS_ID, 0);
         final Uri imageUri = Uri.parse(intent.getStringExtra(EXTRA_IMAGE_URI));
         mComics = DataManager.getDataManager().getComics(comicsId);
         setTitle(mComics.getName());
+        //Toolbar
+        final Toolbar toolbar = (Toolbar)findViewById(R.id.toolbar_actionbar);
+        setSupportActionBar(toolbar);
+        getSupportActionBar().setDisplayHomeAsUpEnabled(true);
+        toolbar.setNavigationIcon(R.drawable.ic_close);
         //l'immagine deve avere una ratio di 10:4
         mCropImageView = (CropImageView)findViewById(R.id.cropImageView);
         mCropImageView.setCustomRatio(10, 4);
@@ -62,8 +62,13 @@ public class ComicsCropActivity extends ActionBarActivity {
     public boolean onOptionsItemSelected(MenuItem item) {
         int id = item.getItemId();
         //
-        if (id == R.id.action_save) {
-
+        if (id == android.R.id.home) {
+            //intercetto il back
+            //termino l'activity in modo che torni all'activity chiamante
+            //  e non al padre indicato nel manifest
+            finish();
+            return true;
+        } else if (id == R.id.action_save) {
             //salvo l'immagine in un file temporaneo
             FileOutputStream outputStream = null;
             try {
@@ -72,7 +77,7 @@ public class ComicsCropActivity extends ActionBarActivity {
                 mCropImageView.getCroppedBitmap().compress(Bitmap.CompressFormat.JPEG, 80, outputStream);
                 //
                 Intent data = new Intent();
-                data.putExtra(EXTRA_TEMP_URI, Uri.fromFile(tempFile).toString());
+                data.putExtra(EXTRA_TEMP_FILE, tempFile.toString());
                 setResult(Activity.RESULT_OK, data);
             } catch (IOException e) {
                 e.printStackTrace();
