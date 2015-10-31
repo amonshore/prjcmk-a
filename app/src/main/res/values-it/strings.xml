@@ -107,4 +107,5 @@
     <string name="pref_main_settings_title">Opzioni</string>
     <string name="dialog_backup_wait_title">Attendere prego</string>
     <string name="dialog_backup_wait_message">Backup dei dati in corso...</string>
+    <string name="comics_detail_choose_image">Scegli l\'immagine</string>
 </resources>

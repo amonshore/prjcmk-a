@@ -144,4 +144,7 @@
         <item>@string/comics_detail_image_change</item>
         <item>@string/comics_detail_image_remove</item>
     </string-array>
+
+    <!-- comics detail -->
+    <string name="comics_detail_choose_image">Choose Image</string>
 </resources>

@@ -9,8 +9,12 @@ import android.os.Bundle;
 import android.support.v7.widget.Toolbar;
 import android.view.Menu;
 import android.view.MenuItem;
+import android.view.View;
+import android.widget.ProgressBar;
 
 import com.bumptech.glide.Glide;
+import com.bumptech.glide.request.RequestListener;
+import com.bumptech.glide.request.target.Target;
 import com.isseiaoki.simplecropview.CropImageView;
 
 import java.io.File;
@@ -28,7 +32,9 @@ public class ComicsCropActivity extends ActionBarActivity {
     public final static String EXTRA_TEMP_FILE = "tempFile";
 
     private CropImageView mCropImageView;
+    private ProgressBar mProgressBar;
     private Comics mComics;
+    private String mTempFilePrefix;
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
@@ -38,6 +44,8 @@ public class ComicsCropActivity extends ActionBarActivity {
         final Intent intent = getIntent();
         final long comicsId = intent.getLongExtra(EXTRA_COMICS_ID, 0);
         final Uri imageUri = Uri.parse(intent.getStringExtra(EXTRA_IMAGE_URI));
+        //in questo modo rendo univoco il file che verrà salvato nella cache
+        mTempFilePrefix = getUriLastPart(imageUri);
         mComics = DataManager.getDataManager().getComics(comicsId);
         setTitle(mComics.getName());
         //Toolbar
@@ -48,8 +56,10 @@ public class ComicsCropActivity extends ActionBarActivity {
         //l'immagine deve avere una ratio di 10:4
         mCropImageView = (CropImageView)findViewById(R.id.cropImageView);
         mCropImageView.setCustomRatio(10, 4);
+        //
+        mProgressBar = (ProgressBar)findViewById(R.id.progressBar);
         //imposto l'immagine alla vista
-        Glide.with(this).load(imageUri).asBitmap().into(mCropImageView);
+        loadImageIntoView(imageUri);
     }
 
     @Override
@@ -72,7 +82,8 @@ public class ComicsCropActivity extends ActionBarActivity {
             //salvo l'immagine in un file temporaneo
             FileOutputStream outputStream = null;
             try {
-                File tempFile = File.createTempFile("cropped", ".jpg");
+                //File tempFile = File.createTempFile("cropped", ".jpg");
+                File tempFile = new File(getCacheDir(), mTempFilePrefix + ".jpg");
                 outputStream = new FileOutputStream(tempFile);
                 mCropImageView.getCroppedBitmap().compress(Bitmap.CompressFormat.JPEG, 80, outputStream);
                 //
@@ -97,6 +108,32 @@ public class ComicsCropActivity extends ActionBarActivity {
         }
 
         return super.onOptionsItemSelected(item);
+    }
+
+    private String getUriLastPart(Uri uri) {
+        int pp = uri.getPath().lastIndexOf('/');
+        if (pp >= 0) {
+            return uri.getPath().substring(pp);
+        } else {
+            return "" + System.currentTimeMillis();
+        }
+    }
+
+    private void loadImageIntoView(Uri imageUri) {
+        //nascondo la progress bar al termine del caricamento o in caso di errore
+        Glide.with(this).load(imageUri).asBitmap().listener(new RequestListener<Uri, Bitmap>() {
+            @Override
+            public boolean onException(Exception e, Uri model, Target<Bitmap> target, boolean isFirstResource) {
+                mProgressBar.setVisibility(View.GONE);
+                return false;
+            }
+
+            @Override
+            public boolean onResourceReady(Bitmap resource, Uri model, Target<Bitmap> target, boolean isFromMemoryCache, boolean isFirstResource) {
+                mProgressBar.setVisibility(View.GONE);
+                return false;
+            }
+        }).into(mCropImageView);
     }
 
 }
