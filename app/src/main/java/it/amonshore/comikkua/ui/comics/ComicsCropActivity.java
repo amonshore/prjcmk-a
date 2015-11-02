@@ -20,6 +20,7 @@ import com.isseiaoki.simplecropview.CropImageView;
 import java.io.File;
 import java.io.FileOutputStream;
 import java.io.IOException;
+import java.util.UUID;
 
 import it.amonshore.comikkua.R;
 import it.amonshore.comikkua.data.Comics;
@@ -44,8 +45,8 @@ public class ComicsCropActivity extends ActionBarActivity {
         final Intent intent = getIntent();
         final long comicsId = intent.getLongExtra(EXTRA_COMICS_ID, 0);
         final Uri imageUri = Uri.parse(intent.getStringExtra(EXTRA_IMAGE_URI));
-        //in questo modo rendo univoco il file che verrà salvato nella cache
-        mTempFilePrefix = getUriLastPart(imageUri);
+        //occorre rendere univoco il nome del file croppato altrimenti verrà presentato sempre quello cachato
+        mTempFilePrefix = UUID.randomUUID().toString();
         mComics = DataManager.getDataManager().getComics(comicsId);
         setTitle(mComics.getName());
         //Toolbar
@@ -110,14 +111,14 @@ public class ComicsCropActivity extends ActionBarActivity {
         return super.onOptionsItemSelected(item);
     }
 
-    private String getUriLastPart(Uri uri) {
-        int pp = uri.getPath().lastIndexOf('/');
-        if (pp >= 0) {
-            return uri.getPath().substring(pp);
-        } else {
-            return "" + System.currentTimeMillis();
-        }
-    }
+//    private String getUriLastPart(Uri uri) {
+//        int pp = uri.getPath().lastIndexOf('/');
+//        if (pp >= 0) {
+//            return uri.getPath().substring(pp);
+//        } else {
+//            return "" + System.currentTimeMillis();
+//        }
+//    }
 
     private void loadImageIntoView(Uri imageUri) {
         //nascondo la progress bar al termine del caricamento o in caso di errore
