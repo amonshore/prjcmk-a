@@ -12,7 +12,7 @@ android {
         applicationId "it.amonshore.comikkua"
         minSdkVersion 16
         targetSdkVersion 21
-        versionCode 16
+        versionCode 17
         versionName 'v1.0.3'
         renderscriptTargetApi 23
         renderscriptSupportModeEnabled true
@@ -45,4 +45,5 @@ dependencies {
     compile 'com.nispok:snackbar:2.10.10'
     compile 'com.github.bumptech.glide:glide:3.6.1'
     compile 'jp.wasabeef:glide-transformations:1.2.1'
+    compile 'com.isseiaoki:simplecropview:1.0.9'
 }

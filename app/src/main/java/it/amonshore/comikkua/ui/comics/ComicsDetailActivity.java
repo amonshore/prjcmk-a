@@ -27,7 +27,6 @@ import com.bumptech.glide.request.target.SimpleTarget;
 import java.io.File;
 import java.io.FileOutputStream;
 import java.io.IOException;
-import java.io.OutputStream;
 
 import it.amonshore.comikkua.R;
 import it.amonshore.comikkua.RequestCodes;
@@ -129,15 +128,24 @@ public class ComicsDetailActivity extends ActionBarActivity {
                 //A0049
                 int releaseNumber = data.getIntExtra(ReleaseEditorActivity.EXTRA_RELEASE_NUMBER, DataManager.NO_RELEASE);
                 mDataManager.updateData(DataManager.ACTION_ADD, mComics.getId(), releaseNumber);
-            } else if (requestCode == RequestCodes.LOAD_IMAGES) {
+            } else if (requestCode == RequestCodes.LOAD_IMAGE) {
                 //A0024
                 //elimino il file precedente
                 Uri imageUri = data.getData();
+                //A0054 crop immagine
+                Intent cropIntenet = new Intent(this, ComicsCropActivity.class);
+                cropIntenet.putExtra(ComicsCropActivity.EXTRA_COMICS_ID, mComics.getId());
+                cropIntenet.putExtra(ComicsCropActivity.EXTRA_IMAGE_URI, imageUri.toString());
+                startActivityForResult(cropIntenet, RequestCodes.CROP_IMAGE);
+            } else if (requestCode == RequestCodes.CROP_IMAGE) {
+                //A0054 ok cropped bitmap: aggiorno header
+                File tempFile = new File(data.getStringExtra(ComicsCropActivity.EXTRA_TEMP_FILE));
+                //  in caso di selezione del medesimo file presentare il rettangolo di crop con le coordinate salvate
                 String destFileName = Comics.getDefaultImageFileName(mComics.getId());
                 mComics.setImage(destFileName);
                 mDataManager.updateData(DataManager.ACTION_UPD, mComics.getId(), DataManager.NO_RELEASE);
                 //applica i filtri all'immagine, la salva e quindi la carica a video
-                createComicsImageFromUri(imageUri, FileHelper.getExternalFile(this, destFileName));
+                createComicsImageFromFile(tempFile, FileHelper.getExternalFile(this, destFileName));
             }
         }
     }
@@ -205,47 +213,28 @@ public class ComicsDetailActivity extends ActionBarActivity {
     private void showComicsImageSelector() {
         Intent intent = new Intent(Intent.ACTION_GET_CONTENT);
         intent.setType("image/*");
-        startActivityForResult(Intent.createChooser(intent, "Choose Picture"), RequestCodes.LOAD_IMAGES);
+        startActivityForResult(Intent.createChooser(intent, getString(R.string.comics_detail_choose_image)), RequestCodes.LOAD_IMAGE);
     }
 
-    private void createComicsImageFromUri(Uri uri, final File file) {
+    private void createComicsImageFromFile(final File inputFile, final File outputFile) {
         //A0024 cambia il colore dell'immagine (scala di grigio + filtro colore) e la salva compressa (jpg)
-        final Context context = this;
-        new AsyncTask<Uri, Void, BitmapRequestBuilder<Uri, Bitmap>>() {
-            @Override
-            protected BitmapRequestBuilder<Uri, Bitmap> doInBackground(Uri... params) {
-                return
-                Glide.with(context).load(params[0])
-                        .asBitmap()
-//                        .diskCacheStrategy(DiskCacheStrategy.SOURCE) //TODO da togliere
-//                        .skipMemoryCache(true) //TODO da togliere
-                        .transform(
-                                new CenterCrop(context),
-                                new GrayscaleTransformation(context),
-                                new ColorFilterTransformation(context, getResources().getColor(R.color.comikku_comics_image_color))
-////                                ,
-//
-////                                new ComicsImageTransformation(context, 100,
-////                                        getResources().getColor(R.color.comikku_primary_color),
-////                                        Color.TRANSPARENT) //TODO provare direttamente comikku_comics_image_color in modo
-                        )
-                        .override(500, 195) //TODO considerare le dim. originali dell'immagine e dell view (portrait 1080 * 420)
-                        ;
-            }
 
-            @Override
-            protected void onPostExecute(BitmapRequestBuilder<Uri, Bitmap> bitmapRequestBuilder) {
-                bitmapRequestBuilder.into(new SimpleTarget<Bitmap>() {
+        Glide.with(this).load(Uri.fromFile(inputFile))
+                .asBitmap()
+                .transform(
+                        new CenterCrop(this),
+                        new GrayscaleTransformation(this),
+                        new ColorFilterTransformation(this, getResources().getColor(R.color.comikku_comics_image_color))
+                )
+                .into(new SimpleTarget<Bitmap>() {
                     @Override
                     public void onResourceReady(Bitmap resource, GlideAnimation<? super Bitmap> glideAnimation) {
-                        OutputStream outputStream = null;
+                        FileOutputStream outputStream = null;
                         try {
-                            outputStream = new FileOutputStream(file);
+                            outputStream = new FileOutputStream(outputFile);
                             resource.compress(Bitmap.CompressFormat.JPEG, 80, outputStream);
-                            outputStream.close();
-                            outputStream = null;
                             //
-                            loadComicsImage(file);
+                            loadComicsImage(outputFile);
                         } catch (IOException e) {
                             e.printStackTrace();
                         } finally {
@@ -256,11 +245,55 @@ public class ComicsDetailActivity extends ActionBarActivity {
                                     e.printStackTrace();
                                 }
                             }
+                            //elimino il file di input
+                            inputFile.delete();
                         }
                     }
                 });
-            }
-        }.execute(uri);
+
+
+//        final Context context = this;
+//        new AsyncTask<Uri, Void, BitmapRequestBuilder<Uri, Bitmap>>() {
+//            @Override
+//            protected BitmapRequestBuilder<Uri, Bitmap> doInBackground(Uri... params) {
+//                return
+//                Glide.with(context).load(params[0])
+//                        .asBitmap()
+//                        .transform(
+//                                new CenterCrop(context),
+//                                new GrayscaleTransformation(context),
+//                                new ColorFilterTransformation(context, getResources().getColor(R.color.comikku_comics_image_color))
+//                        );
+//            }
+//
+//            @Override
+//            protected void onPostExecute(BitmapRequestBuilder<Uri, Bitmap> bitmapRequestBuilder) {
+//                bitmapRequestBuilder.into(new SimpleTarget<Bitmap>() {
+//                    @Override
+//                    public void onResourceReady(Bitmap resource, GlideAnimation<? super Bitmap> glideAnimation) {
+//                        FileOutputStream outputStream = null;
+//                        try {
+//                            outputStream = new FileOutputStream(outputFile);
+//                            resource.compress(Bitmap.CompressFormat.JPEG, 80, outputStream);
+//                            //
+//                            loadComicsImage(outputFile);
+//                        } catch (IOException e) {
+//                            e.printStackTrace();
+//                        } finally {
+//                            if (outputStream != null) {
+//                                try {
+//                                    outputStream.close();
+//                                } catch (Exception e) {
+//                                    e.printStackTrace();
+//                                }
+//                            }
+//                            //elimino il file di input
+//                            inputFile.delete();
+//                        }
+//                    }
+//                });
+//            }
+//        }.execute(Uri.fromFile(inputFile));
     }
 
     private void loadComicsImage(File file) {
@@ -270,21 +303,7 @@ public class ComicsDetailActivity extends ActionBarActivity {
             //se è stato caricato in precedenza un file con lo stesso, l'imageView non carica quello nuovo
             //  perché l'Uri non è cambiato, è necessario quindi passre null per forzare il refresh
             mImageView.setImageDrawable(null);
-//            mImageView.setScaleType(ImageView.ScaleType.CENTER_CROP);
             mImageView.setImageURI(Uri.fromFile(file));
-
-//            final int height = 10;
-//            final Context context = this;
-//            Glide.with(this).load(file)
-////                    .diskCacheStrategy(DiskCacheStrategy.SOURCE) //TODO da togliere
-////                    .skipMemoryCache(true) //TODO da togliere
-//                    .bitmapTransform(
-//                            new CenterCrop(context),
-//                            new ComicsImageTransformation(context, height,
-//                                    getResources().getColor(R.color.comikku_primary_color),
-////                                Color.TRANSPARENT) //TODO provare direttamente comikku_comics_image_color in modo
-//                                    getResources().getColor(R.color.comikku_comics_image_color))
-//                    ).into(mImageView);
         }
     }
 

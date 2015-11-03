@@ -40,3 +40,6 @@ Versione: v1.0.3 (16)
 - eliminate immagini non più associate a comics
 - lista fumetti: possibilità di scelta se mostrare ultimo numero comprato o primo da comprare
 - interazione bloccata durante il backup su file
+
+Versione: v1.0.3 (17)
+- l'utente può selezionare la porzione di immagine per il comics

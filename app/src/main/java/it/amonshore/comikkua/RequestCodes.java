@@ -7,7 +7,8 @@ public abstract class RequestCodes {
 
     public final static int EDIT_COMICS_REQUEST = 1001;
     public final static int EDIT_RELEASE_REQUEST = 2001;
-    public final static int LOAD_IMAGES = 3001;
+    public final static int LOAD_IMAGE = 3001;
+    public final static int CROP_IMAGE = 3010;
 
     //TODO completare con gli altri codici
 }

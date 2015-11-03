@@ -2,13 +2,11 @@
 <manifest xmlns:android="http://schemas.android.com/apk/res/android"
     package="it.amonshore.comikkua" >
 
-    <uses-permission
-        android:name="android.permission.WRITE_EXTERNAL_STORAGE" />
+    <uses-permission android:name="android.permission.WRITE_EXTERNAL_STORAGE" />
 
     <!-- Google Analytics required permissions -->
-    <!--<uses-permission android:name="android.permission.INTERNET" />-->
-    <!--<uses-permission android:name="android.permission.ACCESS_NETWORK_STATE" />-->
-
+    <!-- <uses-permission android:name="android.permission.INTERNET" /> -->
+    <!-- <uses-permission android:name="android.permission.ACCESS_NETWORK_STATE" /> -->
     <application
         android:name=".ComikkuApp"
         android:allowBackup="true"
@@ -16,18 +14,19 @@
         android:label="@string/app_name"
         android:theme="@style/AppTheme" >
 
-        <!--<meta-data-->
-            <!--android:name="com.google.android.gms.version"-->
-            <!--android:value="@integer/google_play_services_version" />-->
+        <!-- <meta-data -->
+        <!-- android:name="com.google.android.gms.version" -->
+        <!-- android:value="@integer/google_play_services_version" /> -->
 
-        <!--<service android:name="com.google.android.gms.analytics.AnalyticsService"-->
-            <!--android:enabled="true"-->
-            <!--android:exported="false"/>-->
+
+        <!-- <service android:name="com.google.android.gms.analytics.AnalyticsService" -->
+        <!-- android:enabled="true" -->
+        <!-- android:exported="false"/> -->
 
         <activity
-            android:name="it.amonshore.comikkua.ui.MainActivity"
-            android:launchMode="singleTop"
-            android:label="@string/title_activity_main" >
+            android:name=".ui.MainActivity"
+            android:label="@string/title_activity_main"
+            android:launchMode="singleTop" >
             <intent-filter>
                 <action android:name="android.intent.action.MAIN" />
 
@@ -35,46 +34,48 @@
             </intent-filter>
         </activity>
         <activity
-            android:name="it.amonshore.comikkua.ui.SettingsActivity"
+            android:name=".ui.SettingsActivity"
             android:label="@string/title_activity_settings"
-            android:parentActivityName="it.amonshore.comikkua.ui.MainActivity" >
+            android:parentActivityName=".ui.MainActivity" >
             <meta-data
                 android:name="android.support.PARENT_ACTIVITY"
                 android:value="it.amonshore.comikkua.ui.MainActivity" />
         </activity>
         <activity
-            android:name="it.amonshore.comikkua.ui.comics.ComicsEditorActivity"
+            android:name=".ui.comics.ComicsEditorActivity"
             android:label="@string/title_activity_comics_new"
-            android:parentActivityName="it.amonshore.comikkua.ui.MainActivity"
+            android:parentActivityName=".ui.MainActivity"
             android:windowSoftInputMode="stateUnchanged" >
             <meta-data
                 android:name="android.support.PARENT_ACTIVITY"
                 android:value="it.amonshore.comikkua.ui.MainActivity" />
         </activity>
         <activity
-            android:name="it.amonshore.comikkua.ui.release.ReleaseEditorActivity"
+            android:name=".ui.release.ReleaseEditorActivity"
             android:label="@string/title_activity_release_editor"
-            android:parentActivityName="it.amonshore.comikkua.ui.MainActivity"
+            android:parentActivityName=".ui.MainActivity"
             android:windowSoftInputMode="stateUnchanged" >
             <meta-data
                 android:name="android.support.PARENT_ACTIVITY"
                 android:value="it.amonshore.comikkua.ui.MainActivity" />
         </activity>
         <activity
-            android:name="it.amonshore.comikkua.ui.comics.ComicsDetailActivity"
+            android:name=".ui.comics.ComicsDetailActivity"
             android:label="@string/title_activity_comics_detail"
-            android:parentActivityName="it.amonshore.comikkua.ui.MainActivity" >
+            android:parentActivityName=".ui.MainActivity" >
             <meta-data
                 android:name="android.support.PARENT_ACTIVITY"
                 android:value="it.amonshore.comikkua.ui.MainActivity" />
         </activity>
         <activity
-            android:name="it.amonshore.comikkua.ui.InfoActivity"
+            android:name=".ui.InfoActivity"
             android:label="@string/title_activity_info"
-            android:parentActivityName="it.amonshore.comikkua.ui.MainActivity" >
+            android:parentActivityName=".ui.MainActivity" >
             <meta-data
                 android:name="android.support.PARENT_ACTIVITY"
                 android:value="it.amonshore.comikkua.ui.MainActivity" />
+        </activity>
+        <activity android:name=".ui.comics.ComicsCropActivity" >
         </activity>
     </application>
 
