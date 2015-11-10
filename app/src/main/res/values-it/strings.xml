@@ -75,12 +75,12 @@
     <string name="comics_empty_list">Non ci sono fumetti</string>
     <string name="release_empty_list">Non ci sono uscite</string>
     <string name="last_restored">Ultimo backup eseguito il %1$te %1$tB, %1$tY alle %1$tl:%1$tM %1$tp</string>
-    <string name="pref_backup_now_title">Crea backup</string>
-    <string name="pref_restore_now_title">Ripristina backup</string>
-    <string name="toast_backup_created">Backup creato</string>
-    <string name="toast_backup_problem">Si è verificato un errore durante il backup</string>
-    <string name="toast_backup_restored">Backup ripristinato</string>
-    <string name="toast_restore_problem">Si è verificato un errore durante il ripristino</string>
+    <string name="opt_backup_now_title">Crea backup</string>
+    <string name="opt_restore_now_title">Ripristina backup</string>
+    <string name="opt_backup_now_done">Backup creato</string>
+    <string name="opt_backup_now_fail">Si è verificato un errore durante il backup</string>
+    <string name="opt_restore_now_done">Backup ripristinato</string>
+    <string name="opt_restore_now_fail">Si è verificato un errore durante il ripristino</string>
     <string name="action_comics_share">Condividi</string>
     <string name="share">Condividi</string>
     <string name="action_info">Info</string>
@@ -92,9 +92,9 @@
     <string name="action_comics_search">Cerca</string>
     <string name="action_release_delete">Rimuovi</string>
     <string name="action_release_share">Condividi</string>
-    <string name="pref_clear_data">Rimuovi tutti i dati</string>
-    <string name="pref_restore_old">Ripristina i dati da una versione meno recente di Comikku</string>
-    <string name="toast_data_cleared">Dati rimossi</string>
+    <string name="opt_clear_data_title">Rimuovi tutti i dati</string>
+    <string name="opt_restore_old_title">Ripristina i dati da una versione meno recente di Comikku</string>
+    <string name="opt_clear_data_done">Dati rimossi</string>
     <string name="comics_detail_image_change">Cambia immagine</string>
     <string name="comics_detail_image_remove">Rimuovi immagine</string>
     <string name="pref_last_purchased_title">Mostra l\'ultimo numero acquistato</string>
@@ -106,6 +106,10 @@
     <string name="pref_data_settings_title">Dati</string>
     <string name="pref_main_settings_title">Opzioni</string>
     <string name="dialog_backup_wait_title">Attendere prego</string>
-    <string name="dialog_backup_wait_message">Backup dei dati in corso...</string>
     <string name="comics_detail_choose_image">Scegli l\'immagine</string>
+    <string name="action_data_options">Dati</string>
+    <string name="cancel">Annulla</string>
+    <string name="opt_backup_now_confirm_ok">Crea ora</string>
+    <string name="opt_backup_now_confirm_title">Crea backup?</string>
+    <string name="title_activity_data_options">Dati</string>
 </resources>

@@ -53,6 +53,7 @@
     <color name="comikku_secondary_text">#607D8B</color>
     <!--<color name="comikku_tertiary_text">#CFD8DC</color>-->
     <color name="comikku_tertiary_text">#90A4AE</color>
+    <color name="comikku_disalbled_text">#DDDDDD</color>
 
     <!-- colori per gli stati delle release: to purchase, purchased, expired (lost), wishlist
         background: 500, border: 600, text: 50

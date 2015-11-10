@@ -6,6 +6,7 @@
     <string name="action_info">Info</string>
     <string name="action_share_data">Share data</string>
     <string name="action_save">Save</string>
+    <string name="action_data_options">Data</string>
 
     <string name="action_comics_delete">Remove</string>
     <string name="action_comics_sort_by_name">Sort by name</string>
@@ -25,6 +26,7 @@
     <string name="title_activity_release_editor">New release</string>
     <string name="title_activity_comics_detail">Comics detail</string>
     <string name="title_activity_info">Info</string>
+    <string name="title_activity_data_options">Data</string>
 
     <string name="share">Share</string>
     <string name="share_data">Share all data</string>
@@ -35,6 +37,7 @@
     <string name="comics_removed">Comics removed</string>
     <string name="release_removed">Release removed</string>
     <string name="also_releases">Also: %1s</string>
+    <string name="cancel">Cancel</string>
 
     <string name="comics_empty_list">You have no comics</string>
     <string name="release_empty_list">You have no releases</string>
@@ -54,24 +57,45 @@
     <string name="pref_week_start_on_monday_title">Week start on monday</string>
     <string name="pref_week_start_on_monday_on">Monday is the first day of week</string>
     <string name="pref_week_start_on_monday_off">Sunday is the first day of week</string>
-    <string name="pref_backup_now_title">Create bakcup</string>
-    <string name="pref_restore_now_title">Restore bakcup</string>
-    <string name="pref_clear_data">Remove all data</string>
-    <string name="pref_restore_old">Restore data from old version of Comikku app</string>
     <string name="pref_last_purchased_title">Show last release purchased</string>
     <string name="pref_last_purchased_on">The last number purchased is shown in the list comics</string>
     <string name="pref_last_purchased_off">The next issue that must be purchased is shown in the comics list</string>
     <string name="pref_autofill_release_title">Automatically fill release data</string>
     <string name="pref_autofill_release_on">The fields of a new release will be automatically set according to the previous release</string>
     <string name="pref_autofill_release_off">The fields of a new release will be empty</string>
-    <string name="dialog_backup_wait_title">Please wait</string>
-    <string name="dialog_backup_wait_message">Backup data to file...</string>
-    <string name="toast_backup_created">Backup created</string>
-    <string name="toast_backup_problem">There was a problem with backup</string>
-    <string name="toast_backup_restored">Backup restored</string>
-    <string name="toast_restore_problem">There was a problem with restore</string>
-    <string name="toast_data_cleared">Data removed</string>
+
+    <!-- options -->
+    <string name="opt_backup_now_title">Create bakcup</string>
+    <string name="opt_backup_now_confirm_title">Create bakcup?</string>
+    <string name="opt_backup_now_confirm_message">The backup file will be created in Downloads folder. The previous backup will be overwritten.</string>
+    <string name="opt_backup_now_confirm_ok">Create now</string>
+    <string name="opt_backup_now_done">Backup created</string>
+    <string name="opt_backup_now_fail">There was a problem with backup</string>
+    <string name="opt_backup_now_wait">Backup data to file...</string>
+
+    <string name="opt_restore_now_title">Restore bakcup</string>
+    <string name="opt_restore_now_confirm_title">Restore bakcup?</string>
+    <string name="opt_restore_now_confirm_message">Current data will be removed and restored from backup file.</string>
+    <string name="opt_restore_now_confirm_ok">Restore now</string>
+    <string name="opt_restore_now_done">Backup restored</string>
+    <string name="opt_restore_now_fail">There was a problem with restore</string>
     <string name="last_restored">Last backup was on %1$tB %1$te, %1$tY at %1$tl:%1$tM %1$tp</string>
+    <string name="opt_restore_now_wait">Restore data from file...</string>
+
+    <string name="opt_restore_old_title">Restore data from old version of Comikku app</string>
+    <string name="opt_restore_old_confirm_title">Restore data?</string>
+    <string name="opt_restore_old_confirm_message">Current data will be removed and restored from old app file.</string>
+    <string name="opt_restore_old_confirm_ok">Restore now</string>
+    <string name="opt_restore_old_wait">Restore data from old app file...</string>
+
+    <string name="opt_clear_data_title">Remove all data</string>
+    <string name="opt_clear_data_confirm_title">Remove all data?</string>
+    <string name="opt_clear_data_confirm_message">Current data will be removed. It\'s recommended backing up data before proceed.</string>
+    <string name="opt_clear_data_confirm_ok">Remove all</string>
+    <string name="opt_clear_data_done">Data removed</string>
+    <string name="opt_clear_data_wait">Removing data...</string>
+
+    <string name="dialog_backup_wait_title">Please wait</string>
 
     <!-- page captions -->
     <string name="title_page_comics">COMICS</string>
