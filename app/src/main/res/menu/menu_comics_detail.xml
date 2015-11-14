@@ -11,6 +11,6 @@
         android:orderInCategory="100" app:showAsAction="ifRoom" />
     <item android:id="@+id/action_comics_search"
         android:title="@string/action_comics_search"
-        android:icon="@drawable/ic_magnify"
+        android:icon="@drawable/ic_web"
         android:orderInCategory="110" app:showAsAction="ifRoom" />
 </menu>

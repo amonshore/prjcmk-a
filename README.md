@@ -43,3 +43,7 @@ Versione: v1.0.3 (16)
 
 Versione: v1.0.3 (17)
 - l'utente può selezionare la porzione di immagine per il comics
+
+Versione: v1.0.3 (18)
+- attività sui dati spostate in una sezione apposita
+- chiesta conferma utente per ogni attività di backup/restore sui dati

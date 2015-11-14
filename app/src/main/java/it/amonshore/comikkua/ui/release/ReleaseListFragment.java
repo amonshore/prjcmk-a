@@ -1,6 +1,7 @@
 package it.amonshore.comikkua.ui.release;
 
 import android.app.Activity;
+import android.app.SearchManager;
 import android.content.Intent;
 import android.content.SharedPreferences;
 import android.os.Bundle;
@@ -245,6 +246,16 @@ public class ReleaseListFragment extends AFragment implements ScrollToTopListene
                     sendIntent.putExtra(Intent.EXTRA_TEXT, Utils.join("\n", false, rows));
                     sendIntent.setType("text/plain");
                     startActivity(Intent.createChooser(sendIntent, getResources().getText(R.string.share)));
+                    return true;
+                } else if (menuId == R.id.action_comics_search) {
+                    long[] ags = mListView.getCheckedItemIds();
+                    ReleaseInfo ri = (ReleaseInfo) mAdapter.getItem((int) ags[0]);
+                    Comics comics = dataManager.getComics(ri.getRelease().getComicsId());
+                    String query = Utils.join(" ", true, comics.getName(), comics.getAuthors(),
+                            comics.getPublisher());
+                    Intent intent = new Intent(Intent.ACTION_WEB_SEARCH);
+                    intent.putExtra(SearchManager.QUERY, query);
+                    startActivity(intent);
                     return true;
                 } else {
                     return false;
