@@ -61,8 +61,8 @@
     <string name="pref_last_purchased_on">The last number purchased is shown in the list comics</string>
     <string name="pref_last_purchased_off">The next issue that must be purchased is shown in the comics list</string>
     <string name="pref_autofill_release_title">Automatically fill release data</string>
-    <string name="pref_autofill_release_on">The fields of a new release will be automatically set according to the previous release</string>
-    <string name="pref_autofill_release_off">The fields of a new release will be empty</string>
+    <string name="pref_autofill_release_on">The fields of the new release will be automatically set according to the previous release</string>
+    <string name="pref_autofill_release_off">The fields of the new release will be empty</string>
 
     <!-- options -->
     <string name="opt_backup_now_title">Create bakcup</string>
@@ -84,7 +84,7 @@
 
     <string name="opt_restore_old_title">Restore data from old version of Comikku app</string>
     <string name="opt_restore_old_confirm_title">Restore data?</string>
-    <string name="opt_restore_old_confirm_message">Current data will be removed and restored from old app file.</string>
+    <string name="opt_restore_old_confirm_message">Current data will be removed and restored from the old version of the application.</string>
     <string name="opt_restore_old_confirm_ok">Restore now</string>
     <string name="opt_restore_old_wait">Restore data from old app file...</string>
 

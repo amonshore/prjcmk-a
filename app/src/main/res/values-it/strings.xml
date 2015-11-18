@@ -112,4 +112,18 @@
     <string name="opt_backup_now_confirm_ok">Crea ora</string>
     <string name="opt_backup_now_confirm_title">Crea backup?</string>
     <string name="title_activity_data_options">Dati</string>
+    <string name="opt_backup_now_confirm_message">Il file di backup verrà creato nella cartella Download. Il precedente backup verrà sovrascritto.</string>
+    <string name="opt_backup_now_wait">Sto effettuando il backup dei dati su file...</string>
+    <string name="opt_clear_data_confirm_message">I dati attuali verranno rimossi. Si consiglia di effettuare il backup dei dati prima di procedere.</string>
+    <string name="opt_clear_data_confirm_ok">Rimuovi tutto</string>
+    <string name="opt_clear_data_confirm_title">Rimuovere tutti i dati?</string>
+    <string name="opt_clear_data_wait">Rimozione dati in corso...</string>
+    <string name="opt_restore_now_confirm_message">I dati attuali verrano rimossi e ripristinati dal file di backup.</string>
+    <string name="opt_restore_now_confirm_ok">Ripristina adesso</string>
+    <string name="opt_restore_now_confirm_title">Ripristinare il backup?</string>
+    <string name="opt_restore_now_wait">Ripristino dei dati in corso...</string>
+    <string name="opt_restore_old_confirm_message">I dati attuali verranno rimossi e ripristinati da una vecchia versione dell\'applicazione.</string>
+    <string name="opt_restore_old_confirm_ok">Ripristina adesso</string>
+    <string name="opt_restore_old_confirm_title">Ripristinare i dati?</string>
+    <string name="opt_restore_old_wait">Ripristino dei dati in corso...</string>
 </resources>
