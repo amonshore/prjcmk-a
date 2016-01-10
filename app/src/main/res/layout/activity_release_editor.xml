@@ -33,7 +33,7 @@
                         android:id="@+id/txt_editor_release_number"
                         android:layout_width="match_parent"
                         android:layout_height="wrap_content"
-                        android:inputType="number"
+                        android:inputType="text"
                         android:layout_marginBottom="10dp"
                         app:flw_labelText="@string/editor_release_number" />
 

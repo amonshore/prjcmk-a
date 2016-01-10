@@ -125,9 +125,10 @@ public class ComicsDetailActivity extends ActionBarActivity {
             } else if (requestCode == RequestCodes.EDIT_RELEASE_REQUEST) {
                 mDataManager.updateBestRelease(mComics.getId());
                 mDataManager.notifyChanged(DataManager.CAUSE_RELEASE_ADDED);
-                //A0049
-                int releaseNumber = data.getIntExtra(ReleaseEditorActivity.EXTRA_RELEASE_NUMBER, DataManager.NO_RELEASE);
-                mDataManager.updateData(DataManager.ACTION_ADD, mComics.getId(), releaseNumber);
+                //A0056
+//                //A0049
+//                int releaseNumber = data.getIntExtra(ReleaseEditorActivity.EXTRA_RELEASE_NUMBER, DataManager.NO_RELEASE);
+//                mDataManager.updateData(DataManager.ACTION_ADD, mComics.getId(), releaseNumber);
             } else if (requestCode == RequestCodes.LOAD_IMAGE) {
                 //A0024
                 //elimino il file precedente

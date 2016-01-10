@@ -4,15 +4,14 @@ import android.content.Context;
 import android.text.TextUtils;
 import android.util.Log;
 
-import java.io.File;
-import java.io.FileInputStream;
-import java.io.FileOutputStream;
-import java.io.IOException;
-import java.nio.channels.FileChannel;
 import java.text.ParseException;
 import java.text.SimpleDateFormat;
+import java.util.ArrayList;
 import java.util.Date;
+import java.util.HashSet;
+import java.util.Iterator;
 import java.util.Locale;
+import java.util.TreeSet;
 
 import hirondelle.date4j.DateTime;
 
@@ -159,6 +158,37 @@ public class Utils {
         }
 
         return buffer;
+    }
+
+    /**
+     *
+     * @param text testo da interpretare
+     * @param separator separatore di intervalli
+     * @param sequenceSeparator separatore di sequenze
+     * @return elenco ordinato di interi
+     */
+    public static int[] parseInterval(String text, String separator, String sequenceSeparator) {
+        TreeSet<Integer> list = new TreeSet<>();
+        for (String token : text.split(separator)) {
+            String[] range = token.split(sequenceSeparator);
+            if (range.length == 1) {
+                list.add(Integer.parseInt(range[0].trim()));
+            } else if (range.length == 2) {
+                int from = Integer.parseInt(range[0].trim());
+                int to = Integer.parseInt(range[1].trim());
+                do {
+                    list.add(from);
+                } while (++from <= to);
+            }
+        }
+        return toIntArray(list.iterator(), new int[list.size()]);
+    }
+
+    public static int[] toIntArray(Iterator<Integer> src, int[] dst) {
+        for (int ii=0; src.hasNext() ;ii++) {
+            dst[ii] = src.next();
+        }
+        return dst;
     }
 
     /**

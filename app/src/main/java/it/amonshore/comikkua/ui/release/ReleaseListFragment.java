@@ -257,6 +257,15 @@ public class ReleaseListFragment extends AFragment implements ScrollToTopListene
                     intent.putExtra(SearchManager.QUERY, query);
                     startActivity(intent);
                     return true;
+                } else if (menuId == R.id.action_release_ordered) { //A0057
+                    long[] ags = mListView.getCheckedItemIds();
+                    for (int ii = ags.length - 1; ii >= 0; ii--) {
+                        ReleaseInfo ri = (ReleaseInfo)mAdapter.getItem((int) ags[ii]);
+                        ri.getRelease().setOrdered(true); //TODO gestire toggle
+                        dataManager.updateData(DataManager.ACTION_UPD, ri.getRelease().getComicsId(), ri.getRelease().getNumber());
+                    }
+                    dataManager.notifyChanged(DataManager.CAUSE_RELEASE_CHANGED);
+                    return true;
                 } else {
                     return false;
                 }
@@ -286,9 +295,10 @@ public class ReleaseListFragment extends AFragment implements ScrollToTopListene
                 if (comicsId != ReleaseEditorActivity.COMICS_ID_NONE) {
                     dataManager.updateBestRelease(comicsId);
                     dataManager.notifyChanged(DataManager.CAUSE_RELEASE_CHANGED);
-                    //A0049
-                    final int releaseNumber = data.getIntExtra(ReleaseEditorActivity.EXTRA_RELEASE_NUMBER, DataManager.NO_RELEASE);
-                    dataManager.updateData(DataManager.ACTION_UPD, comicsId, releaseNumber);
+                    //A0056
+//                    //A0049
+//                    final int releaseNumber = data.getIntExtra(ReleaseEditorActivity.EXTRA_RELEASE_NUMBER, DataManager.NO_RELEASE);
+//                    dataManager.updateData(DataManager.ACTION_UPD, comicsId, releaseNumber);
                 }
             }
         }

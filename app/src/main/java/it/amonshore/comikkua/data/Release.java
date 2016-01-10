@@ -111,4 +111,26 @@ public class Release {
     public boolean isWishlist() {
         return date == null;
     }
+
+    /**
+     * Copia tutte le proprietà tranne number
+     *
+     * @param release
+     */
+    public void copyFrom(Release release) {
+        this.setDate(release.getDate());
+        this.setPrice(release.getPrice());
+        this.setFlags(release.getFlags());
+        this.setNotes(release.getNotes());
+    }
+
+    public Release clone() {
+        Release clone = new Release(comicsId);
+        clone.setNumber(this.getNumber());
+        clone.setDate(this.getDate());
+        clone.setPrice(this.getPrice());
+        clone.setFlags(this.getFlags());
+        clone.setNotes(this.getNotes());
+        return clone;
+    }
 }

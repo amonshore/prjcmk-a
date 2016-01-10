@@ -22,7 +22,7 @@
     <string name="title_activity_release_editor">Nuova uscita</string>
     <string name="title_activity_comics_new">Nuovo fumetto</string>
     <string name="title_activity_comics_detail">Dettagli fumetto</string>
-    <string name="selected_items">%1d selezionati</string>
+    <string name="selected_items">%1d</string>
     <string name="release_removed">Uscita rimossa</string>
     <string name="pref_week_start_on_monday_title">La settimana inizia di lunedì</string>
     <string name="pref_week_start_on_monday_on">Lunedì è il primo giorno della settimana</string>
@@ -36,7 +36,7 @@
     <string name="editor_release_number_negative">Il numero deve essere positivo</string>
     <string name="editor_release_number_empty">Il numero è richiesto</string>
     <string name="editor_release_number_duplicate">Il numero è già stato usato</string>
-    <string name="editor_release_number">Numero</string>
+    <string name="editor_release_number">Numero o intervalli di numeri (es: 1,4-6)</string>
     <string name="editor_release_notes">Note</string>
     <string name="editor_release_date">Data</string>
     <string name="editor_comics_series">Serie</string>
@@ -87,7 +87,7 @@
     <string name="action_share_data">Convidividi</string>
     <string name="share_data">Condividi tutti i dati</string>
     <string name="title_activity_info">Informazioni</string>
-    <string name="selected_item">%1d selezionato</string>
+    <string name="selected_item">%1d</string>
     <string name="also_releases">Altro: %1s</string>
     <string name="action_comics_search">Cerca</string>
     <string name="action_release_delete">Rimuovi</string>
@@ -126,4 +126,6 @@
     <string name="opt_restore_old_confirm_ok">Ripristina adesso</string>
     <string name="opt_restore_old_confirm_title">Ripristinare i dati?</string>
     <string name="opt_restore_old_wait">Ripristino dei dati in corso...</string>
+    <string name="editor_release_number_pattern_error">Il valore non è valido</string>
+    <string name="action_release_ordered">Ordinato</string>
 </resources>

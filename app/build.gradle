@@ -3,7 +3,7 @@ apply plugin: 'com.android.application'
 android {
     signingConfigs {
         config {
-            storeFile file('C:/Users/Gianfranco/Documents/dev/android_key_store/my-release-key.keystore')
+            storeFile file('/Users/narsenico/android_key_store/my-release-key.keystore')
         }
     }
     compileSdkVersion 23
@@ -12,7 +12,7 @@ android {
         applicationId "it.amonshore.comikkua"
         minSdkVersion 16
         targetSdkVersion 23
-        versionCode 18
+        versionCode 19
         versionName 'v1.0.3'
         renderscriptTargetApi 23
         renderscriptSupportModeEnabled true
@@ -34,7 +34,7 @@ repositories {
 }
 
 dependencies {
-    compile fileTree(dir: 'libs', include: ['*.jar'])
+    compile fileTree(include: ['*.jar'], dir: 'libs')
     compile 'com.android.support:support-v4:23.1.1'
     compile 'com.darwinsys:hirondelle-date4j:1.5.1'
     compile 'se.emilsjolander:stickylistheaders:2.7.0'

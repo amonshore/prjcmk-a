@@ -20,6 +20,7 @@
     <string name="action_release_calendar">Calendar</string>
     <string name="action_release_wishlist">Wishlist</string>
     <string name="action_release_share">Share</string>
+    <string name="action_release_ordered">Ordered</string>
 
     <string name="title_activity_comics_new">New comics</string>
     <string name="title_activity_comics_edit">Edit comics</string>
@@ -30,8 +31,8 @@
 
     <string name="share">Share</string>
     <string name="share_data">Share all data</string>
-    <string name="selected_item">%1d selected</string>
-    <string name="selected_items">%1d selected</string>
+    <string name="selected_item">%1d</string>
+    <string name="selected_items">%1d</string>
     <string name="placeholder_wishlist" translatable="false">wish</string>
     <string name="undo">Undo</string>
     <string name="comics_removed">Comics removed</string>
@@ -151,10 +152,11 @@
     <string name="editor_comics_notes">Notes</string>
 
     <!-- release editor -->
-    <string name="editor_release_number">Number</string>
+    <string name="editor_release_number">Number or intervals of numbers (eg: 1,4-6)</string>
     <string name="editor_release_number_empty">The number is required</string>
     <string name="editor_release_number_negative">Number must be positive</string>
     <string name="editor_release_number_duplicate">The number is already being used</string>
+    <string name="editor_release_number_pattern_error">The value is not valid</string>
     <string name="editor_release_date">Date</string>
     <string name="editor_release_price">Price</string>
     <string name="editor_release_notes">Notes</string>
