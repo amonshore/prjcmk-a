@@ -47,3 +47,6 @@ Versione: v1.0.3 (17)
 Versione: v1.0.3 (18)
 - attività sui dati spostate in una sezione apposita
 - chiesta conferma utente per ogni attività di backup/restore sui dati
+
+Versione: v1.0.3 (19)
+- inserimento release multiple

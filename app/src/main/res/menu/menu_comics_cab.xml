@@ -8,6 +8,6 @@
         android:icon="@drawable/ic_share"
         android:orderInCategory="100" app:showAsAction="ifRoom" />
     <item android:id="@+id/action_comics_search" android:title="@string/action_comics_search"
-        android:icon="@drawable/ic_web"
+        android:icon="@drawable/ic_magnify"
         android:orderInCategory="10" app:showAsAction="ifRoom" />
 </menu>

@@ -259,9 +259,11 @@ public class ReleaseListFragment extends AFragment implements ScrollToTopListene
                     return true;
                 } else if (menuId == R.id.action_release_ordered) { //A0057
                     long[] ags = mListView.getCheckedItemIds();
-                    for (int ii = ags.length - 1; ii >= 0; ii--) {
+                    boolean ordered = false;
+                    for (int ii = 0; ii < ags.length; ii++) {
                         ReleaseInfo ri = (ReleaseInfo)mAdapter.getItem((int) ags[ii]);
-                        ri.getRelease().setOrdered(true); //TODO gestire toggle
+                        if (ii == 0) ordered = !ri.getRelease().isOrdered();
+                        ri.getRelease().setOrdered(ordered);
                         dataManager.updateData(DataManager.ACTION_UPD, ri.getRelease().getComicsId(), ri.getRelease().getNumber());
                     }
                     dataManager.notifyChanged(DataManager.CAUSE_RELEASE_CHANGED);

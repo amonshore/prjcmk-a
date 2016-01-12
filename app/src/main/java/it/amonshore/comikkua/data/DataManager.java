@@ -309,7 +309,7 @@ public class DataManager extends Observable<ComicsObserver> {
                         comics.setAuthors(curComics.getString(DBHelper.ComicsTable.IDX_AUTHORS));
                         comics.setPrice(curComics.getDouble(DBHelper.ComicsTable.IDX_PRICE));
                         comics.setPeriodicity(curComics.getString(DBHelper.ComicsTable.IDX_PERIODICITY));
-                        comics.setReserved(curComics.getString(DBHelper.ComicsTable.IDX_RESERVED) == DBHelper.TRUE);
+                        comics.setReserved(DBHelper.TRUE.equals(curComics.getString(DBHelper.ComicsTable.IDX_RESERVED)));
                         comics.setNotes(curComics.getString(DBHelper.ComicsTable.IDX_NOTES));
                         comics.setImage(curComics.getString(DBHelper.ComicsTable.IDX_IMAGE));
                         //

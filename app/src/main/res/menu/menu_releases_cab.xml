@@ -3,14 +3,14 @@
     xmlns:app="http://schemas.android.com/apk/res-auto">
     <item android:id="@+id/action_release_delete" android:title="@string/action_release_delete"
         android:icon="@drawable/ic_delete"
-        android:orderInCategory="105" app:showAsAction="ifRoom" />
+        android:orderInCategory="110" app:showAsAction="always" />
     <item android:id="@+id/action_release_ordered" android:title="@string/action_release_ordered"
         android:icon="@drawable/ic_archive"
-        android:orderInCategory="110" app:showAsAction="ifRoom" />
+        android:orderInCategory="105" app:showAsAction="always" />
     <item android:id="@+id/action_release_share" android:title="@string/action_release_share"
         android:icon="@drawable/ic_share"
-        android:orderInCategory="100" app:showAsAction="ifRoom" />
+        android:orderInCategory="100" app:showAsAction="always" />
     <item android:id="@+id/action_comics_search" android:title="@string/action_comics_search"
-        android:icon="@drawable/ic_web"
-        android:orderInCategory="10" app:showAsAction="ifRoom" />
+        android:icon="@drawable/ic_magnify"
+        android:orderInCategory="10" app:showAsAction="always" />
 </menu>

@@ -79,6 +79,7 @@ public class ReleaseEditorActivity extends ActionBarActivity {
         //imposto i valori e creo i listener
         mTxtNumber = (FloatingLabelEditText)findViewById(R.id.txt_editor_release_number);
         mTxtNumber.setInputWidgetText(mRelease.getNumber() < 0 ? "" : Integer.toString(mRelease.getNumber()));
+        mTxtNumber.getInputWidget().selectAll();
         //
         mTxtDate = (FloatingLabelDatePicker<JavaDateInstant>)findViewById(R.id.txt_editor_release_date);
         mTxtDate.setInstantPrinter(new ReleaseDatePrinter());
