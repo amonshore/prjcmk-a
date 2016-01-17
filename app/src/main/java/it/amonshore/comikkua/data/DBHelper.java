@@ -4,7 +4,6 @@ import android.content.ContentValues;
 import android.content.Context;
 import android.database.sqlite.SQLiteDatabase;
 import android.database.sqlite.SQLiteOpenHelper;
-import android.provider.BaseColumns;
 
 import it.amonshore.comikkua.Utils;
 
@@ -80,7 +79,7 @@ public class DBHelper extends SQLiteOpenHelper {
         public static final String COL_USER = "user";
         public static final String COL_COMICS_ID = "comics_id";
         public static final String COL_NUMBER = "number";
-        public static final String COL_DATA = "date";
+        public static final String COL_DATE = "date";
         public static final String COL_PRICE = "price";
         public static final String COL_FLAGS = "flags";
         public static final String COL_NOTES = "notes";
@@ -89,13 +88,13 @@ public class DBHelper extends SQLiteOpenHelper {
         public static final int IDX_USER = 1;
         public static final int IDX_COMICS_ID = 2;
         public static final int IDX_NUMBER = 3;
-        public static final int IDX_DATA = 4;
+        public static final int IDX_DATE = 4;
         public static final int IDX_PRICE = 5;
         public static final int IDX_FLAGS = 6;
         public static final int IDX_NOTES = 7;
 
         public static final String[] COLUMNS = { COL_ID, COL_USER, COL_COMICS_ID,
-                COL_NUMBER, COL_DATA, COL_PRICE, COL_FLAGS, COL_NOTES };
+                COL_NUMBER, COL_DATE, COL_PRICE, COL_FLAGS, COL_NOTES };
 
         //la colonna _id non serve a nulla ma è necessaria per eventuali usi di classi come CursorAdapter, etc.
         static final String SQL_CREATE = "create table " + NAME +
@@ -109,7 +108,7 @@ public class DBHelper extends SQLiteOpenHelper {
             cv.put(COL_USER, user);
             cv.put(COL_COMICS_ID, release.getComicsId());
             cv.put(COL_NUMBER, release.getNumber());
-            cv.put(COL_DATA, Utils.formatDbRelease(release.getDate()));
+            cv.put(COL_DATE, Utils.formatDbRelease(release.getDate()));
             cv.put(COL_PRICE, release.getPrice());
             cv.put(COL_FLAGS, release.getFlags());
             cv.put(COL_NOTES, release.getNotes());

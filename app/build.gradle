@@ -46,4 +46,5 @@ dependencies {
     compile 'jp.wasabeef:glide-transformations:1.2.1'
     compile 'com.isseiaoki:simplecropview:1.0.9'
     compile 'com.android.support:appcompat-v7:23.1.1'
+    compile 'com.evernote:android-job:1.0.2'
 }

@@ -6,9 +6,7 @@ import android.util.Log;
 
 import java.text.ParseException;
 import java.text.SimpleDateFormat;
-import java.util.ArrayList;
 import java.util.Date;
-import java.util.HashSet;
 import java.util.Iterator;
 import java.util.Locale;
 import java.util.TreeSet;
@@ -44,6 +42,10 @@ public class Utils {
 
     public static String formatReleaseLongDate(Date date) {
         return SDF_RELEASE_LONG.format(date);
+    }
+
+    public static String formatDbRelease(long date) {
+        return formatDbRelease(new Date(date));
     }
 
     public static String formatDbRelease(Date date) {
