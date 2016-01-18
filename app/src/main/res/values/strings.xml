@@ -64,6 +64,7 @@
     <string name="pref_autofill_release_title">Automatically fill release data</string>
     <string name="pref_autofill_release_on">The fields of the new release will be automatically set according to the previous release</string>
     <string name="pref_autofill_release_off">The fields of the new release will be empty</string>
+    <string name="pref_reminder_title">Enable release reminder</string>
 
     <!-- options -->
     <string name="opt_backup_now_title">Create bakcup</string>

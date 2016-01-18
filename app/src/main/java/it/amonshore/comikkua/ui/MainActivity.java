@@ -24,7 +24,7 @@ import it.amonshore.comikkua.ui.release.ReleaseListFragment;
 /**
  * http://developer.android.com/training/implementing-navigation/lateral.html#tabs
  */
-public class MainActivity extends ActionBarActivity implements SharedPreferences.OnSharedPreferenceChangeListener, ComicsObserver {
+public class MainActivity extends ActionBarActivity implements ComicsObserver {
 
     public final static String PREFS_NAME = "ComikkuPrefs";
 
@@ -48,9 +48,9 @@ public class MainActivity extends ActionBarActivity implements SharedPreferences
         //impsota i valori di default, il parametro false assicura che questo venga fatto una sola volta
         //  indipendentemente da quante volte viene chiamato il metodo
         PreferenceManager.setDefaultValues(this, R.xml.preferences, false);
-        //registro il listerner per il cambiamento dei settings
-        SharedPreferences prefs = PreferenceManager.getDefaultSharedPreferences(this);
-        prefs.registerOnSharedPreferenceChangeListener(this);
+//        //registro il listerner per il cambiamento dei settings
+//        SharedPreferences prefs = PreferenceManager.getDefaultSharedPreferences(this);
+//        prefs.registerOnSharedPreferenceChangeListener(this);
         //Toolbar
         final Toolbar toolbar = (Toolbar)findViewById(R.id.toolbar_actionbar);
         setSupportActionBar(toolbar);
@@ -91,14 +91,15 @@ public class MainActivity extends ActionBarActivity implements SharedPreferences
         slidingTabLayout.setViewPager(viewPager);
     }
 
-    @Override
-    public void onSharedPreferenceChanged(SharedPreferences sharedPreferences, String key) {
-        Utils.d("onSharedPreferenceChanged " + key + " " + sharedPreferences.getBoolean(key, false));
-        //A0046 aggiorno le best release di tutti i fumetti
-        if (DataManager.KEY_PREF_LAST_PURCHASED.equals(key)) {
-            mDataManager.updateBestRelease();
-        }
-    }
+    //spostato in DataManager
+//    @Override
+//    public void onSharedPreferenceChanged(SharedPreferences sharedPreferences, String key) {
+//        Utils.d("onSharedPreferenceChanged " + key + " " + sharedPreferences.getBoolean(key, false));
+//        //A0046 aggiorno le best release di tutti i fumetti
+//        if (DataManager.KEY_PREF_LAST_PURCHASED.equals(key)) {
+//            mDataManager.updateBestRelease();
+//        }
+//    }
 
     @Override
     protected void onPostResume() {
@@ -125,8 +126,8 @@ public class MainActivity extends ActionBarActivity implements SharedPreferences
     protected void onDestroy() {
         super.onDestroy();
         Utils.d(this.getClass(), "*********** MAIN onDestroy -> unregister observer and stop WH");
-        SharedPreferences prefs = PreferenceManager.getDefaultSharedPreferences(this);
-        prefs.unregisterOnSharedPreferenceChangeListener(this);
+//        SharedPreferences prefs = PreferenceManager.getDefaultSharedPreferences(this);
+//        prefs.unregisterOnSharedPreferenceChangeListener(this);
         mDataManager.unregisterObserver(this);
         mDataManager.stopWriteHandler();
     }

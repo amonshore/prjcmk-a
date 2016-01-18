@@ -32,6 +32,18 @@
             android:summaryOff="@string/pref_autofill_release_off"
             android:defaultValue="true" />
 
+        <CheckBoxPreference
+            android:key="pref_reminder"
+            android:title="@string/pref_reminder_title"
+            android:defaultValue="false" />
+
+        <it.amonshore.comikkua.ui.TimePreference
+            android:key="pref_reminder_time"
+            android:dependency="pref_reminder"
+            android:title="Show release reminder at"
+            android:defaultValue="28800000" />
+
+
     <!--</PreferenceCategory>-->
 
     <!--<PreferenceCategory-->

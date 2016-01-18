@@ -34,6 +34,7 @@ public class DataOptionsActivity extends ActionBarActivity {
     private static final int ID_RESTORE_NOW = 1;
     private static final int ID_RESTORE_OLD = 2;
     private static final int ID_CLEAR_DATA = 3;
+    private static final int ID_CLEAR_PREFERENCES = 4;
 
     private DataOptions[] mDataOptionses;
 
@@ -60,6 +61,8 @@ public class DataOptionsActivity extends ActionBarActivity {
                         R.string.opt_clear_data_confirm_title, R.string.opt_clear_data_confirm_message, R.string.opt_clear_data_confirm_ok,
                         R.string.opt_clear_data_wait, true)
         };
+
+        //TODO: aggiungere ripristino opzioni di defualt
 
         //
         final DataManager dataManager = DataManager.getDataManager();
@@ -218,11 +221,6 @@ public class DataOptionsActivity extends ActionBarActivity {
         public long getItemId(int position) {
             return ((DataOptions)getItem(position)).Id;
         }
-
-//        @Override
-//        public boolean isEnabled(int position) {
-//            return mDataOptions[position].Enabled;
-//        }
 
         @Override
         public View getView(int position, View convertView, ViewGroup parent) {

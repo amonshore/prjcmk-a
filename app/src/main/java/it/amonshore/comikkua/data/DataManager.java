@@ -25,6 +25,7 @@ import java.util.regex.Matcher;
 import java.util.regex.Pattern;
 
 import hirondelle.date4j.DateTime;
+import it.amonshore.comikkua.BuildConfig;
 import it.amonshore.comikkua.Utils;
 import it.amonshore.comikkua.reminder.ReleaseReminderJob;
 import it.amonshore.comikkua.reminder.ReleaseReminderJobCreator;
@@ -32,7 +33,7 @@ import it.amonshore.comikkua.reminder.ReleaseReminderJobCreator;
 /**
  * Created by Narsenico on 07/05/2015.
  */
-public class DataManager extends Observable<ComicsObserver> {
+public class DataManager extends Observable<ComicsObserver> implements SharedPreferences.OnSharedPreferenceChangeListener {
 
     public final static int ACTION_ADD = 1;
     public final static int ACTION_UPD = 1 << 1;
@@ -61,6 +62,8 @@ public class DataManager extends Observable<ComicsObserver> {
     public static final String KEY_PREF_WEEK_START_ON_MONDAY = "pref_week_start_on_monday";
     public static final String KEY_PREF_LAST_PURCHASED = "pref_last_purchased";
     public static final String KEY_PREF_AUTOFILL_RELEASE = "pref_autofill_release";
+    public static final String KEY_PREF_REMINDER = "pref_reminder";
+    public static final String KEY_PREF_REMINDER_TIME = "pref_reminder_time";
 
     private static DataManager instance;
 
@@ -124,8 +127,27 @@ public class DataManager extends Observable<ComicsObserver> {
         mUndoRelease = new UndoHelper<>();
         //
         mPreferences = PreferenceManager.getDefaultSharedPreferences(context);
+        mPreferences.registerOnSharedPreferenceChangeListener(this);
         //
         mDBHelper = new DBHelper(context);
+    }
+
+    @Override
+    public void onSharedPreferenceChanged(SharedPreferences sharedPreferences, String key) {
+        if (KEY_PREF_LAST_PURCHASED.equals(key)) {
+            updateBestRelease();
+        } else if (KEY_PREF_REMINDER.equals(key)) {
+            if (sharedPreferences.getBoolean(key, false)) {
+                updateReminder();
+            } else {
+//                        if (BuildConfig.DEBUG) {
+//                            sharedPreferences.edit().remove(KEY_PREF_REMINDER_TIME).commit();
+//                        }
+                cancelReminders();
+            }
+        } else if (KEY_PREF_REMINDER_TIME.equals(key) && sharedPreferences.getBoolean(KEY_PREF_REMINDER, false)) {
+            updateReminder();
+        }
     }
 
     private void putPublisher(String publisher) {
@@ -144,6 +166,10 @@ public class DataManager extends Observable<ComicsObserver> {
 
     public boolean getPreference(String key, boolean def) {
         return mPreferences.getBoolean(key, def);
+    }
+
+    public long getPreference(String key, long def) {
+        return mPreferences.getLong(key, def);
     }
 
     /**
@@ -518,6 +544,16 @@ public class DataManager extends Observable<ComicsObserver> {
      *
      * @return this
      */
+    public DataManager cancelReminders() {
+        JobManager.instance().cancelAll();
+
+        return this;
+    }
+
+    /**
+     *
+     * @return this
+     */
     public DataManager updateReminder() {
         //TODO A0033 ricordarsi di registrare un listener sul boot di sistema per eseguire questo metodo
         //eliminio i job già schedulati
@@ -526,9 +562,10 @@ public class DataManager extends Observable<ComicsObserver> {
         SQLiteDatabase database = null;
         Cursor curReleaseDates = null;
         //TODO A0033 parametrizzare il modificatore dell'ora di schedulazione facendo scegliere all'utente l'ora della schedulazione e flag stesso giorno o giorno prima
-        long modifier = 8 * 3_600_000; //8:00 AM
         long fromNow;
+        final long modifier = getPreference(KEY_PREF_REMINDER_TIME, 8 * 3_600_000); //def 8:00 AM
         final long now = System.currentTimeMillis();
+        Utils.d(this.getClass(), "job modifier " + modifier);
         try {
             database = mDBHelper.getReadableDatabase();
             curReleaseDates = database.query(
@@ -555,6 +592,7 @@ public class DataManager extends Observable<ComicsObserver> {
                     new JobRequest.Builder(ReleaseReminderJob.TAG)
                             .setExtras(extras)
                             .setExact(fromNow)
+//                            .setPersisted(true)
                             .build()
                             .schedule();
                 }
@@ -606,6 +644,7 @@ public class DataManager extends Observable<ComicsObserver> {
     }
 
     private void dispose() {
+        mPreferences.unregisterOnSharedPreferenceChangeListener(this);
         unregisterAll();
         stopWriteHandler();
     }
