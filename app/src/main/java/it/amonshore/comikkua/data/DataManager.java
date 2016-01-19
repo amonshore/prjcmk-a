@@ -25,7 +25,6 @@ import java.util.regex.Matcher;
 import java.util.regex.Pattern;
 
 import hirondelle.date4j.DateTime;
-import it.amonshore.comikkua.BuildConfig;
 import it.amonshore.comikkua.Utils;
 import it.amonshore.comikkua.reminder.ReleaseReminderJob;
 import it.amonshore.comikkua.reminder.ReleaseReminderJobCreator;
@@ -39,6 +38,8 @@ public class DataManager extends Observable<ComicsObserver> implements SharedPre
     public final static int ACTION_UPD = 1 << 1;
     public final static int ACTION_DEL = 1 << 2;
     public final static int ACTION_CLEAR = 1 << 3;
+    public final static int ACTION_REMINDER_CLEAR = 1 << 4;
+    public final static int ACTION_REMINDER_UPDATE = 1 << 5;
 
     public static final int CAUSE_EMPTY = 0;
     public static final int CAUSE_SAFE = 1;
@@ -138,15 +139,15 @@ public class DataManager extends Observable<ComicsObserver> implements SharedPre
             updateBestRelease();
         } else if (KEY_PREF_REMINDER.equals(key)) {
             if (sharedPreferences.getBoolean(key, false)) {
-                updateReminder();
+                updateReminders(false);
             } else {
 //                        if (BuildConfig.DEBUG) {
 //                            sharedPreferences.edit().remove(KEY_PREF_REMINDER_TIME).commit();
 //                        }
-                cancelReminders();
+                cancelReminders(false);
             }
         } else if (KEY_PREF_REMINDER_TIME.equals(key) && sharedPreferences.getBoolean(KEY_PREF_REMINDER, false)) {
-            updateReminder();
+            updateReminders(false);
         }
     }
 
@@ -542,70 +543,80 @@ public class DataManager extends Observable<ComicsObserver> implements SharedPre
 
     /**
      *
+     * @param execNow   true i reminder vengono eliminiati subito, false la richiesta è aggiunta all'event loop
      * @return this
      */
-    public DataManager cancelReminders() {
-        JobManager.instance().cancelAll();
+    public DataManager cancelReminders(boolean execNow) {
+        if (execNow) {
+            JobManager.instance().cancelAll();
+        } else {
+            mWriteHandler.appendRequest(new AsyncActionRequest(ACTION_REMINDER_CLEAR, NO_COMICS, NO_RELEASE));
+        }
 
         return this;
     }
 
     /**
      *
+     * @param execNow   true i reminder vengono eliminiati subito, false la richiesta è aggiunta all'event loop
      * @return this
      */
-    public DataManager updateReminder() {
-        //TODO A0033 ricordarsi di registrare un listener sul boot di sistema per eseguire questo metodo
-        //eliminio i job già schedulati
-        JobManager.instance().cancelAll();
-        //
-        SQLiteDatabase database = null;
-        Cursor curReleaseDates = null;
-        //TODO A0033 parametrizzare il modificatore dell'ora di schedulazione facendo scegliere all'utente l'ora della schedulazione e flag stesso giorno o giorno prima
-        long fromNow;
-        final long modifier = getPreference(KEY_PREF_REMINDER_TIME, 8 * 3_600_000); //def 8:00 AM
-        final long now = System.currentTimeMillis();
-        Utils.d(this.getClass(), "job modifier " + modifier);
-        try {
-            database = mDBHelper.getReadableDatabase();
-            curReleaseDates = database.query(
-                    DBHelper.ReleasesTable.NAME,
-                    //estraggo solo la data
-                    new String[] { DBHelper.ReleasesTable.COL_DATE, "COUNT(*)" },
-                    //filtro sull'utente e sulla data di uscita
-                    DBHelper.ReleasesTable.COL_USER + " = '" + mUserName + "' and " +
-                            DBHelper.ReleasesTable.COL_DATE + " >= '" + Utils.formatDbRelease(now) + "'",
-                    null,
-                    //raggruppo per data di uscita
-                    DBHelper.ReleasesTable.COL_DATE,
-                    null,
-                    DBHelper.ReleasesTable.COL_DATE,
-                    null);
-            //per ogni data schedulo un allarme
-            while (curReleaseDates.moveToNext()) {
-                fromNow = Utils.parseDbRelease(curReleaseDates.getString(0)).getTime() + modifier - now;
+    public DataManager updateReminders(boolean execNow) {
+        if (execNow) {
+            //TODO A0033 ricordarsi di registrare un listener sul boot di sistema per eseguire questo metodo
+            //eliminio i job già schedulati
+            JobManager.instance().cancelAll();
+            //
+            SQLiteDatabase database = null;
+            Cursor curReleaseDates = null;
+            //TODO A0033 parametrizzare il modificatore dell'ora di schedulazione facendo scegliere all'utente l'ora della schedulazione e flag stesso giorno o giorno prima
+            long fromNow;
+            final long modifier = getPreference(KEY_PREF_REMINDER_TIME, 8 * 3_600_000); //def 8:00 AM
+            final long now = System.currentTimeMillis();
+            Utils.d(this.getClass(), "job modifier " + modifier);
+            try {
+                database = mDBHelper.getReadableDatabase();
+                curReleaseDates = database.query(
+                        DBHelper.ReleasesTable.NAME,
+                        //estraggo solo la data
+                        new String[]{DBHelper.ReleasesTable.COL_DATE, "COUNT(*)"},
+                        //filtro sull'utente e sulla data di uscita
+                        DBHelper.ReleasesTable.COL_USER + " = '" + mUserName + "' and " +
+                                DBHelper.ReleasesTable.COL_DATE + " >= '" + Utils.formatDbRelease(now) + "'",
+                        null,
+                        //raggruppo per data di uscita
+                        DBHelper.ReleasesTable.COL_DATE,
+                        null,
+                        DBHelper.ReleasesTable.COL_DATE,
+                        null);
+                //per ogni data schedulo un allarme
+                while (curReleaseDates.moveToNext()) {
+                    fromNow = Utils.parseDbRelease(curReleaseDates.getString(0)).getTime() + modifier - now;
 //                Utils.d(this.getClass(), "UPDREM " +  curReleaseDates.getString(0) + " -> " + fromNow);
-                if (fromNow > 0) {
-                    PersistableBundleCompat extras = new PersistableBundleCompat();
-                    extras.putString(ReleaseReminderJob.EXTRA_DATE, curReleaseDates.getString(0));
-                    extras.putInt(ReleaseReminderJob.EXTRA_COUNT, curReleaseDates.getInt(1));
-                    new JobRequest.Builder(ReleaseReminderJob.TAG)
-                            .setExtras(extras)
-                            .setExact(fromNow)
+                    if (fromNow > 0) {
+                        PersistableBundleCompat extras = new PersistableBundleCompat();
+                        extras.putString(ReleaseReminderJob.EXTRA_DATE, curReleaseDates.getString(0));
+                        extras.putInt(ReleaseReminderJob.EXTRA_COUNT, curReleaseDates.getInt(1));
+                        new JobRequest.Builder(ReleaseReminderJob.TAG)
+                                .setExtras(extras)
+                                .setExact(fromNow)
 //                            .setPersisted(true)
-                            .build()
-                            .schedule();
+                                .build()
+                                .schedule();
+                    }
+                }
+            } catch (Exception ex) {
+                Utils.e(this.getClass(), "Update reminder", ex);
+            } finally {
+                if (curReleaseDates != null) {
+                    curReleaseDates.close();
+                }
+                if (database != null) {
+                    database.close();
                 }
             }
-        } catch (Exception ex) {
-            Utils.e(this.getClass(), "Update reminder", ex);
-        } finally {
-            if (curReleaseDates != null) {
-                curReleaseDates.close();
-            }
-            if (database != null) {
-                database.close();
-            }
+        } else {
+            mWriteHandler.appendRequest(new AsyncActionRequest(ACTION_REMINDER_UPDATE, NO_COMICS, NO_RELEASE));
         }
 
         return this;
@@ -661,6 +672,7 @@ public class DataManager extends Observable<ComicsObserver> implements SharedPre
         }
     }
 
+    //TODO A0058 trasformarlo in un event loop
     private class AsyncWriteHandler {
 
         private Semaphore mMainLoopHandler;
@@ -702,7 +714,11 @@ public class DataManager extends Observable<ComicsObserver> implements SharedPre
                                 database = DataManager.this.mDBHelper.getWritableDatabase();
                                 AsyncActionRequest request;
                                 while ((request = mQueue.poll()) != null) {
-                                    if (request.Action == ACTION_CLEAR) {
+                                    if (request.Action == ACTION_REMINDER_CLEAR) {
+                                        clearReminders();
+                                    } else if (request.Action == ACTION_REMINDER_UPDATE) {
+                                        updateReminders();
+                                    } else if (request.Action == ACTION_CLEAR) {
                                         clear(database);
                                     } else if (request.ReleaseNumber == DataManager.NO_RELEASE) {  //comics
                                         if (request.Action == DataManager.ACTION_ADD) {
@@ -741,60 +757,61 @@ public class DataManager extends Observable<ComicsObserver> implements SharedPre
 
         private void writeComics(SQLiteDatabase database, Comics comics, boolean isNew) {
             if (isNew) {
-                long res = database.insert(DBHelper.ComicsTable.NAME, null,
+                database.insert(DBHelper.ComicsTable.NAME, null,
                         DBHelper.ComicsTable.getContentValues(comics, DataManager.this.mUserName));
-//                Utils.d(this.getClass(), "A0049 write new comics " + comics.getName() + " -> " + (res >= 0));
                 for (Release release : comics.getReleases()) {
                     writeRelease(database, release, true);
                 }
             } else {
-                long res = database.replace(DBHelper.ComicsTable.NAME, null,
+                database.replace(DBHelper.ComicsTable.NAME, null,
                         DBHelper.ComicsTable.getContentValues(comics, DataManager.this.mUserName));
-//                Utils.d(this.getClass(), "A0049 write comics " + comics.getName() + " -> " + (res >= 0));
             }
         }
 
         private void deleteComics(SQLiteDatabase database, long comicsId) {
-            int res1 = database.delete(DBHelper.ReleasesTable.NAME,
+            database.delete(DBHelper.ReleasesTable.NAME,
                     DBHelper.ReleasesTable.COL_COMICS_ID + " = " + comicsId + " and " +
                             DBHelper.ReleasesTable.COL_USER + " = '" + DataManager.this.mUserName + "'",
                     null);
-            int res2 = database.delete(DBHelper.ComicsTable.NAME,
+            database.delete(DBHelper.ComicsTable.NAME,
                     DBHelper.ComicsTable.COL_ID + " = " + comicsId + " and " +
                         DBHelper.ComicsTable.COL_USER + " = '" + DataManager.this.mUserName + "'",
                     null);
-//            Utils.d(this.getClass(), "A0049 delete comics " + comicsId + " -> " + res2 + "(" + res1 + ")");
         }
 
         private void writeRelease(SQLiteDatabase database, Release release, boolean isNew) {
             if (isNew) {
-                long res = database.insert(DBHelper.ReleasesTable.NAME, null,
+                database.insert(DBHelper.ReleasesTable.NAME, null,
                         DBHelper.ReleasesTable.getContentValues(release, DataManager.this.mUserName));
-//                Utils.d(this.getClass(), "A0049 write new release " + release.getNumber() + " -> " + (res >= 0));
             } else {
-                long res = database.replace(DBHelper.ReleasesTable.NAME, null,
+                database.replace(DBHelper.ReleasesTable.NAME, null,
                         DBHelper.ReleasesTable.getContentValues(release, DataManager.this.mUserName));
-//                Utils.d(this.getClass(), "A0049 write comics " + release.getNumber() + " -> " + (res >= 0));
             }
         }
 
         private void deleteRelease(SQLiteDatabase database, long comicsId, int releaseNumber) {
-            int res = database.delete(DBHelper.ReleasesTable.NAME,
+            database.delete(DBHelper.ReleasesTable.NAME,
                     DBHelper.ReleasesTable.COL_COMICS_ID + " = " + comicsId + " and " +
                             DBHelper.ReleasesTable.COL_USER + " = '" + DataManager.this.mUserName + "' and " +
                             DBHelper.ReleasesTable.COL_NUMBER + " = " + releaseNumber,
                     null);
-//            Utils.d(this.getClass(), "A0049 delete release " + releaseNumber + " -> " + res);
         }
 
         private void clear(SQLiteDatabase database) {
-            int res1 = database.delete(DBHelper.ReleasesTable.NAME,
+            database.delete(DBHelper.ReleasesTable.NAME,
                     DBHelper.ReleasesTable.COL_USER + " = '" + DataManager.this.mUserName + "'",
                     null);
-            int res2 = database.delete(DBHelper.ComicsTable.NAME,
+            database.delete(DBHelper.ComicsTable.NAME,
                     DBHelper.ComicsTable.COL_USER + " = '" + DataManager.this.mUserName + "'",
                     null);
-//            Utils.d(this.getClass(), "A0049 clear -> " + res2 + "(" + res1 + ")");
+        }
+
+        private void clearReminders() {
+            DataManager.this.cancelReminders(true);
+        }
+
+        private void updateReminders() {
+            DataManager.this.updateReminders(true);
         }
 
     }
