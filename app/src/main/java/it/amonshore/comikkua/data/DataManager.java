@@ -21,25 +21,34 @@ import java.util.TimeZone;
 import java.util.TreeMap;
 import java.util.concurrent.ConcurrentLinkedQueue;
 import java.util.concurrent.Semaphore;
+import java.util.concurrent.TimeUnit;
 import java.util.regex.Matcher;
 import java.util.regex.Pattern;
 
 import hirondelle.date4j.DateTime;
+import it.amonshore.comikkua.reminder.ReleaseReminderBootReceiver;
+import it.amonshore.comikkua.RxBus;
 import it.amonshore.comikkua.Utils;
 import it.amonshore.comikkua.reminder.ReleaseReminderJob;
 import it.amonshore.comikkua.reminder.ReleaseReminderJobCreator;
+import rx.Subscription;
+import rx.functions.Action1;
+import rx.functions.Func1;
 
 /**
  * Created by Narsenico on 07/05/2015.
  */
-public class DataManager extends Observable<ComicsObserver> implements SharedPreferences.OnSharedPreferenceChangeListener {
+public class DataManager extends Observable<ComicsObserver> {
 
-    public final static int ACTION_ADD = 1;
-    public final static int ACTION_UPD = 1 << 1;
-    public final static int ACTION_DEL = 1 << 2;
-    public final static int ACTION_CLEAR = 1 << 3;
-    public final static int ACTION_REMINDER_CLEAR = 1 << 4;
-    public final static int ACTION_REMINDER_UPDATE = 1 << 5;
+    private final static int ACTION_DATA = 1;
+    private final static int ACTION_REMINDER = 1 << 10;
+
+    public final static int ACTION_ADD = ACTION_DATA | 1 << 1;
+    public final static int ACTION_UPD = ACTION_DATA | 1 << 2;
+    public final static int ACTION_DEL = ACTION_DATA | 1 << 3;
+    public final static int ACTION_CLEAR = ACTION_DATA | 1 << 4;
+    public final static int ACTION_REMINDER_CLEAR = ACTION_REMINDER | 1 << 11;
+    public final static int ACTION_REMINDER_UPDATE = ACTION_REMINDER | 1 << 12;
 
     public static final int CAUSE_EMPTY = 0;
     public static final int CAUSE_SAFE = 1;
@@ -65,6 +74,7 @@ public class DataManager extends Observable<ComicsObserver> implements SharedPre
     public static final String KEY_PREF_AUTOFILL_RELEASE = "pref_autofill_release";
     public static final String KEY_PREF_REMINDER = "pref_reminder";
     public static final String KEY_PREF_REMINDER_TIME = "pref_reminder_time";
+    public static final String KEY_PREF_REMINDER_DAY_BEFORE = "pref_reminder_daybefore";
 
     private static DataManager instance;
 
@@ -116,6 +126,10 @@ public class DataManager extends Observable<ComicsObserver> implements SharedPre
     private SharedPreferences mPreferences;
     //
     private final Object mSyncObj = new Object();
+    //RX osservatore di eventi per la gestione dei reminder
+    private final RxBus<Integer> mReminderEventBus = new RxBus<>();
+    private Subscription mReminderEventBusSubscription;
+    private boolean mIsReminderEnabled = false;
 
     private DataManager(Context context, String userName) {
         mContext = context;
@@ -128,28 +142,57 @@ public class DataManager extends Observable<ComicsObserver> implements SharedPre
         mUndoRelease = new UndoHelper<>();
         //
         mPreferences = PreferenceManager.getDefaultSharedPreferences(context);
-        mPreferences.registerOnSharedPreferenceChangeListener(this);
+        mPreferences.registerOnSharedPreferenceChangeListener(mSharedPreferenceChangeListener);
+        mIsReminderEnabled = getPreference(KEY_PREF_REMINDER, false);
         //
         mDBHelper = new DBHelper(context);
+        //RX gli eventi inviati al bus vengono gestiti una sola volta ogni 2 secondi
+        mReminderEventBusSubscription =
+        mReminderEventBus.toObservable()
+                .map(new Func1<Integer, Integer>() {
+                    public Integer call(Integer action) {
+                        return (action & ACTION_REMINDER) == ACTION_REMINDER ? action :
+                                (action & ACTION_DATA) == ACTION_DATA ? ACTION_REMINDER_UPDATE : 0;
+                    }
+                })
+                .debounce(2, TimeUnit.SECONDS)
+                .subscribe(new Action1<Integer>() {
+                    @Override
+                    public void call(Integer action) {
+                        Utils.d(this.getClass(), "RX BUS " + action);
+                        mWriteHandler.appendRequest(new AsyncActionRequest(action,
+                                NO_COMICS, NO_RELEASE));
+                    }
+                });
     }
 
-    @Override
-    public void onSharedPreferenceChanged(SharedPreferences sharedPreferences, String key) {
-        if (KEY_PREF_LAST_PURCHASED.equals(key)) {
-            updateBestRelease();
-        } else if (KEY_PREF_REMINDER.equals(key)) {
-            if (sharedPreferences.getBoolean(key, false)) {
-                updateReminders(false);
-            } else {
-//                        if (BuildConfig.DEBUG) {
-//                            sharedPreferences.edit().remove(KEY_PREF_REMINDER_TIME).commit();
-//                        }
-                cancelReminders(false);
-            }
-        } else if (KEY_PREF_REMINDER_TIME.equals(key) && sharedPreferences.getBoolean(KEY_PREF_REMINDER, false)) {
-            updateReminders(false);
-        }
-    }
+    private SharedPreferences.OnSharedPreferenceChangeListener mSharedPreferenceChangeListener =
+            new SharedPreferences.OnSharedPreferenceChangeListener() {
+                @Override
+                public void onSharedPreferenceChanged(SharedPreferences sharedPreferences, String key) {
+                    if (KEY_PREF_LAST_PURCHASED.equals(key)) {
+                        updateBestRelease();
+                    } else if (KEY_PREF_REMINDER.equals(key)) {
+                        if (sharedPreferences.getBoolean(key, false)) {
+                            mIsReminderEnabled = true;
+                            mReminderEventBus.send(ACTION_REMINDER_UPDATE);
+                            //abilito il boot receiver
+                            ReleaseReminderBootReceiver.setEnabled(mContext, true);
+                        } else {
+                            mIsReminderEnabled = false;
+                            mReminderEventBus.send(ACTION_REMINDER_CLEAR);
+                            //disabilito il boot receiver
+                            ReleaseReminderBootReceiver.setEnabled(mContext, false);
+                        }
+                    } else if (mIsReminderEnabled) {
+                        if (KEY_PREF_REMINDER_TIME.equals(key)) {
+                            mReminderEventBus.send(ACTION_REMINDER_UPDATE);
+                        } else if (KEY_PREF_REMINDER_DAY_BEFORE.equals(key)) {
+                            mReminderEventBus.send(ACTION_REMINDER_UPDATE);
+                        }
+                    }
+                }
+            };
 
     private void putPublisher(String publisher) {
         if (publisher != null && TextUtils.getTrimmedLength(publisher) > 0) {
@@ -310,7 +353,8 @@ public class DataManager extends Observable<ComicsObserver> implements SharedPre
      * @return  this
      */
     public DataManager readComics() {
-        if (mComicsCache == null || !mDataLoaded) {
+//        if (mComicsCache == null || !mDataLoaded) {
+          if (!mDataLoaded) {
             SQLiteDatabase database = null;
             Cursor curComics = null, curReleases = null;
             try {
@@ -526,6 +570,11 @@ public class DataManager extends Observable<ComicsObserver> implements SharedPre
     public void updateData(int action, long comicsId, int releaseNumber) {
         //Utils.d(this.getClass(), String.format("A0049 act %s, cid %s, rel %s", action, comicsId, releaseNumber));
         mWriteHandler.appendRequest(new AsyncActionRequest(action, comicsId, releaseNumber));
+        //RX invio all'osservatore un nuovo evento da gestire
+        if (mIsReminderEnabled) {
+//        Utils.d(this.getClass(), "RX BUS SEND " + action);
+            mReminderEventBus.send(action);
+        }
     }
 
     /**
@@ -548,7 +597,7 @@ public class DataManager extends Observable<ComicsObserver> implements SharedPre
      */
     public DataManager cancelReminders(boolean execNow) {
         if (execNow) {
-            JobManager.instance().cancelAll();
+            JobManager.instance().cancelAllForTag(ReleaseReminderJob.TAG);
         } else {
             mWriteHandler.appendRequest(new AsyncActionRequest(ACTION_REMINDER_CLEAR, NO_COMICS, NO_RELEASE));
         }
@@ -565,13 +614,15 @@ public class DataManager extends Observable<ComicsObserver> implements SharedPre
         if (execNow) {
             //TODO A0033 ricordarsi di registrare un listener sul boot di sistema per eseguire questo metodo
             //eliminio i job già schedulati
-            JobManager.instance().cancelAll();
+            JobManager.instance().cancelAllForTag(ReleaseReminderJob.TAG);
             //
             SQLiteDatabase database = null;
             Cursor curReleaseDates = null;
             //TODO A0033 parametrizzare il modificatore dell'ora di schedulazione facendo scegliere all'utente l'ora della schedulazione e flag stesso giorno o giorno prima
             long fromNow;
-            final long modifier = getPreference(KEY_PREF_REMINDER_TIME, 8 * 3_600_000); //def 8:00 AM
+            //default 8:00 AM
+            final long modifier = getPreference(KEY_PREF_REMINDER_TIME, 8 * 3_600_000) -
+                    (getPreference(KEY_PREF_REMINDER_DAY_BEFORE, false) ? 24 * 3_600_000 : 0);
             final long now = System.currentTimeMillis();
             Utils.d(this.getClass(), "job modifier " + modifier);
             try {
@@ -581,6 +632,7 @@ public class DataManager extends Observable<ComicsObserver> implements SharedPre
                         //estraggo solo la data
                         new String[]{DBHelper.ReleasesTable.COL_DATE, "COUNT(*)"},
                         //filtro sull'utente e sulla data di uscita
+                        //TODO considerare solo quelle non acquistate
                         DBHelper.ReleasesTable.COL_USER + " = '" + mUserName + "' and " +
                                 DBHelper.ReleasesTable.COL_DATE + " >= '" + Utils.formatDbRelease(now) + "'",
                         null,
@@ -600,7 +652,7 @@ public class DataManager extends Observable<ComicsObserver> implements SharedPre
                         new JobRequest.Builder(ReleaseReminderJob.TAG)
                                 .setExtras(extras)
                                 .setExact(fromNow)
-//                            .setPersisted(true)
+//                            .setPersisted(true) ricarico tutto a mano al boot
                                 .build()
                                 .schedule();
                     }
@@ -634,6 +686,7 @@ public class DataManager extends Observable<ComicsObserver> implements SharedPre
      *
      */
     public void stopWriteHandler() {
+        //TODO inviare uno speciale evento EXIT in modo che vengano cmq gestiti tutti gli eventi in coda
         mWriteHandler.cancel();
         mWriteHandler = null;
     }
@@ -655,7 +708,9 @@ public class DataManager extends Observable<ComicsObserver> implements SharedPre
     }
 
     private void dispose() {
-        mPreferences.unregisterOnSharedPreferenceChangeListener(this);
+        //RX
+        mReminderEventBusSubscription.unsubscribe();
+        mPreferences.unregisterOnSharedPreferenceChangeListener(mSharedPreferenceChangeListener);
         unregisterAll();
         stopWriteHandler();
     }
@@ -672,7 +727,7 @@ public class DataManager extends Observable<ComicsObserver> implements SharedPre
         }
     }
 
-    //TODO A0058 trasformarlo in un event loop
+    //TODO A0058 trasformarlo in un event loop, può essere gestito con Rx
     private class AsyncWriteHandler {
 
         private Semaphore mMainLoopHandler;

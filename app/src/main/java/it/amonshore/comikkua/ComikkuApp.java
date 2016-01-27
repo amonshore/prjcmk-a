@@ -20,7 +20,6 @@ public class ComikkuApp extends Application {
                 .init(this, "default")
                 .readComics()
                 .initReminderEngine() //A0033
-//                .updateReminders() //A0033
                 .removeDirtyImages(false); //A0055
     }
 }
