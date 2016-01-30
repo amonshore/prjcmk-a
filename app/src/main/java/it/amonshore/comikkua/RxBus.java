@@ -12,8 +12,6 @@ import rx.subjects.Subject;
  */
 public class RxBus<T> {
 
-//    private final Subject<Object, Object> mBus = new SerializedSubject<>(PublishSubject.create());
-
     private final Subject<T, T> mBus;
 
     public RxBus() {
@@ -21,11 +19,19 @@ public class RxBus<T> {
         mBus = new SerializedSubject<>(subject);
     }
 
-    public void send(T e) {
-        mBus.onNext(e);
+    public void send(T t) {
+        mBus.onNext(t);
     }
 
-    public Observable<T> toObservable() {
+    public void end() {
+        mBus.onCompleted();
+    }
+
+    public Observable<T> toObserverable() {
         return mBus;
+    }
+
+    public boolean hasObsevers() {
+        return mBus.hasObservers();
     }
 }

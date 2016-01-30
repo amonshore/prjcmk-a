@@ -16,8 +16,10 @@ public class ReleaseReminderBootReceiver extends BroadcastReceiver {
     @Override
     public void onReceive(Context context, Intent intent) {
         if (intent.getAction().equals("android.intent.action.BOOT_COMPLETED")) {
-            //A0033
-            DataManager.getDataManager().updateReminders(true);
+            //A0033 riattivo i reminder
+            DataManager.getDataManager()
+                    .updateData(DataManager.ACTION_REMINDER_BOOT,
+                            DataManager.NO_COMICS, DataManager.NO_RELEASE);
         }
     }
 

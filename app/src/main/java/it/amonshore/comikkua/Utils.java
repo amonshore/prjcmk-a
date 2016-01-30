@@ -1,6 +1,7 @@
 package it.amonshore.comikkua;
 
 import android.content.Context;
+import android.os.Looper;
 import android.text.TextUtils;
 import android.util.Log;
 
@@ -259,6 +260,14 @@ public class Utils {
             else day--;
         }
         return date.minusDays(day);
+    }
+
+    /**
+     *
+     * @return true il thread corrente è quello principale
+     */
+    public static boolean isMainThread() {
+        return Looper.myLooper() == Looper.getMainLooper();
     }
 
 }
