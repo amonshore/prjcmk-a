@@ -120,6 +120,7 @@ public class TimePreference extends DialogPreference {
         if (calendar == null) {
             return null;
         }
-        return DateFormat.getTimeInstance(DateFormat.SHORT).format(new Date(calendar.getTimeInMillis()));
+//        return DateFormat.getTimeInstance(DateFormat.MEDIUM).format(new Date(calendar.getTimeInMillis()));
+        return String.format("%tl:%<tM %<tp", calendar.getTimeInMillis());
     }
 }

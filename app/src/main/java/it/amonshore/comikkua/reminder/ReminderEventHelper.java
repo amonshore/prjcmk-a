@@ -16,9 +16,10 @@ import it.amonshore.comikkua.RxBus;
 import it.amonshore.comikkua.Utils;
 import it.amonshore.comikkua.data.DBHelper;
 import it.amonshore.comikkua.data.DataManager;
+import rx.Subscriber;
 import rx.Subscription;
-import rx.functions.Action1;
 import rx.functions.Func1;
+import rx.schedulers.Schedulers;
 
 /**
  * Created by narsenico on 30/01/16.
@@ -36,28 +37,23 @@ public class ReminderEventHelper {
     }
 
     /**
-     * L'azione ACTION_REMINDER_BOOT viene eseguita subito.
      *
      * @param action    azione da eseguire, può essere anche una azione sui dati che verrà poi convertita in azione sui reminder
      */
     public void send(int action) {
-        if (action == DataManager.ACTION_REMINDER_BOOT) {
-            updateReminders();
-        } else {
-            mEventBus.send(action);
-        }
+        mEventBus.send(action);
     }
 
     /**
      * Solo l'ultimo evento verrà gestito.
      *
-     * @param timeout millisecondi che devono trascorrere senza l'invio di nessun evento prima che venga gestito l'ultimo
      */
-    public void start(long timeout) {
+    public void start() {
         Assert.assertNull(mEventBus);
 
         mEventBus = new RxBus<>();
         mSubscription = mEventBus.toObserverable()
+                .observeOn(Schedulers.io()) //gli eventi verranno consumati in un scheduler specifico per I/O
                 .map(new Func1<Integer, Integer>() {
                     public Integer call(Integer action) {
                         switch (action) {
@@ -71,17 +67,31 @@ public class ReminderEventHelper {
                         }
                     }
                 })
-                .debounce(timeout, TimeUnit.MILLISECONDS)
-                .subscribe(new Action1<Integer>() {
+                //tengo un timeout volutamente alto perché tanto verranno aggiornati alla chiamata di stop()
+                .debounce(2000, TimeUnit.MILLISECONDS)
+                .subscribe(new Subscriber<Integer>() {
+
                     @Override
-                    public void call(Integer action) {
-                        Utils.d(this.getClass(), "RX REMINDER " + action);
+                    public final void onCompleted() {
+                        Utils.d("RX REMINDER end " + Utils.isMainThread());
+                        updateReminders();
+                    }
+
+                    @Override
+                    public final void onError(Throwable e) {
+                        Utils.e("RX REMINDER error", e);
+                    }
+
+                    @Override
+                    public final void onNext(Integer action) {
+                        Utils.d("RX REMINDER " + action + " " + Utils.isMainThread());
                         if (action == DataManager.ACTION_REMINDER_CLEAR) {
                             cancelReminders();
                         } else if (action == DataManager.ACTION_REMINDER_UPDATE) {
                             updateReminders();
                         }
                     }
+
                 });
     }
 
@@ -90,6 +100,7 @@ public class ReminderEventHelper {
      */
     public void stop() {
         if (mEventBus != null) {
+            mEventBus.end(); //scatena onCompleted
             if (mSubscription != null && !mSubscription.isUnsubscribed()) {
                 Utils.d("RX REMINDER unsubscribe");
                 mSubscription.unsubscribe();
@@ -103,14 +114,12 @@ public class ReminderEventHelper {
     }
 
     private void updateReminders() {
-        //TODO A0033 ricordarsi di registrare un listener sul boot di sistema per eseguire questo metodo
         //eliminio i job già schedulati
         JobManager.instance().cancelAllForTag(ReleaseReminderJob.TAG);
         //
         final DataManager dataManager = DataManager.getDataManager();
         SQLiteDatabase database = null;
         Cursor curReleaseDates = null;
-        //TODO A0033 parametrizzare il modificatore dell'ora di schedulazione facendo scegliere all'utente l'ora della schedulazione e flag stesso giorno o giorno prima
         long fromNow;
         //default 8:00 AM
         final long modifier = dataManager.getPreference(DataManager.KEY_PREF_REMINDER_TIME, 8 * 3_600_000) -
@@ -144,7 +153,7 @@ public class ReminderEventHelper {
                     new JobRequest.Builder(ReleaseReminderJob.TAG)
                             .setExtras(extras)
                             .setExact(fromNow)
-//                            .setPersisted(true) ricarico tutto a mano al boot
+                            .setPersisted(true) //ricarico tutto a mano al boot
                             .build()
                             .schedule();
                 }

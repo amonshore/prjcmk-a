@@ -37,13 +37,13 @@
         <it.amonshore.comikkua.ui.TimePreference
             android:key="pref_reminder_time"
             android:dependency="pref_reminder"
-            android:title="Show release reminder at"
+            android:title="@string/pref_reminder_time_title"
             android:defaultValue="28800000" />
 
         <CheckBoxPreference
             android:key="pref_reminder_daybefore"
             android:dependency="pref_reminder"
-            android:title="Day before"
+            android:title="@string/pref_reminder_daybefore_title"
             android:defaultValue="false" />
 
 </PreferenceScreen>

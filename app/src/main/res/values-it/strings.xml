@@ -129,4 +129,6 @@
     <string name="editor_release_number_pattern_error">Il valore non è valido</string>
     <string name="action_release_ordered">Ordinato</string>
     <string name="pref_reminder_title">Attiva il promemoria sulle uscite</string>
+    <string name="pref_reminder_daybefore_title">Giorno prima</string>
+    <string name="pref_reminder_time_title">Mostra la notifica alle ore</string>
 </resources>

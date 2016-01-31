@@ -9,32 +9,20 @@ import android.preference.PreferenceManager;
 import android.text.TextUtils;
 
 import com.evernote.android.job.JobManager;
-import com.evernote.android.job.JobRequest;
-import com.evernote.android.job.util.support.PersistableBundleCompat;
 
 import java.io.File;
 import java.io.IOException;
 import java.util.HashSet;
-import java.util.Queue;
 import java.util.Set;
 import java.util.TimeZone;
 import java.util.TreeMap;
-import java.util.concurrent.ConcurrentLinkedQueue;
-import java.util.concurrent.Semaphore;
-import java.util.concurrent.TimeUnit;
 import java.util.regex.Matcher;
 import java.util.regex.Pattern;
 
 import hirondelle.date4j.DateTime;
-import it.amonshore.comikkua.reminder.ReleaseReminderBootReceiver;
-import it.amonshore.comikkua.RxBus;
 import it.amonshore.comikkua.Utils;
-import it.amonshore.comikkua.reminder.ReleaseReminderJob;
 import it.amonshore.comikkua.reminder.ReleaseReminderJobCreator;
 import it.amonshore.comikkua.reminder.ReminderEventHelper;
-import rx.Subscription;
-import rx.functions.Action1;
-import rx.functions.Func1;
 
 /**
  * Created by Narsenico on 07/05/2015.
@@ -50,7 +38,6 @@ public class DataManager extends Observable<ComicsObserver> {
     public final static int ACTION_CLEAR = ACTION_DATA | 1 << 4;
     public final static int ACTION_REMINDER_CLEAR = ACTION_REMINDER | 1 << 11;
     public final static int ACTION_REMINDER_UPDATE = ACTION_REMINDER | 1 << 12;
-    public final static int ACTION_REMINDER_BOOT = ACTION_REMINDER | 1 << 13;
 
     public static final int CAUSE_EMPTY = 0;
     public static final int CAUSE_SAFE = 1;
@@ -128,14 +115,11 @@ public class DataManager extends Observable<ComicsObserver> {
     private SharedPreferences mPreferences;
     //
     private final Object mSyncObj = new Object();
-////    RX osservatore di eventi per la gestione dei reminder
-//    private final RxBus<Integer> mReminderEventBus = new RxBus<>();
-//    private Subscription mReminderEventBusSubscription;
-    private boolean mIsReminderEnabled = false;
     //A0058
     private DataEventHelper mDataEventHelper;
     //A0033
     private ReminderEventHelper mReminderEventHelper;
+    private boolean mIsReminderEnabled = false;
 
     private DataManager(Context context, String userName) {
         mContext = context;
@@ -152,25 +136,6 @@ public class DataManager extends Observable<ComicsObserver> {
         mIsReminderEnabled = getPreference(KEY_PREF_REMINDER, false);
         //
         mDBHelper = new DBHelper(context);
-//        //RX gli eventi inviati al bus vengono gestiti una sola volta ogni 2 secondi
-//        mReminderEventBusSubscription =
-//        mReminderEventBus.toObserverable()
-//                .map(new Func1<Integer, Integer>() {
-//                    public Integer call(Integer action) {
-//                        return (action & ACTION_REMINDER) == ACTION_REMINDER ? action :
-//                                (action & ACTION_DATA) == ACTION_DATA ? ACTION_REMINDER_UPDATE : 0;
-//                    }
-//                })
-//                .debounce(2, TimeUnit.SECONDS)
-//                .subscribe(new Action1<Integer>() {
-//                    @Override
-//                    public void call(Integer action) {
-//                        Utils.d(this.getClass(), "RX BUS " + action);
-//                        //TODO gestire eventi su reminder. Usare sempre DataEventHelper???
-////                        mWriteHandler.appendRequest(new AsyncActionRequest(action,
-////                                NO_COMICS, NO_RELEASE));
-//                    }
-//                });
         //creo i gestori eventi sui dati e sui reminder
         mDataEventHelper = new DataEventHelper(mContext);
         mReminderEventHelper = new ReminderEventHelper(mContext);
@@ -185,20 +150,13 @@ public class DataManager extends Observable<ComicsObserver> {
                     } else if (KEY_PREF_REMINDER.equals(key)) {
                         if (sharedPreferences.getBoolean(key, false)) {
                             mIsReminderEnabled = true;
-//                            mReminderEventBus.send(ACTION_REMINDER_UPDATE);
                             mReminderEventHelper.send(ACTION_REMINDER_UPDATE);
-                            //abilito il boot receiver
-                            ReleaseReminderBootReceiver.setEnabled(mContext, true);
                         } else {
                             mIsReminderEnabled = false;
-//                            mReminderEventBus.send(ACTION_REMINDER_CLEAR);
                             mReminderEventHelper.send(ACTION_REMINDER_CLEAR);
-                            //disabilito il boot receiver
-                            ReleaseReminderBootReceiver.setEnabled(mContext, false);
                         }
                     } else if (mIsReminderEnabled) {
                         if (KEY_PREF_REMINDER_TIME.equals(key) || KEY_PREF_REMINDER_DAY_BEFORE.equals(key)) {
-//                            mReminderEventBus.send(ACTION_REMINDER_UPDATE);
                             mReminderEventHelper.send(ACTION_REMINDER_UPDATE);
                         }
                     }
@@ -580,15 +538,12 @@ public class DataManager extends Observable<ComicsObserver> {
      * @return  this
      */
     public DataManager updateData(int action, long comicsId, int releaseNumber) {
-//        mWriteHandler.appendRequest(new AsyncActionRequest(action, comicsId, releaseNumber));
-        //RX
+        //se è un evento di tipo data lo invio al gestore degli eventi
         if ((action & ACTION_DATA) == ACTION_DATA) {
             mDataEventHelper.send(action, comicsId, releaseNumber);
         }
-        //RX invio all'osservatore un nuovo evento da gestire
+        //invio all'osservatore un nuovo evento da gestire indipendentemente dal tipo
         if (mIsReminderEnabled) {
-//        Utils.d(this.getClass(), "RX BUS SEND " + action);
-//            mReminderEventBus.send(action);
             mReminderEventHelper.send(action);
         }
 
@@ -608,98 +563,12 @@ public class DataManager extends Observable<ComicsObserver> {
         return this;
     }
 
-//    /**
-//     *
-//     * @param execNow   true i reminder vengono eliminiati subito, false la richiesta è aggiunta all'event loop
-//     * @return this
-//     */
-//    public DataManager cancelReminders(boolean execNow) {
-//        if (execNow) {
-//            JobManager.instance().cancelAllForTag(ReleaseReminderJob.TAG);
-//        } else {
-////            mWriteHandler.appendRequest(new AsyncActionRequest(ACTION_REMINDER_CLEAR, NO_COMICS, NO_RELEASE));
-//        }
-//
-//        return this;
-//    }
-//
-//    /**
-//     *
-//     * @param execNow   true i reminder vengono eliminiati subito, false la richiesta è aggiunta all'event loop
-//     * @return this
-//     */
-//    public DataManager updateReminders(boolean execNow) {
-//        if (execNow) {
-//            //TODO A0033 ricordarsi di registrare un listener sul boot di sistema per eseguire questo metodo
-//            //eliminio i job già schedulati
-//            JobManager.instance().cancelAllForTag(ReleaseReminderJob.TAG);
-//            //
-//            SQLiteDatabase database = null;
-//            Cursor curReleaseDates = null;
-//            //TODO A0033 parametrizzare il modificatore dell'ora di schedulazione facendo scegliere all'utente l'ora della schedulazione e flag stesso giorno o giorno prima
-//            long fromNow;
-//            //default 8:00 AM
-//            final long modifier = getPreference(KEY_PREF_REMINDER_TIME, 8 * 3_600_000) -
-//                    (getPreference(KEY_PREF_REMINDER_DAY_BEFORE, false) ? 24 * 3_600_000 : 0);
-//            final long now = System.currentTimeMillis();
-//            Utils.d(this.getClass(), "job modifier " + modifier);
-//            try {
-//                database = mDBHelper.getReadableDatabase();
-//                curReleaseDates = database.query(
-//                        DBHelper.ReleasesTable.NAME,
-//                        //estraggo solo la data
-//                        new String[]{DBHelper.ReleasesTable.COL_DATE, "COUNT(*)"},
-//                        //filtro sull'utente e sulla data di uscita
-//                        //TODO considerare solo quelle non acquistate
-//                        DBHelper.ReleasesTable.COL_USER + " = '" + mUserName + "' and " +
-//                                DBHelper.ReleasesTable.COL_DATE + " >= '" + Utils.formatDbRelease(now) + "'",
-//                        null,
-//                        //raggruppo per data di uscita
-//                        DBHelper.ReleasesTable.COL_DATE,
-//                        null,
-//                        DBHelper.ReleasesTable.COL_DATE,
-//                        null);
-//                //per ogni data schedulo un allarme
-//                while (curReleaseDates.moveToNext()) {
-//                    fromNow = Utils.parseDbRelease(curReleaseDates.getString(0)).getTime() + modifier - now;
-////                Utils.d(this.getClass(), "UPDREM " +  curReleaseDates.getString(0) + " -> " + fromNow);
-//                    if (fromNow > 0) {
-//                        PersistableBundleCompat extras = new PersistableBundleCompat();
-//                        extras.putString(ReleaseReminderJob.EXTRA_DATE, curReleaseDates.getString(0));
-//                        extras.putInt(ReleaseReminderJob.EXTRA_COUNT, curReleaseDates.getInt(1));
-//                        new JobRequest.Builder(ReleaseReminderJob.TAG)
-//                                .setExtras(extras)
-//                                .setExact(fromNow)
-////                            .setPersisted(true) ricarico tutto a mano al boot
-//                                .build()
-//                                .schedule();
-//                    }
-//                }
-//            } catch (Exception ex) {
-//                Utils.e(this.getClass(), "Update reminder", ex);
-//            } finally {
-//                if (curReleaseDates != null) {
-//                    curReleaseDates.close();
-//                }
-//                if (database != null) {
-//                    database.close();
-//                }
-//            }
-//        } else {
-////            mWriteHandler.appendRequest(new AsyncActionRequest(ACTION_REMINDER_UPDATE, NO_COMICS, NO_RELEASE));
-//        }
-//
-//        return this;
-//    }
-
     /**
      * @return  this
      */
     public DataManager startWriteHandler() {
-//        mWriteHandler = new AsyncWriteHandler();
-//        mWriteHandler.start();
-        mDataEventHelper.start(500);
-        mReminderEventHelper.start(2000);
+        mDataEventHelper.start();
+        mReminderEventHelper.start();
 
         return this;
     }
@@ -708,9 +577,6 @@ public class DataManager extends Observable<ComicsObserver> {
      * @return  this
      */
     public DataManager stopWriteHandler() {
-        //TODO inviare uno speciale evento EXIT in modo che vengano cmq gestiti tutti gli eventi in coda
-//        mWriteHandler.cancel();
-//        mWriteHandler = null;
         mDataEventHelper.stop();
         mReminderEventHelper.stop();
 
@@ -734,166 +600,9 @@ public class DataManager extends Observable<ComicsObserver> {
     }
 
     private void dispose() {
-//        mReminderEventBusSubscription.unsubscribe();
         mPreferences.unregisterOnSharedPreferenceChangeListener(mSharedPreferenceChangeListener);
         unregisterAll();
         stopWriteHandler();
     }
-
-//    private static final class AsyncActionRequest {
-//        public int Action;
-//        public long ComicsId;
-//        public int ReleaseNumber;
-//
-//        public AsyncActionRequest(int action, long comicsId, int releaseNumber) {
-//            this.Action = action;
-//            this.ComicsId = comicsId;
-//            this.ReleaseNumber = releaseNumber;
-//        }
-//    }
-//
-//    //TODO A0058 trasformarlo in un event loop, può essere gestito con Rx
-//    private class AsyncWriteHandler {
-//
-//        private Semaphore mMainLoopHandler;
-//        private boolean mCancel;
-//        //A0049
-//        private Queue<AsyncActionRequest> mQueue;
-//
-//        public AsyncWriteHandler() {
-//            mQueue = new ConcurrentLinkedQueue<>();
-//        }
-//
-//        public void appendRequest(AsyncActionRequest request) {
-//            mQueue.add(request);
-//            mMainLoopHandler.release();
-//        }
-//
-//        public void cancel() {
-////            Utils.d(this.getClass(), "cancel");
-//            mCancel = true ;
-//            mMainLoopHandler.release();
-//        }
-//
-//        public void start() {
-//            mCancel = false;
-//            mMainLoopHandler = new Semaphore(0);
-//
-//            new Thread(new Runnable() {
-//                @Override
-//                public void run() {
-//                    try {
-//                        while (!mCancel) {
-//                            //
-//                            mMainLoopHandler.drainPermits();
-//                            //attendo un tempo indefinito
-//                            mMainLoopHandler.acquire();
-//                            Utils.d(this.getClass(), "*** saving");
-//                            SQLiteDatabase database = null;
-//                            try {
-//                                database = DataManager.this.mDBHelper.getWritableDatabase();
-//                                AsyncActionRequest request;
-//                                while ((request = mQueue.poll()) != null) {
-//                                    if (request.Action == ACTION_REMINDER_CLEAR) {
-//                                        clearReminders();
-//                                    } else if (request.Action == ACTION_REMINDER_UPDATE) {
-//                                        updateReminders();
-//                                    } else if (request.Action == ACTION_CLEAR) {
-//                                        clear(database);
-//                                    } else if (request.ReleaseNumber == DataManager.NO_RELEASE) {  //comics
-//                                        if (request.Action == DataManager.ACTION_ADD) {
-//                                            writeComics(database, DataManager.this.getComics(request.ComicsId), true);
-//                                        } else if (request.Action == DataManager.ACTION_UPD) {
-//                                            writeComics(database, DataManager.this.getComics(request.ComicsId), false);
-//                                        } else if (request.Action == DataManager.ACTION_DEL) {
-//                                            deleteComics(database, request.ComicsId);
-//                                        }
-//                                    } else {    //release
-//                                        if (request.Action == DataManager.ACTION_ADD) {
-//                                            writeRelease(database, DataManager.this.getComics(request.ComicsId)
-//                                                    .getRelease(request.ReleaseNumber), true);
-//                                        } else if (request.Action == DataManager.ACTION_UPD) {
-//                                            writeRelease(database, DataManager.this.getComics(request.ComicsId)
-//                                                    .getRelease(request.ReleaseNumber), false);
-//                                        } else if (request.Action == DataManager.ACTION_DEL) {
-//                                            deleteRelease(database, request.ComicsId, request.ReleaseNumber);
-//                                        }
-//                                    }
-//                                }
-//                            } catch (Exception ex) {
-//                                Utils.e(this.getClass(), "Write data", ex);
-//                            } finally {
-//                                if (database != null) {
-//                                    database.close();
-//                                }
-//                            }
-//                        }
-//                    } catch (InterruptedException iex) {
-//                        Utils.e("async save main loop", iex);
-//                    }
-//                }
-//            }).start();
-//        }
-//
-//        private void writeComics(SQLiteDatabase database, Comics comics, boolean isNew) {
-//            if (isNew) {
-//                database.insert(DBHelper.ComicsTable.NAME, null,
-//                        DBHelper.ComicsTable.getContentValues(comics, DataManager.this.mUserName));
-//                for (Release release : comics.getReleases()) {
-//                    writeRelease(database, release, true);
-//                }
-//            } else {
-//                database.replace(DBHelper.ComicsTable.NAME, null,
-//                        DBHelper.ComicsTable.getContentValues(comics, DataManager.this.mUserName));
-//            }
-//        }
-//
-//        private void deleteComics(SQLiteDatabase database, long comicsId) {
-//            database.delete(DBHelper.ReleasesTable.NAME,
-//                    DBHelper.ReleasesTable.COL_COMICS_ID + " = " + comicsId + " and " +
-//                            DBHelper.ReleasesTable.COL_USER + " = '" + DataManager.this.mUserName + "'",
-//                    null);
-//            database.delete(DBHelper.ComicsTable.NAME,
-//                    DBHelper.ComicsTable.COL_ID + " = " + comicsId + " and " +
-//                        DBHelper.ComicsTable.COL_USER + " = '" + DataManager.this.mUserName + "'",
-//                    null);
-//        }
-//
-//        private void writeRelease(SQLiteDatabase database, Release release, boolean isNew) {
-//            if (isNew) {
-//                database.insert(DBHelper.ReleasesTable.NAME, null,
-//                        DBHelper.ReleasesTable.getContentValues(release, DataManager.this.mUserName));
-//            } else {
-//                database.replace(DBHelper.ReleasesTable.NAME, null,
-//                        DBHelper.ReleasesTable.getContentValues(release, DataManager.this.mUserName));
-//            }
-//        }
-//
-//        private void deleteRelease(SQLiteDatabase database, long comicsId, int releaseNumber) {
-//            database.delete(DBHelper.ReleasesTable.NAME,
-//                    DBHelper.ReleasesTable.COL_COMICS_ID + " = " + comicsId + " and " +
-//                            DBHelper.ReleasesTable.COL_USER + " = '" + DataManager.this.mUserName + "' and " +
-//                            DBHelper.ReleasesTable.COL_NUMBER + " = " + releaseNumber,
-//                    null);
-//        }
-//
-//        private void clear(SQLiteDatabase database) {
-//            database.delete(DBHelper.ReleasesTable.NAME,
-//                    DBHelper.ReleasesTable.COL_USER + " = '" + DataManager.this.mUserName + "'",
-//                    null);
-//            database.delete(DBHelper.ComicsTable.NAME,
-//                    DBHelper.ComicsTable.COL_USER + " = '" + DataManager.this.mUserName + "'",
-//                    null);
-//        }
-//
-//        private void clearReminders() {
-//            DataManager.this.cancelReminders(true);
-//        }
-//
-//        private void updateReminders() {
-//            DataManager.this.updateReminders(true);
-//        }
-//
-//    }
 
 }
