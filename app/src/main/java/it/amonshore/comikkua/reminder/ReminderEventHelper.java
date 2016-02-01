@@ -121,9 +121,11 @@ public class ReminderEventHelper {
         SQLiteDatabase database = null;
         Cursor curReleaseDates = null;
         long fromNow;
-        //default 8:00 AM
-        final long modifier = dataManager.getPreference(DataManager.KEY_PREF_REMINDER_TIME, 8 * 3_600_000) -
-                (dataManager.getPreference(DataManager.KEY_PREF_REMINDER_DAY_BEFORE, false) ? 24 * 3_600_000 : 0);
+        //l'orario è espresso in ms, se negativo si riferisce al giorno prima,  default 8:00 AM
+        long modifier = dataManager.getPreference(DataManager.KEY_PREF_REMINDER_TIME, 8 * 3_600_000);
+        if (modifier < 0) {
+            modifier = modifier * -1 - (24 * 3_600_000); //trasformo in positivo e tolgo un giorno
+        }
         final long now = System.currentTimeMillis();
         Utils.d(this.getClass(), "job modifier " + modifier);
         try {

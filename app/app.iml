@@ -110,8 +110,8 @@
     <orderEntry type="library" exported="" name="android-job-1.0.2" level="project" />
     <orderEntry type="library" exported="" name="datetimepicker-0.1.2" level="project" />
     <orderEntry type="library" exported="" name="snackbar-2.10.10" level="project" />
-    <orderEntry type="library" exported="" name="glide-3.6.1" level="project" />
     <orderEntry type="library" exported="" name="support-annotations-23.1.1" level="project" />
+    <orderEntry type="library" exported="" name="glide-3.6.1" level="project" />
     <orderEntry type="library" exported="" name="appcompat-v7-23.1.1" level="project" />
     <orderEntry type="library" exported="" name="fab-1.5.0" level="project" />
   </component>

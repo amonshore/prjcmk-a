@@ -50,3 +50,6 @@ Versione: v1.0.3 (18)
 
 Versione: v1.0.3 (19)
 - inserimento release multiple
+
+Versione: v1.0.4 (20)
+- promemoria sulle uscite

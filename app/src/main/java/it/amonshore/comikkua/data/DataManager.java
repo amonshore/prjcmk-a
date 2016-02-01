@@ -63,7 +63,6 @@ public class DataManager extends Observable<ComicsObserver> {
     public static final String KEY_PREF_AUTOFILL_RELEASE = "pref_autofill_release";
     public static final String KEY_PREF_REMINDER = "pref_reminder";
     public static final String KEY_PREF_REMINDER_TIME = "pref_reminder_time";
-    public static final String KEY_PREF_REMINDER_DAY_BEFORE = "pref_reminder_daybefore";
 
     private static DataManager instance;
 
@@ -156,7 +155,7 @@ public class DataManager extends Observable<ComicsObserver> {
                             mReminderEventHelper.send(ACTION_REMINDER_CLEAR);
                         }
                     } else if (mIsReminderEnabled) {
-                        if (KEY_PREF_REMINDER_TIME.equals(key) || KEY_PREF_REMINDER_DAY_BEFORE.equals(key)) {
+                        if (KEY_PREF_REMINDER_TIME.equals(key)) {
                             mReminderEventHelper.send(ACTION_REMINDER_UPDATE);
                         }
                     }
@@ -175,6 +174,10 @@ public class DataManager extends Observable<ComicsObserver> {
 
     public boolean getPreference(String key, boolean def) {
         return mPreferences.getBoolean(key, def);
+    }
+
+    public int getPreference(String key, int def) {
+        return mPreferences.getInt(key, def);
     }
 
     public long getPreference(String key, long def) {

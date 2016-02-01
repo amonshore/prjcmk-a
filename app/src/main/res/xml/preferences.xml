@@ -1,6 +1,9 @@
 <?xml version="1.0" encoding="utf-8"?>
 <PreferenceScreen xmlns:android="http://schemas.android.com/apk/res/android">
 
+    <PreferenceCategory
+        android:title="@string/pref_category_general">
+
         <CheckBoxPreference
             android:key="pref_group_by_month"
             android:title="@string/pref_group_by_month_title"
@@ -29,6 +32,11 @@
             android:summaryOff="@string/pref_autofill_release_off"
             android:defaultValue="true" />
 
+    </PreferenceCategory>
+
+    <PreferenceCategory
+        android:title="@string/pref_category_reminder">
+
         <CheckBoxPreference
             android:key="pref_reminder"
             android:title="@string/pref_reminder_title"
@@ -40,10 +48,6 @@
             android:title="@string/pref_reminder_time_title"
             android:defaultValue="28800000" />
 
-        <CheckBoxPreference
-            android:key="pref_reminder_daybefore"
-            android:dependency="pref_reminder"
-            android:title="@string/pref_reminder_daybefore_title"
-            android:defaultValue="false" />
+    </PreferenceCategory>
 
 </PreferenceScreen>

@@ -6,6 +6,7 @@ import android.os.Build;
 import android.preference.DialogPreference;
 import android.util.AttributeSet;
 import android.view.View;
+import android.widget.Switch;
 import android.widget.TimePicker;
 
 import java.text.DateFormat;
@@ -15,15 +16,19 @@ import java.util.GregorianCalendar;
 import java.util.TimeZone;
 
 import hirondelle.date4j.DateTime;
+import it.amonshore.comikkua.R;
 
 /**
  * Created by narsenico on 18/01/16.
  *
- * http://stackoverflow.com/a/10608622
  */
 public class TimePreference extends DialogPreference {
-    private Calendar calendar;
-    private TimePicker picker = null;
+
+    private TimePicker mTimePicker = null;
+    private Switch mDayBeforeSwitch = null;
+    private int mValue; //in millisecondi
+
+    private final static int DEFAULT_VALUE = 8 * 3_600_000;
 
     public TimePreference(Context ctxt) {
         this(ctxt, null);
@@ -36,53 +41,53 @@ public class TimePreference extends DialogPreference {
     public TimePreference(Context ctxt, AttributeSet attrs, int defStyle) {
         super(ctxt, attrs, defStyle);
 
+        setDialogLayoutResource(R.layout.dialog_time_preference);
         setPositiveButtonText(android.R.string.ok);
         setNegativeButtonText(android.R.string.cancel);
-        calendar = new GregorianCalendar();
-    }
-
-    @Override
-    protected View onCreateDialogView() {
-        picker = new TimePicker(getContext());
-        picker.setIs24HourView(true);
-        return (picker);
     }
 
     @Override
     protected void onBindDialogView(View v) {
         super.onBindDialogView(v);
+
+        mDayBeforeSwitch = (Switch)v.findViewById(R.id.dayBeforeSwitch);
+        mTimePicker = (TimePicker)v.findViewById(R.id.timePicker);
+        mTimePicker.setIs24HourView(true);
+
+        //mValue è espresso in ms, se negativo l'orario è riferito al giorno prima
+        final int ms = Math.abs(mValue);
+        final int hour = ms / 3_600_000;
+        final int minute = (ms - (hour * 3_600_000)) / 60_000;
+
         if (Build.VERSION.SDK_INT < Build.VERSION_CODES.M) {
-            picker.setCurrentHour(calendar.get(Calendar.HOUR_OF_DAY));
-            picker.setCurrentMinute(calendar.get(Calendar.MINUTE));
+            mTimePicker.setCurrentHour(hour);
+            mTimePicker.setCurrentMinute(minute);
         } else {
-            picker.setHour(calendar.get(Calendar.HOUR_OF_DAY));
-            picker.setMinute(calendar.get(Calendar.MINUTE));
+            mTimePicker.setHour(hour);
+            mTimePicker.setMinute(minute);
         }
+
+        mDayBeforeSwitch.setChecked(mValue < 0);
     }
 
     @Override
     protected void onDialogClosed(boolean positiveResult) {
         super.onDialogClosed(positiveResult);
 
-        final TimeZone timeZone = TimeZone.getDefault();
-        final long today = DateTime.today(timeZone).getMilliseconds(timeZone);
-
         if (positiveResult) {
             if (Build.VERSION.SDK_INT < Build.VERSION_CODES.M) {
-                calendar.set(Calendar.HOUR_OF_DAY, picker.getCurrentHour());
-                calendar.set(Calendar.MINUTE, picker.getCurrentMinute());
+                mValue = (mTimePicker.getCurrentHour() * 60 + mTimePicker.getCurrentMinute()) * 60_000;
             } else {
-                calendar.set(Calendar.HOUR_OF_DAY, picker.getHour());
-                calendar.set(Calendar.MINUTE, picker.getMinute());
+                mValue = (mTimePicker.getHour() * 60 + mTimePicker.getMinute()) * 60_000;
             }
-            calendar.set(Calendar.SECOND, 0);
-            calendar.set(Calendar.MILLISECOND, 0);
+
+            if (mDayBeforeSwitch.isChecked()) {
+                mValue *= -1;
+            }
 
             setSummary(getSummary());
-
-            final long value = calendar.getTimeInMillis() - today;
-            if (callChangeListener(value)) {
-                persistLong(value);
+            if (callChangeListener(mValue)) {
+                persistInt(mValue);
                 notifyChanged();
             }
         }
@@ -94,22 +99,18 @@ public class TimePreference extends DialogPreference {
     }
 
     @Override
-    protected void onSetInitialValue(boolean restoreValue, Object defaultValue) {
-
-        final TimeZone timeZone = TimeZone.getDefault();
-        final long today = DateTime.today(timeZone).getMilliseconds(timeZone);
-
-        if (restoreValue) {
+    protected void onSetInitialValue(boolean restorePersistedValue, Object defaultValue) {
+        if (restorePersistedValue) {
             if (defaultValue == null) {
-                calendar.setTimeInMillis(today + getPersistedLong(System.currentTimeMillis() - today));
+                mValue = getPersistedInt(DEFAULT_VALUE);
             } else {
-                calendar.setTimeInMillis(today + Long.parseLong(getPersistedString((String) defaultValue)));
+                mValue = Integer.parseInt(getPersistedString((String) defaultValue));
             }
         } else {
             if (defaultValue == null) {
-                calendar.setTimeInMillis(System.currentTimeMillis());
+                mValue = getPersistedInt(DEFAULT_VALUE);
             } else {
-                calendar.setTimeInMillis(today + Long.parseLong((String) defaultValue));
+                mValue = Integer.parseInt((String) defaultValue);
             }
         }
         setSummary(getSummary());
@@ -117,10 +118,13 @@ public class TimePreference extends DialogPreference {
 
     @Override
     public CharSequence getSummary() {
-        if (calendar == null) {
-            return null;
-        }
-//        return DateFormat.getTimeInstance(DateFormat.MEDIUM).format(new Date(calendar.getTimeInMillis()));
-        return String.format("%tl:%<tM %<tp", calendar.getTimeInMillis());
+        final int ms = Math.abs(mValue);
+        final int hour = ms / 3_600_000;
+        final int minute = (ms - (hour * 3_600_000)) / 60_000;
+
+        return this.getContext().getString((mValue < 0 ?
+                R.string.pref_reminder_time_summary_day_before :
+                R.string.pref_reminder_time_summary),
+                hour, minute);
     }
 }

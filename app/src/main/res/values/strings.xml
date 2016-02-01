@@ -52,6 +52,8 @@
     <string name="title_activity_settings">Settings</string>
     <string name="pref_main_settings_title">Options</string>
     <string name="pref_data_settings_title">Data</string>
+    <string name="pref_category_general">General</string>
+    <string name="pref_category_reminder">Reminder</string>
     <string name="pref_group_by_month_title">Group releases by month</string>
     <string name="pref_group_by_month_on">The releases are grouped by month</string>
     <string name="pref_group_by_month_off">The releases are grouped by week</string>
@@ -66,7 +68,9 @@
     <string name="pref_autofill_release_off">The fields of the new release will be empty</string>
     <string name="pref_reminder_title">Enable release reminder</string>
     <string name="pref_reminder_time_title">Show release reminder at</string>
-    <string name="pref_reminder_daybefore_title">Day before</string>
+    <string name="pref_reminder_time_summary">%1$02d:%2$02d</string>
+    <string name="pref_reminder_time_summary_day_before">%1$02d:%2$02d of the day before</string>
+    <string name="pref_reminder_time_day_before">Set the alarm for the day before</string>
 
     <!-- options -->
     <string name="opt_backup_now_title">Create bakcup</string>
@@ -75,7 +79,7 @@
     <string name="opt_backup_now_confirm_ok">Create now</string>
     <string name="opt_backup_now_done">Backup created</string>
     <string name="opt_backup_now_fail">There was a problem with backup</string>
-    <string name="opt_backup_now_wait">Backup data to file...</string>
+    <string name="opt_backup_now_wait">Backup data to file&#8230;</string>
 
     <string name="opt_restore_now_title">Restore bakcup</string>
     <string name="opt_restore_now_confirm_title">Restore bakcup?</string>
@@ -84,20 +88,20 @@
     <string name="opt_restore_now_done">Backup restored</string>
     <string name="opt_restore_now_fail">There was a problem with restore</string>
     <string name="last_restored">Last backup was on %1$tB %1$te, %1$tY at %1$tl:%1$tM %1$tp</string>
-    <string name="opt_restore_now_wait">Restore data from file...</string>
+    <string name="opt_restore_now_wait">Restore data from file&#8230;</string>
 
     <string name="opt_restore_old_title">Restore data from old version of Comikku app</string>
     <string name="opt_restore_old_confirm_title">Restore data?</string>
     <string name="opt_restore_old_confirm_message">Current data will be removed and restored from the old version of the application.</string>
     <string name="opt_restore_old_confirm_ok">Restore now</string>
-    <string name="opt_restore_old_wait">Restore data from old app file...</string>
+    <string name="opt_restore_old_wait">Restore data from old app file&#8230;</string>
 
     <string name="opt_clear_data_title">Remove all data</string>
     <string name="opt_clear_data_confirm_title">Remove all data?</string>
     <string name="opt_clear_data_confirm_message">Current data will be removed. It\'s recommended backing up data before proceed.</string>
     <string name="opt_clear_data_confirm_ok">Remove all</string>
     <string name="opt_clear_data_done">Data removed</string>
-    <string name="opt_clear_data_wait">Removing data...</string>
+    <string name="opt_clear_data_wait">Removing data&#8230;</string>
 
     <string name="dialog_backup_wait_title">Please wait</string>
 
@@ -155,7 +159,7 @@
     <string name="editor_comics_notes">Notes</string>
 
     <!-- release editor -->
-    <string name="editor_release_number">Number or intervals of numbers (eg: 1,4-6)</string>
+    <string name="editor_release_number">Number or intervals of numbers (eg: 1,4&#8211;6)</string>
     <string name="editor_release_number_empty">The number is required</string>
     <string name="editor_release_number_negative">Number must be positive</string>
     <string name="editor_release_number_duplicate">The number is already being used</string>
