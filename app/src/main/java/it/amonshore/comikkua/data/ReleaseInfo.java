@@ -39,7 +39,7 @@ public class ReleaseInfo {
      */
     public boolean isExpired() { return expired; }
 
-    protected void setRelease(Release release) {
+    void setRelease(Release release) {
         this.release = release;
     }
 

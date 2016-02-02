@@ -34,7 +34,6 @@ public class ComicsCropActivity extends ActionBarActivity {
 
     private CropImageView mCropImageView;
     private ProgressBar mProgressBar;
-    private Comics mComics;
     private String mTempFilePrefix;
 
     @Override
@@ -45,10 +44,10 @@ public class ComicsCropActivity extends ActionBarActivity {
         final Intent intent = getIntent();
         final long comicsId = intent.getLongExtra(EXTRA_COMICS_ID, 0);
         final Uri imageUri = Uri.parse(intent.getStringExtra(EXTRA_IMAGE_URI));
+        final Comics comics = DataManager.getDataManager().getComics(comicsId);
+        setTitle(comics.getName());
         //occorre rendere univoco il nome del file croppato altrimenti verrà presentato sempre quello cachato
         mTempFilePrefix = UUID.randomUUID().toString();
-        mComics = DataManager.getDataManager().getComics(comicsId);
-        setTitle(mComics.getName());
         //Toolbar
         final Toolbar toolbar = (Toolbar)findViewById(R.id.toolbar_actionbar);
         setSupportActionBar(toolbar);

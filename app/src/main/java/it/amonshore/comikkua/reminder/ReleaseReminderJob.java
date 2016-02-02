@@ -14,7 +14,6 @@ import java.util.TimeZone;
 
 import hirondelle.date4j.DateTime;
 import it.amonshore.comikkua.R;
-import it.amonshore.comikkua.Utils;
 import it.amonshore.comikkua.ui.MainActivity;
 
 /**

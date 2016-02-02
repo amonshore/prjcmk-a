@@ -6,7 +6,6 @@ import android.content.Intent;
 import android.content.SharedPreferences;
 import android.os.Bundle;
 import android.os.Handler;
-import android.preference.PreferenceManager;
 import android.view.ActionMode;
 import android.view.LayoutInflater;
 import android.view.Menu;
@@ -36,7 +35,6 @@ import it.amonshore.comikkua.data.UndoHelper;
 import it.amonshore.comikkua.ui.AFragment;
 import it.amonshore.comikkua.ui.MainActivity;
 import it.amonshore.comikkua.ui.ScrollToTopListener;
-import it.amonshore.comikkua.ui.SettingsActivity;
 import it.amonshore.comikkua.ui.comics.ComicsDetailActivity;
 import se.emilsjolander.stickylistheaders.StickyListHeadersListView;
 

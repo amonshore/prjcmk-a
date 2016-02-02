@@ -9,13 +9,6 @@ import android.view.View;
 import android.widget.Switch;
 import android.widget.TimePicker;
 
-import java.text.DateFormat;
-import java.util.Calendar;
-import java.util.Date;
-import java.util.GregorianCalendar;
-import java.util.TimeZone;
-
-import hirondelle.date4j.DateTime;
 import it.amonshore.comikkua.R;
 
 /**
@@ -123,8 +116,8 @@ public class TimePreference extends DialogPreference {
         final int minute = (ms - (hour * 3_600_000)) / 60_000;
 
         return this.getContext().getString((mValue < 0 ?
-                R.string.pref_reminder_time_summary_day_before :
-                R.string.pref_reminder_time_summary),
+                        R.string.pref_reminder_time_summary_day_before :
+                        R.string.pref_reminder_time_summary),
                 hour, minute);
     }
 }

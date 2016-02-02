@@ -22,7 +22,6 @@ import com.marvinlabs.widget.floatinglabel.instantpicker.FloatingLabelInstantPic
 import com.marvinlabs.widget.floatinglabel.instantpicker.JavaDateInstant;
 
 import java.text.SimpleDateFormat;
-import java.util.ArrayList;
 import java.util.GregorianCalendar;
 import java.util.Locale;
 import java.util.regex.Pattern;
@@ -32,7 +31,6 @@ import it.amonshore.comikkua.Utils;
 import it.amonshore.comikkua.data.Comics;
 import it.amonshore.comikkua.data.DataManager;
 import it.amonshore.comikkua.data.Release;
-import it.amonshore.comikkua.ui.SettingsActivity;
 
 public class ReleaseEditorActivity extends ActionBarActivity {
 
@@ -43,7 +41,7 @@ public class ReleaseEditorActivity extends ActionBarActivity {
 
     private Comics mComics;
     private Release mRelease;
-    private boolean mIsNew;
+//    private boolean mIsNew;
 
     private FloatingLabelEditText mTxtNumber, mTxtPrice, mTxtNotes;
     private FloatingLabelDatePicker<JavaDateInstant> mTxtDate;
@@ -64,10 +62,10 @@ public class ReleaseEditorActivity extends ActionBarActivity {
         mComics = dataManager.getComics(comicsId);
         setTitle(mComics.getName());
         if (releaseNumber == RELEASE_NEW) {
-            mIsNew = true;
+//            mIsNew = true;
             mRelease = mComics.createRelease(dataManager.getPreference(DataManager.KEY_PREF_AUTOFILL_RELEASE, true));
         } else {
-            mIsNew = false;
+//            mIsNew = false;
             mRelease = mComics.getRelease(releaseNumber);
         }
         //Toolbar
@@ -93,7 +91,7 @@ public class ReleaseEditorActivity extends ActionBarActivity {
             instant = new JavaDateInstant(calendar);
             mTxtDate.setSelectedInstant(instant);
         }
-        mTxtDate.setWidgetListener(new FloatingLabelInstantPicker.OnWidgetEventListener() {
+        mTxtDate.setWidgetListener(new FloatingLabelInstantPicker.OnWidgetEventListener<JavaDateInstant>() {
             @Override
             public void onShowInstantPickerDialog(FloatingLabelInstantPicker floatingLabelInstantPicker) {
                 DatePickerDialog.newInstance(new DatePickerDialog.OnDateSetListener() {
@@ -181,7 +179,7 @@ public class ReleaseEditorActivity extends ActionBarActivity {
                 int[] numbers = Utils.parseInterval(getViewText(mTxtNumber.getInputWidget()), ",", "-");
                 Release release;
                 for (int number : numbers) {
-                    release = mRelease.clone();
+                    release = mRelease.cloneRelease();
                     release.setNumber(number);
                     dataManager.updateData(mComics.putRelease(release) ? DataManager.ACTION_ADD : DataManager.ACTION_UPD,
                             mComics.getId(), number);

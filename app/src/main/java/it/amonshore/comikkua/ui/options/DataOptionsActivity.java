@@ -48,18 +48,18 @@ public class DataOptionsActivity extends ActionBarActivity {
         getSupportActionBar().setDisplayHomeAsUpEnabled(true);
 
         mDataOptionses = new DataOptions[] {
-                new DataOptions(ID_BACKAUP_NOW, getString(R.string.opt_backup_now_title), null,
+                new DataOptions(ID_BACKAUP_NOW, getString(R.string.opt_backup_now_title),
                         R.string.opt_backup_now_confirm_title, R.string.opt_backup_now_confirm_message, R.string.opt_backup_now_confirm_ok,
-                        R.string.opt_backup_now_wait, true),
-                new DataOptions(ID_RESTORE_NOW, getString(R.string.opt_restore_now_title), null,
+                        R.string.opt_backup_now_wait),
+                new DataOptions(ID_RESTORE_NOW, getString(R.string.opt_restore_now_title),
                         R.string.opt_restore_now_confirm_title, R.string.opt_restore_now_confirm_message, R.string.opt_restore_now_confirm_ok,
-                        R.string.opt_restore_now_wait, true),
-                new DataOptions(ID_RESTORE_OLD, getString(R.string.opt_restore_old_title), null,
+                        R.string.opt_restore_now_wait),
+                new DataOptions(ID_RESTORE_OLD, getString(R.string.opt_restore_old_title),
                         R.string.opt_restore_old_confirm_title, R.string.opt_restore_old_confirm_message, R.string.opt_restore_old_confirm_ok,
-                        R.string.opt_restore_old_wait, true),
-                new DataOptions(ID_CLEAR_DATA, getString(R.string.opt_clear_data_title), null,
+                        R.string.opt_restore_old_wait),
+                new DataOptions(ID_CLEAR_DATA, getString(R.string.opt_clear_data_title),
                         R.string.opt_clear_data_confirm_title, R.string.opt_clear_data_confirm_message, R.string.opt_clear_data_confirm_ok,
-                        R.string.opt_clear_data_wait, true)
+                        R.string.opt_clear_data_wait)
         };
 
         //TODO: aggiungere ripristino opzioni di defualt
@@ -182,18 +182,17 @@ public class DataOptionsActivity extends ActionBarActivity {
         public int ConfirmPositiveId;
         public int WaitMessageId;
         public boolean Enabled;
-        public DataOptions(long id, String title, String summary, int confirmTitleId,
+        public DataOptions(long id, String title, int confirmTitleId,
                            int confirmMessageId, int confirmPositiveId,
-                           int waitMessageId,
-                           boolean enabled) {
+                           int waitMessageId) {
             this.Id = id;
             this.Title = title;
-            this.Summary = summary;
+            this.Summary = null;
             this.ConfirmTitleId = confirmTitleId;
             this.ConfirmMessageId = confirmMessageId;
             this.ConfirmPositiveId = confirmPositiveId;
             this.WaitMessageId = waitMessageId;
-            this.Enabled = enabled;
+            this.Enabled = true;
         }
     }
 

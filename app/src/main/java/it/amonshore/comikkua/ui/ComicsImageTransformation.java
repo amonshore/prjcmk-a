@@ -16,7 +16,7 @@ import com.bumptech.glide.load.resource.bitmap.BitmapResource;
 /**
  * Created by Narsenico on 17/10/2015.
  */
-public class ComicsImageTransformation implements Transformation<Bitmap> {
+class ComicsImageTransformation implements Transformation<Bitmap> {
 
     private BitmapPool mBitmapPool;
     private float mHeight;
@@ -27,7 +27,7 @@ public class ComicsImageTransformation implements Transformation<Bitmap> {
         this(Glide.get(context).getBitmapPool(), height, color0, color1);
     }
 
-    public ComicsImageTransformation(BitmapPool pool, float height, int color0, int color1) {
+    private ComicsImageTransformation(BitmapPool pool, float height, int color0, int color1) {
         mBitmapPool = pool;
         mHeight = height;
         mColor0 = color0;

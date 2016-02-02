@@ -5,7 +5,6 @@ import android.text.TextUtils;
 import java.util.ArrayList;
 import java.util.Calendar;
 import java.util.GregorianCalendar;
-import java.util.UUID;
 
 /**
  * Created by Narsenico on 07/05/2015.

@@ -3,19 +3,13 @@ package it.amonshore.comikkua.data;
 import android.content.Context;
 import android.database.sqlite.SQLiteDatabase;
 
-import junit.framework.Assert;
-
 import java.util.List;
-import java.util.Queue;
-import java.util.concurrent.ConcurrentLinkedQueue;
 import java.util.concurrent.TimeUnit;
 
 import it.amonshore.comikkua.RxBus;
 import it.amonshore.comikkua.Utils;
 import rx.Observable;
 import rx.Subscriber;
-import rx.Subscription;
-import rx.functions.Action1;
 import rx.functions.Func1;
 import rx.schedulers.Schedulers;
 
@@ -24,10 +18,9 @@ import rx.schedulers.Schedulers;
  *
  * A0058
  */
-public class DataEventHelper {
+class DataEventHelper {
 
     private RxBus<DataEvent> mEventBus;
-    private Subscription mSubscription;
     private DBHelper mDBHelper;
 
     public DataEventHelper(Context context) {
@@ -61,7 +54,7 @@ public class DataEventHelper {
 //        final Queue<DataEvent> pEventQueue = new ConcurrentLinkedQueue<>();
 
             mEventBus = new RxBus<>();
-            mSubscription = mEventBus.toObserverable()
+            mEventBus.toObserverable()
                     .observeOn(Schedulers.io()) //gli eventi verranno consumati in un scheduler specifico per I/O
                             //raggruppo una serie di eventi (buffer) e li gestisco dopo che è passato un certo periodo di tempo senza altri eventi (debouce)
                             //il timeout deve essere basso per evitare che alcuni eventi non vengano gestiti

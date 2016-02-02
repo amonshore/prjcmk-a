@@ -8,8 +8,6 @@ import com.evernote.android.job.JobManager;
 import com.evernote.android.job.JobRequest;
 import com.evernote.android.job.util.support.PersistableBundleCompat;
 
-import junit.framework.Assert;
-
 import java.util.concurrent.TimeUnit;
 
 import it.amonshore.comikkua.RxBus;
@@ -17,7 +15,6 @@ import it.amonshore.comikkua.Utils;
 import it.amonshore.comikkua.data.DBHelper;
 import it.amonshore.comikkua.data.DataManager;
 import rx.Subscriber;
-import rx.Subscription;
 import rx.functions.Func1;
 import rx.schedulers.Schedulers;
 
@@ -29,7 +26,6 @@ import rx.schedulers.Schedulers;
 public class ReminderEventHelper {
 
     private RxBus<Integer> mEventBus;
-    private Subscription mSubscription;
     private DBHelper mDBHelper;
 
     public ReminderEventHelper(Context context) {
@@ -52,7 +48,7 @@ public class ReminderEventHelper {
         if (mEventBus == null) {
 
             mEventBus = new RxBus<>();
-            mSubscription = mEventBus.toObserverable()
+            mEventBus.toObserverable()
                     .observeOn(Schedulers.io()) //gli eventi verranno consumati in un scheduler specifico per I/O
                     .map(new Func1<Integer, Integer>() {
                         public Integer call(Integer action) {
@@ -130,7 +126,7 @@ public class ReminderEventHelper {
             curReleaseDates = database.query(
                     DBHelper.ReleasesTable.NAME,
                     //estraggo solo la data
-                    new String[]{DBHelper.ReleasesTable.COL_DATE, "COUNT(*)"},
+                    new String[] { DBHelper.ReleasesTable.COL_DATE, "COUNT(*)" },
                     //filtro sull'utente e sulla data di uscita
                     //TODO considerare solo quelle non acquistate
                     DBHelper.ReleasesTable.COL_USER + " = '" + dataManager.getUserName() + "' and " +
@@ -143,7 +139,7 @@ public class ReminderEventHelper {
                     null);
             //per ogni data schedulo un allarme
             while (curReleaseDates.moveToNext()) {
-                fromNow = Utils.parseDbRelease(curReleaseDates.getString(0)).getTime() + modifier - now;
+                fromNow = Utils.parseDbReleaseMilliseconds(curReleaseDates.getString(0)) + modifier - now;
 //                Utils.d(this.getClass(), "UPDREM " +  curReleaseDates.getString(0) + " -> " + fromNow);
                 if (fromNow > 0) {
                     PersistableBundleCompat extras = new PersistableBundleCompat();

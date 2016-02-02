@@ -24,18 +24,18 @@
     <color name="comikku_primary_color">#1976D2</color>
     <color name="comikku_primary_color_dark">#1565C0</color>
 
-    <color name="comikku_primary_color_50">#E3F2FD</color>
-    <color name="comikku_primary_color_100">#BBDEFB</color>
+    <!--<color name="comikku_primary_color_50">#E3F2FD</color>-->
+    <!--<color name="comikku_primary_color_100">#BBDEFB</color>-->
     <color name="comikku_primary_color_200">#90CAF9</color>
-    <color name="comikku_primary_color_300">#64B5F6</color>
-    <color name="comikku_primary_color_400">#42A5F5</color>
-    <color name="comikku_primary_color_500">#2196F3</color>
-    <color name="comikku_primary_color_600">#1E88E5</color>
-    <color name="comikku_primary_color_700">#1976D2</color>
-    <color name="comikku_primary_color_800">#1565C0</color>
-    <color name="comikku_primary_color_900">#0D47A1</color>
+    <!--<color name="comikku_primary_color_300">#64B5F6</color>-->
+    <!--<color name="comikku_primary_color_400">#42A5F5</color>-->
+    <!--<color name="comikku_primary_color_500">#2196F3</color>-->
+    <!--<color name="comikku_primary_color_600">#1E88E5</color>-->
+    <!--<color name="comikku_primary_color_700">#1976D2</color>-->
+    <!--<color name="comikku_primary_color_800">#1565C0</color>-->
+    <!--<color name="comikku_primary_color_900">#0D47A1</color>-->
 
-    <color name="comikku_control_activated_color">#1565C0</color>
+    <!--<color name="comikku_control_activated_color">#1565C0</color>-->
     <color name="comikku_comics_image_color">#AA1976D2</color>
 
     <!-- colori per i pulsanti circolari -->
@@ -43,9 +43,9 @@
     <color name="comikku_fab_pressed_color">#03A9F4</color>
     <color name="comikku_fab_ripple_color">#B3E5FC</color>
 
-    <color name="comikku_fab_mini_normal_color">#E91E63</color>
-    <color name="comikku_fab_mini_pressed_color">#F8BBD0</color>
-    <color name="comikku_fab_mini_ripple_color">#EC407A</color>
+    <!--<color name="comikku_fab_mini_normal_color">#E91E63</color>-->
+    <!--<color name="comikku_fab_mini_pressed_color">#F8BBD0</color>-->
+    <!--<color name="comikku_fab_mini_ripple_color">#EC407A</color>-->
 
     <color name="comikku_selected_tab_color">#FFFFFF</color>
 
@@ -64,25 +64,25 @@
     <color name="comikku_to_purchase_color_text_light">#E0E0E0</color>
 
     <color name="comikku_today_color_primary">#1E88E5</color>
-    <color name="comikku_today_color_secondary">#64B5F6</color>
+    <!--<color name="comikku_today_color_secondary">#64B5F6</color>-->
     <color name="comikku_today_color_primary_dark">#1976D2</color>
     <color name="comikku_today_color_text_light">#E0E0E0</color>
 
     <!--<color name="comikku_purchased_color_primary">#9E9E9E</color>-->
     <color name="comikku_purchased_color_primary">#607D8B</color>
-    <color name="comikku_purchased_color_secondary">#E0E0E0</color>
+    <!--<color name="comikku_purchased_color_secondary">#E0E0E0</color>-->
     <!--<color name="comikku_purchased_color_primary_dark">#757575</color>-->
     <!--<color name="comikku_purchased_color_primary_dark">#546E7A</color>-->
     <color name="comikku_purchased_color_primary_dark">#90A4AE</color>
     <color name="comikku_purchased_color_text_light">#E0E0E0</color>
 
     <color name="comikku_expired_color_primary">#E53935</color>
-    <color name="comikku_expired_color_secondary">#E57373</color>
+    <!--<color name="comikku_expired_color_secondary">#E57373</color>-->
     <color name="comikku_expired_color_primary_dark">#D32F2F</color>
     <color name="comikku_expired_color_text_light">#E0E0E0</color>
 
     <color name="comikku_wishlist_color_primary">#9C27B0</color>
-    <color name="comikku_wishlist_color_secondary">#BA68C8</color>
+    <!--<color name="comikku_wishlist_color_secondary">#BA68C8</color>-->
     <color name="comikku_wishlist_color_primary_dark">#8E24AA</color>
     <color name="comikku_wishlist_color_text_light">#E0E0E0</color>
 

@@ -66,7 +66,7 @@ public class ReleaseGroupHelper {
     /**
      * Gruppo sconosciuto
      */
-    public final static int GROUP_UNKNOWN = -1;
+    private final static int GROUP_UNKNOWN = -1;
 
     private final int mMode;
     private final ArrayList<ReleaseInfo> mList;

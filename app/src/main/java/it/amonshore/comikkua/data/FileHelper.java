@@ -23,6 +23,7 @@ import java.text.SimpleDateFormat;
 import java.util.ArrayList;
 import java.util.Date;
 import java.util.List;
+import java.util.Locale;
 
 import it.amonshore.comikkua.Utils;
 
@@ -58,7 +59,7 @@ public class FileHelper {
 
     public FileHelper() {
         mLastComicsId = System.currentTimeMillis();
-        mDateFormat = new SimpleDateFormat("yyyy-MM-dd");
+        mDateFormat = new SimpleDateFormat("yyyy-MM-dd", Locale.getDefault());
     }
 
     /**
@@ -300,10 +301,10 @@ public class FileHelper {
             try {
                 fcSource = new FileInputStream(source).getChannel();
                 fcDestination = new FileOutputStream(dest).getChannel();
-                if (fcDestination != null && fcSource != null) {
+//                if (fcDestination != null && fcSource != null) {
                     fcDestination.transferFrom(fcSource, 0, fcSource.size());
                     res = true;
-                }
+//                }
             } finally {
                 if (fcSource != null) {
                     fcSource.close();

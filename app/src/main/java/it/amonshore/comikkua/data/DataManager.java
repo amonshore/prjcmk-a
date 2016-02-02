@@ -29,8 +29,8 @@ import it.amonshore.comikkua.reminder.ReminderEventHelper;
  */
 public class DataManager extends Observable<ComicsObserver> {
 
-    public final static int ACTION_DATA = 1;
-    public final static int ACTION_REMINDER = 1 << 10;
+    private final static int ACTION_DATA = 1;
+    private final static int ACTION_REMINDER = 1 << 10;
 
     public final static int ACTION_ADD = ACTION_DATA | 1 << 1;
     public final static int ACTION_UPD = ACTION_DATA | 1 << 2;
@@ -59,9 +59,9 @@ public class DataManager extends Observable<ComicsObserver> {
 
     public static final String KEY_PREF_GROUP_BY_MONTH = "pref_group_by_month";
     public static final String KEY_PREF_WEEK_START_ON_MONDAY = "pref_week_start_on_monday";
-    public static final String KEY_PREF_LAST_PURCHASED = "pref_last_purchased";
+    private static final String KEY_PREF_LAST_PURCHASED = "pref_last_purchased";
     public static final String KEY_PREF_AUTOFILL_RELEASE = "pref_autofill_release";
-    public static final String KEY_PREF_REMINDER = "pref_reminder";
+    private static final String KEY_PREF_REMINDER = "pref_reminder";
     public static final String KEY_PREF_REMINDER_TIME = "pref_reminder_time";
 
     private static DataManager instance;
@@ -288,7 +288,7 @@ public class DataManager extends Observable<ComicsObserver> {
     /**
      *
      */
-    public void updateBestRelease() {
+    private void updateBestRelease() {
         synchronized (mSyncObj) {
             for (long id : getComics()) {
                 updateBestRelease(id);
@@ -473,12 +473,15 @@ public class DataManager extends Observable<ComicsObserver> {
      */
     public DataManager removeDirtyImages(boolean removeAll) {
         final Pattern pattern = Pattern.compile(Comics.IMAGE_PREFIX + "(-?\\d+)\\.jpg");
-        File folder = FileHelper.getExternalFolder(mContext);
-        String[] fileNames = folder.list();
+        final File folder = FileHelper.getExternalFolder(mContext);
+        final String[] fileNames = folder.list();
         for (String fileName : fileNames) {
-            Matcher matcher = pattern.matcher(fileName);
+            final Matcher matcher = pattern.matcher(fileName);
             if (matcher.find() && (removeAll || getComics(Long.parseLong(matcher.group(1))) == null)) {
-                new File(folder, fileName).delete();
+                final File file = new File(folder, fileName);
+                if (!file.delete()) {
+                    Utils.w(this.getClass(), "Cannot delete " + file.getPath());
+                }
             }
         }
 

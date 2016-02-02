@@ -57,7 +57,7 @@
     <string name="action_release_shopping">Lista della spesa</string>
     <string name="action_release_calendar">Calendario</string>
     <string name="action_release_wishlist">Lista dei desideri</string>
-    <string name="title_release_group_unknown">Sconosciuto %1</string>
+    <string name="title_release_group_unknown">Sconosciuto %1s</string>
     <string name="editor_comics_reserved">Prenotato</string>
     <string name="periodicity_unknown">Nessuna</string>
     <string name="periodicity_every_2_months">Ogni 2 mesi</string>

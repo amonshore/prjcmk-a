@@ -10,9 +10,9 @@ import java.util.Date;
 public class Release {
 
     public final static int FLAG_NONE = 0;
-    public final static int FLAG_REMINDER = 1;
-    public final static int FLAG_ORDERED = 2;
-    public final static int FLAG_PURCHASED = 4;
+    private final static int FLAG_REMINDER = 1;
+    private final static int FLAG_ORDERED = 2;
+    private final static int FLAG_PURCHASED = 4;
 
     private final long comicsId;
     private int number;
@@ -124,7 +124,7 @@ public class Release {
         this.setNotes(release.getNotes());
     }
 
-    public Release clone() {
+    public Release cloneRelease() {
         Release clone = new Release(comicsId);
         clone.setNumber(this.getNumber());
         clone.setDate(this.getDate());

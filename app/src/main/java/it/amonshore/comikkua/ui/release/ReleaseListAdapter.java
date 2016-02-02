@@ -1,6 +1,7 @@
 package it.amonshore.comikkua.ui.release;
 
 import android.content.Context;
+import android.os.Build;
 import android.view.LayoutInflater;
 import android.view.View;
 import android.view.ViewGroup;
@@ -26,7 +27,7 @@ import se.emilsjolander.stickylistheaders.StickyListHeadersAdapter;
  *
  * Per gestire le sezioni visibili in ogni visibilità vedere putReleaseInSection
  */
-public class ReleaseListAdapter extends BaseAdapter implements StickyListHeadersAdapter {
+class ReleaseListAdapter extends BaseAdapter implements StickyListHeadersAdapter {
 
     private final Context mContext;
     private final DataManager mDataManager;
@@ -184,10 +185,15 @@ public class ReleaseListAdapter extends BaseAdapter implements StickyListHeaders
         }
 
         //se la release è stata prenotata inserisco una icona
+        //TODO gestire versione 16
         if (release.isOrdered()) {
-            holder.txtNotes.setCompoundDrawablesRelativeWithIntrinsicBounds(0, 0, R.drawable.ic_archive_16, 0);
+            if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.JELLY_BEAN_MR1) {
+                holder.txtNotes.setCompoundDrawablesRelativeWithIntrinsicBounds(0, 0, R.drawable.ic_archive_16, 0);
+            }
         } else {
-            holder.txtNotes.setCompoundDrawablesRelativeWithIntrinsicBounds(0, 0, 0, 0);
+            if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.JELLY_BEAN_MR1) {
+                holder.txtNotes.setCompoundDrawablesRelativeWithIntrinsicBounds(0, 0, 0, 0);
+            }
         }
 
         //imposto background e colore del testo in base allo stato della release
@@ -257,7 +263,7 @@ public class ReleaseListAdapter extends BaseAdapter implements StickyListHeaders
         return mReleaseInfos.get(position).getGroup();
     }
 
-    public CharSequence getGroupTitle(int group) {
+    private CharSequence getGroupTitle(int group) {
         switch (group) {
             case ReleaseGroupHelper.GROUP_PERIOD:
                 return mContext.getString(mGroupByMonth ? R.string.title_release_group_current_month :

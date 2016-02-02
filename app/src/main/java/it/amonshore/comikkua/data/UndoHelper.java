@@ -13,7 +13,7 @@ public class UndoHelper<E> {
     private final ArrayList<E> mElements;
     private final HashMap<Integer, Stack<E>> mRetainedElements;
 
-    protected UndoHelper() {
+    UndoHelper() {
         mLastTag = 0;
         mElements = new ArrayList<>();
         mRetainedElements = new HashMap<>();

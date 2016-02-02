@@ -20,7 +20,6 @@ import com.marvinlabs.widget.floatinglabel.itempicker.StringPickerDialogFragment
 
 import java.util.ArrayList;
 import java.util.Arrays;
-import java.util.Collection;
 
 import it.amonshore.comikkua.R;
 import it.amonshore.comikkua.data.Comics;

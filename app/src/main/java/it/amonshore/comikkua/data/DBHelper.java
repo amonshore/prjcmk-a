@@ -14,11 +14,11 @@ import it.amonshore.comikkua.Utils;
  */
 public class DBHelper extends SQLiteOpenHelper {
 
-    public static final int DATABASE_VERSION = 3;
-    public static final String DATABASE_NAME = "comikkua.db";
+    private static final int DATABASE_VERSION = 3;
+    private static final String DATABASE_NAME = "comikkua.db";
 
     public final static String TRUE = "T";
-    public final static String FALSE = "F";
+    private final static String FALSE = "F";
 
     public static final class ComicsTable {
         public static final String NAME = "tComics";
