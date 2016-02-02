@@ -49,50 +49,51 @@ public class ReminderEventHelper {
      *
      */
     public void start() {
-        Assert.assertNull(mEventBus);
+        if (mEventBus == null) {
 
-        mEventBus = new RxBus<>();
-        mSubscription = mEventBus.toObserverable()
-                .observeOn(Schedulers.io()) //gli eventi verranno consumati in un scheduler specifico per I/O
-                .map(new Func1<Integer, Integer>() {
-                    public Integer call(Integer action) {
-                        switch (action) {
-                            case DataManager.ACTION_REMINDER_CLEAR:
-                            case DataManager.ACTION_REMINDER_UPDATE:
-                                return action;
-                            case DataManager.ACTION_CLEAR:
-                                return DataManager.ACTION_REMINDER_CLEAR;
-                            default:
-                                return DataManager.ACTION_REMINDER_UPDATE;
+            mEventBus = new RxBus<>();
+            mSubscription = mEventBus.toObserverable()
+                    .observeOn(Schedulers.io()) //gli eventi verranno consumati in un scheduler specifico per I/O
+                    .map(new Func1<Integer, Integer>() {
+                        public Integer call(Integer action) {
+                            switch (action) {
+                                case DataManager.ACTION_REMINDER_CLEAR:
+                                case DataManager.ACTION_REMINDER_UPDATE:
+                                    return action;
+                                case DataManager.ACTION_CLEAR:
+                                    return DataManager.ACTION_REMINDER_CLEAR;
+                                default:
+                                    return DataManager.ACTION_REMINDER_UPDATE;
+                            }
                         }
-                    }
-                })
-                //tengo un timeout volutamente alto perché tanto verranno aggiornati alla chiamata di stop()
-                .debounce(2000, TimeUnit.MILLISECONDS)
-                .subscribe(new Subscriber<Integer>() {
+                    })
+                            //tengo un timeout volutamente alto perché tanto verranno aggiornati alla chiamata di stop()
+                    .debounce(1000, TimeUnit.MILLISECONDS)
+                    .subscribe(new Subscriber<Integer>() {
 
-                    @Override
-                    public final void onCompleted() {
-                        Utils.d("RX REMINDER end " + Utils.isMainThread());
-                        updateReminders();
-                    }
-
-                    @Override
-                    public final void onError(Throwable e) {
-                        Utils.e("RX REMINDER error", e);
-                    }
-
-                    @Override
-                    public final void onNext(Integer action) {
-                        Utils.d("RX REMINDER " + action + " " + Utils.isMainThread());
-                        if (action == DataManager.ACTION_REMINDER_CLEAR) {
-                            cancelReminders();
-                        } else if (action == DataManager.ACTION_REMINDER_UPDATE) {
+                        @Override
+                        public final void onCompleted() {
+                            Utils.d("RX REMINDER end " + Utils.isMainThread());
                             updateReminders();
                         }
-                    }
 
-                });
+                        @Override
+                        public final void onError(Throwable e) {
+                            Utils.e("RX REMINDER error", e);
+                        }
+
+                        @Override
+                        public final void onNext(Integer action) {
+                            Utils.d("RX REMINDER " + action + " " + Utils.isMainThread());
+                            if (action == DataManager.ACTION_REMINDER_CLEAR) {
+                                cancelReminders();
+                            } else if (action == DataManager.ACTION_REMINDER_UPDATE) {
+                                updateReminders();
+                            }
+                        }
+
+                    });
+        }
     }
 
     /**
@@ -101,10 +102,6 @@ public class ReminderEventHelper {
     public void stop() {
         if (mEventBus != null) {
             mEventBus.end(); //scatena onCompleted
-            if (mSubscription != null && !mSubscription.isUnsubscribed()) {
-                Utils.d("RX REMINDER unsubscribe");
-                mSubscription.unsubscribe();
-            }
             mEventBus = null;
         }
     }
@@ -127,7 +124,7 @@ public class ReminderEventHelper {
             modifier = modifier * -1 - (24 * 3_600_000); //trasformo in positivo e tolgo un giorno
         }
         final long now = System.currentTimeMillis();
-        Utils.d(this.getClass(), "job modifier " + modifier);
+//        Utils.d(this.getClass(), "job modifier " + modifier);
         try {
             database = mDBHelper.getReadableDatabase();
             curReleaseDates = database.query(

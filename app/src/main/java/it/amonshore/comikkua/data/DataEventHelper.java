@@ -55,90 +55,90 @@ public class DataEventHelper {
      *
      */
     public void start() {
-        Assert.assertNull(mEventBus);
+        if (mEventBus == null) {
 
-        final DataManager dataManager = DataManager.getDataManager();
+            final DataManager dataManager = DataManager.getDataManager();
 //        final Queue<DataEvent> pEventQueue = new ConcurrentLinkedQueue<>();
 
-        mEventBus = new RxBus<>();
-        mSubscription = mEventBus.toObserverable()
-                .observeOn(Schedulers.io()) //gli eventi verranno consumati in un scheduler specifico per I/O
-                //raggruppo una serie di eventi (buffer) e li gestisco dopo che è passato un certo periodo di tempo senza altri eventi (debouce)
-                //il timeout deve essere basso per evitare che alcuni eventi non vengano gestiti
-                .publish(new Func1<Observable<DataEvent>, Observable<List<DataEvent>>>() {
-                    @Override
-                    public Observable<List<DataEvent>> call(Observable<DataEvent> stream) {
-                        return stream.buffer(stream.debounce(200, TimeUnit.MILLISECONDS));
-                    }
-                })
+            mEventBus = new RxBus<>();
+            mSubscription = mEventBus.toObserverable()
+                    .observeOn(Schedulers.io()) //gli eventi verranno consumati in un scheduler specifico per I/O
+                            //raggruppo una serie di eventi (buffer) e li gestisco dopo che è passato un certo periodo di tempo senza altri eventi (debouce)
+                            //il timeout deve essere basso per evitare che alcuni eventi non vengano gestiti
+                    .publish(new Func1<Observable<DataEvent>, Observable<List<DataEvent>>>() {
+                        @Override
+                        public Observable<List<DataEvent>> call(Observable<DataEvent> stream) {
+                            return stream.buffer(stream.debounce(200, TimeUnit.MILLISECONDS));
+                        }
+                    })
 //                .doOnNext(new Action1<List<DataEvent>>() {
 //                    @Override
 //                    public void call(List<DataEvent> dataEvents) {
 //                        pEventQueue.addAll(dataEvents);
 //                    }
 //                })
-                .subscribe(new Subscriber<List<DataEvent>>() {
-                    @Override
-                    public void onCompleted() {
-                        Utils.d("RX DATA end " + Utils.isMainThread());
-                    }
+                    .subscribe(new Subscriber<List<DataEvent>>() {
+                        @Override
+                        public void onCompleted() {
+                            Utils.d("RX DATA end " + Utils.isMainThread());
+                        }
 
-                    @Override
-                    public void onError(Throwable e) {
-                        Utils.e("RX REMINDER error", e);
-                    }
+                        @Override
+                        public void onError(Throwable e) {
+                            Utils.e("RX REMINDER error", e);
+                        }
 
-                    @Override
-                    public void onNext(List<DataEvent> dataEvents) {
-                        Utils.d("RX DATA " + dataEvents.size() + " " + Utils.isMainThread());
-                        if (dataEvents.size() > 0) {
-                            final String userName = dataManager.getUserName();
-                            SQLiteDatabase database = null;
-                            try {
-                                database = mDBHelper.getWritableDatabase();
-                                for (DataEvent event : dataEvents) {
+                        @Override
+                        public void onNext(List<DataEvent> dataEvents) {
+                            Utils.d("RX DATA " + dataEvents.size() + " " + Utils.isMainThread());
+                            if (dataEvents.size() > 0) {
+                                final String userName = dataManager.getUserName();
+                                SQLiteDatabase database = null;
+                                try {
+                                    database = mDBHelper.getWritableDatabase();
+                                    for (DataEvent event : dataEvents) {
 //                                    Utils.d(String.format("RX DATA act %s cid %s rid %s", event.Action, event.ComicsId, event.ReleaseNumber));
-                                    switch (event.Action) {
-                                        case DataManager.ACTION_CLEAR:
-                                            clear(database, userName);
-                                            break;
-                                        case DataManager.ACTION_ADD:
-                                            if (event.ReleaseNumber == DataManager.NO_RELEASE) {
-                                                writeComics(database, userName, dataManager.getComics(event.ComicsId), true);
-                                            } else {
-                                                writeRelease(database, userName, dataManager.getComics(event.ComicsId)
-                                                        .getRelease(event.ReleaseNumber), true);
-                                            }
-                                            break;
-                                        case DataManager.ACTION_UPD:
-                                            if (event.ReleaseNumber == DataManager.NO_RELEASE) {
-                                                writeComics(database, userName, dataManager.getComics(event.ComicsId), false);
-                                            } else {
-                                                writeRelease(database, userName, dataManager.getComics(event.ComicsId)
-                                                        .getRelease(event.ReleaseNumber), false);
-                                            }
-                                            break;
-                                        case DataManager.ACTION_DEL:
-                                            if (event.ReleaseNumber == DataManager.NO_RELEASE) {
-                                                deleteComics(database, userName, event.ComicsId);
-                                            } else {
-                                                deleteRelease(database, userName, event.ComicsId, event.ReleaseNumber);
-                                            }
-                                            break;
+                                        switch (event.Action) {
+                                            case DataManager.ACTION_CLEAR:
+                                                clear(database, userName);
+                                                break;
+                                            case DataManager.ACTION_ADD:
+                                                if (event.ReleaseNumber == DataManager.NO_RELEASE) {
+                                                    writeComics(database, userName, dataManager.getComics(event.ComicsId), true);
+                                                } else {
+                                                    writeRelease(database, userName, dataManager.getComics(event.ComicsId)
+                                                            .getRelease(event.ReleaseNumber), true);
+                                                }
+                                                break;
+                                            case DataManager.ACTION_UPD:
+                                                if (event.ReleaseNumber == DataManager.NO_RELEASE) {
+                                                    writeComics(database, userName, dataManager.getComics(event.ComicsId), false);
+                                                } else {
+                                                    writeRelease(database, userName, dataManager.getComics(event.ComicsId)
+                                                            .getRelease(event.ReleaseNumber), false);
+                                                }
+                                                break;
+                                            case DataManager.ACTION_DEL:
+                                                if (event.ReleaseNumber == DataManager.NO_RELEASE) {
+                                                    deleteComics(database, userName, event.ComicsId);
+                                                } else {
+                                                    deleteRelease(database, userName, event.ComicsId, event.ReleaseNumber);
+                                                }
+                                                break;
+                                        }
                                     }
-                                }
-                            } catch (Exception ex) {
-                                Utils.e(this.getClass(), "Write data", ex);
-                            } finally {
-                                if (database != null) {
-                                    database.close();
+                                } catch (Exception ex) {
+                                    Utils.e(this.getClass(), "Write data", ex);
+                                } finally {
+                                    if (database != null) {
+                                        database.close();
+                                    }
                                 }
                             }
                         }
-                    }
-                });
+                    });
 
-
+        }
     }
 
     /**
@@ -147,10 +147,6 @@ public class DataEventHelper {
     public void stop() {
         if (mEventBus != null) {
             mEventBus.end(); //scatena onCompleted
-            if (mSubscription != null && !mSubscription.isUnsubscribed()) {
-                Utils.d("RX DATA unsubscribe");
-                mSubscription.unsubscribe();
-            }
             mEventBus = null;
         }
     }

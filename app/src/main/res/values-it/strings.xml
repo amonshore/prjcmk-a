@@ -135,4 +135,9 @@
     <string name="pref_reminder_time_day_before">Imposta l\'allarme il giorno prima</string>
     <string name="pref_category_general">Generali</string>
     <string name="pref_category_reminder">Promemoria</string>
+    <string name="notification_release_title_single">1 fumetto in uscita</string>
+    <string name="notification_release_title_more">%1d fumetti in uscita</string>
+    <string name="notification_release_today">Oggi</string>
+    <string name="notification_release_tomorrow">Domani</string>
+    <string name="notification_release_next_days">%1$tA, %1$tB %1$te</string>
 </resources>

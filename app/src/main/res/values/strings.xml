@@ -180,4 +180,11 @@
 
     <!-- comics detail -->
     <string name="comics_detail_choose_image">Choose Image</string>
+
+    <!-- notification -->
+    <string name="notification_release_title_single">1 new comic releae</string>
+    <string name="notification_release_title_more">%1d new comic releaes</string>
+    <string name="notification_release_today">Today</string>
+    <string name="notification_release_tomorrow">Tomorrow</string>
+    <string name="notification_release_next_days">%1$tA, %1$tB %1$te</string>
 </resources>
