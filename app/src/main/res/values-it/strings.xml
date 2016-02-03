@@ -129,10 +129,10 @@
     <string name="editor_release_number_pattern_error">Il valore non è valido</string>
     <string name="action_release_ordered">Ordinato</string>
     <string name="pref_reminder_title">Attiva il promemoria sulle uscite</string>
-    <string name="pref_reminder_time_title">Mostra la notifica alle ore</string>
+    <string name="pref_reminder_time_title">Ora notifica</string>
     <string name="pref_reminder_time_summary_day_before">%1$02d:%2$02d del giorno prima</string>
     <string name="pref_reminder_time_summary">%1$02d:%2$02d</string>
-    <string name="pref_reminder_time_day_before">Imposta l\'allarme il giorno prima</string>
+    <string name="pref_reminder_time_day_before">Ricordamelo il giorno prima</string>
     <string name="pref_category_general">Generali</string>
     <string name="pref_category_reminder">Promemoria</string>
     <string name="notification_release_title_single">1 fumetto in uscita</string>

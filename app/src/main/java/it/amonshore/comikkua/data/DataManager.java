@@ -573,6 +573,9 @@ public class DataManager extends Observable<ComicsObserver> {
      * @return  this
      */
     public DataManager startWriteHandler() {
+        //può capitare che una istanza della MainActivity venga creata quando ne esiste già una
+        //quindi gli helper tengono conto di questo fatto e attivano i processi interni una sola
+        //volta
         mDataEventHelper.start();
         mReminderEventHelper.start();
 
@@ -583,6 +586,8 @@ public class DataManager extends Observable<ComicsObserver> {
      * @return  this
      */
     public DataManager stopWriteHandler() {
+        //perché vengano fermati i processi interni deve essere chiamato lo stop tante volte
+        //quante volte è stato chiamato start
         mDataEventHelper.stop();
         mReminderEventHelper.stop();
 

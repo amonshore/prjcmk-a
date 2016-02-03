@@ -67,10 +67,10 @@
     <string name="pref_autofill_release_on">The fields of the new release will be automatically set according to the previous release</string>
     <string name="pref_autofill_release_off">The fields of the new release will be empty</string>
     <string name="pref_reminder_title">Enable release reminder</string>
-    <string name="pref_reminder_time_title">Show release reminder at</string>
+    <string name="pref_reminder_time_title">Reminder time</string>
     <string name="pref_reminder_time_summary">%1$02d:%2$02d</string>
     <string name="pref_reminder_time_summary_day_before">%1$02d:%2$02d of the day before</string>
-    <string name="pref_reminder_time_day_before">Set the alarm for the day before</string>
+    <string name="pref_reminder_time_day_before">Remind me the day before</string>
 
     <!-- options -->
     <string name="opt_backup_now_title">Create bakcup</string>
@@ -182,7 +182,7 @@
     <string name="comics_detail_choose_image">Choose Image</string>
 
     <!-- notification -->
-    <string name="notification_release_title_single">1 new comic releae</string>
+    <string name="notification_release_title_single">1 new comic release</string>
     <string name="notification_release_title_more">%1d new comic releases</string>
     <string name="notification_release_today">Today</string>
     <string name="notification_release_tomorrow">Tomorrow</string>

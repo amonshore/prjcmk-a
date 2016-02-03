@@ -6,6 +6,7 @@ import android.database.sqlite.SQLiteDatabase;
 import java.util.List;
 import java.util.concurrent.TimeUnit;
 
+import it.amonshore.comikkua.AIncrementalStart;
 import it.amonshore.comikkua.RxBus;
 import it.amonshore.comikkua.Utils;
 import rx.Observable;
@@ -18,7 +19,7 @@ import rx.schedulers.Schedulers;
  *
  * A0058
  */
-class DataEventHelper {
+class DataEventHelper extends AIncrementalStart {
 
     private RxBus<DataEvent> mEventBus;
     private DBHelper mDBHelper;
@@ -44,10 +45,8 @@ class DataEventHelper {
         }
     }
 
-    /**
-     *
-     */
-    public void start() {
+    @Override
+    protected void safeStart() {
         if (mEventBus == null) {
 
             final DataManager dataManager = DataManager.getDataManager();
@@ -134,10 +133,8 @@ class DataEventHelper {
         }
     }
 
-    /**
-     *
-     */
-    public void stop() {
+    @Override
+    protected void safeStop() {
         if (mEventBus != null) {
             mEventBus.end(); //scatena onCompleted
             mEventBus = null;

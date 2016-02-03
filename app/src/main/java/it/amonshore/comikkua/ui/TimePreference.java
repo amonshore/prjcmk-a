@@ -6,7 +6,7 @@ import android.os.Build;
 import android.preference.DialogPreference;
 import android.util.AttributeSet;
 import android.view.View;
-import android.widget.Switch;
+import android.widget.CheckBox;
 import android.widget.TimePicker;
 
 import it.amonshore.comikkua.R;
@@ -18,7 +18,7 @@ import it.amonshore.comikkua.R;
 public class TimePreference extends DialogPreference {
 
     private TimePicker mTimePicker = null;
-    private Switch mDayBeforeSwitch = null;
+    private CheckBox mChkDayBefore = null;
     private int mValue; //in millisecondi
 
     private final static int DEFAULT_VALUE = 8 * 3_600_000;
@@ -43,7 +43,7 @@ public class TimePreference extends DialogPreference {
     protected void onBindDialogView(View v) {
         super.onBindDialogView(v);
 
-        mDayBeforeSwitch = (Switch)v.findViewById(R.id.dayBeforeSwitch);
+        mChkDayBefore = (CheckBox)v.findViewById(R.id.chkDayBefore);
         mTimePicker = (TimePicker)v.findViewById(R.id.timePicker);
         mTimePicker.setIs24HourView(true);
 
@@ -60,7 +60,7 @@ public class TimePreference extends DialogPreference {
             mTimePicker.setMinute(minute);
         }
 
-        mDayBeforeSwitch.setChecked(mValue < 0);
+        mChkDayBefore.setChecked(mValue < 0);
     }
 
     @Override
@@ -74,7 +74,7 @@ public class TimePreference extends DialogPreference {
                 mValue = (mTimePicker.getHour() * 60 + mTimePicker.getMinute()) * 60_000;
             }
 
-            if (mDayBeforeSwitch.isChecked()) {
+            if (mChkDayBefore.isChecked()) {
                 mValue *= -1;
             }
 

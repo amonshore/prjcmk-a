@@ -10,10 +10,12 @@ import com.evernote.android.job.util.support.PersistableBundleCompat;
 
 import java.util.concurrent.TimeUnit;
 
+import it.amonshore.comikkua.AIncrementalStart;
 import it.amonshore.comikkua.RxBus;
 import it.amonshore.comikkua.Utils;
 import it.amonshore.comikkua.data.DBHelper;
 import it.amonshore.comikkua.data.DataManager;
+import it.amonshore.comikkua.data.Release;
 import rx.Subscriber;
 import rx.functions.Func1;
 import rx.schedulers.Schedulers;
@@ -23,7 +25,7 @@ import rx.schedulers.Schedulers;
  *
  * A0033
  */
-public class ReminderEventHelper {
+public class ReminderEventHelper extends AIncrementalStart {
 
     private RxBus<Integer> mEventBus;
     private DBHelper mDBHelper;
@@ -40,11 +42,8 @@ public class ReminderEventHelper {
         mEventBus.send(action);
     }
 
-    /**
-     * Solo l'ultimo evento verrà gestito.
-     *
-     */
-    public void start() {
+    @Override
+    protected void safeStart() {
         if (mEventBus == null) {
 
             mEventBus = new RxBus<>();
@@ -63,7 +62,7 @@ public class ReminderEventHelper {
                             }
                         }
                     })
-                            //tengo un timeout volutamente alto perché tanto verranno aggiornati alla chiamata di stop()
+                    //tengo un timeout volutamente alto perché tanto verranno aggiornati alla chiamata di stop()
                     .debounce(1000, TimeUnit.MILLISECONDS)
                     .subscribe(new Subscriber<Integer>() {
 
@@ -92,10 +91,8 @@ public class ReminderEventHelper {
         }
     }
 
-    /**
-     *
-     */
-    public void stop() {
+    @Override
+    protected void safeStop() {
         if (mEventBus != null) {
             mEventBus.end(); //scatena onCompleted
             mEventBus = null;
@@ -127,10 +124,10 @@ public class ReminderEventHelper {
                     DBHelper.ReleasesTable.NAME,
                     //estraggo solo la data
                     new String[] { DBHelper.ReleasesTable.COL_DATE, "COUNT(*)" },
-                    //filtro sull'utente e sulla data di uscita
-                    //TODO considerare solo quelle non acquistate
+                    //filtro sull'utente e sulla data di uscita, considero solo quelle non acquistate
                     DBHelper.ReleasesTable.COL_USER + " = '" + dataManager.getUserName() + "' and " +
-                            DBHelper.ReleasesTable.COL_DATE + " >= '" + Utils.formatDbRelease(now) + "'",
+                    DBHelper.ReleasesTable.COL_DATE + " >= '" + Utils.formatDbRelease(now) + "' and " +
+                    "(" + DBHelper.ReleasesTable.COL_FLAGS + " & " + Release.FLAG_PURCHASED + ") <> " + Release.FLAG_PURCHASED,
                     null,
                     //raggruppo per data di uscita
                     DBHelper.ReleasesTable.COL_DATE,

@@ -10,9 +10,9 @@ import java.util.Date;
 public class Release {
 
     public final static int FLAG_NONE = 0;
-    private final static int FLAG_REMINDER = 1;
-    private final static int FLAG_ORDERED = 2;
-    private final static int FLAG_PURCHASED = 4;
+//    public final static int FLAG_REMINDER = 1;
+    public final static int FLAG_ORDERED = 2;
+    public final static int FLAG_PURCHASED = 4;
 
     private final long comicsId;
     private int number;
@@ -54,16 +54,16 @@ public class Release {
         this.price = price;
     }
 
-    public boolean isReminder() {
-        return (flags & FLAG_REMINDER) == FLAG_REMINDER;
-    }
-
-    public void setReminder(boolean reminder) {
-        if (reminder)
-            this.flags |= FLAG_REMINDER;
-        else
-            this.flags &= ~FLAG_REMINDER;
-    }
+//    public boolean isReminder() {
+//        return (flags & FLAG_REMINDER) == FLAG_REMINDER;
+//    }
+//
+//    public void setReminder(boolean reminder) {
+//        if (reminder)
+//            this.flags |= FLAG_REMINDER;
+//        else
+//            this.flags &= ~FLAG_REMINDER;
+//    }
 
     public boolean isOrdered() {
         return (flags & FLAG_ORDERED) == FLAG_ORDERED;

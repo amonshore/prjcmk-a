@@ -157,7 +157,7 @@ public class FileHelper {
         release.setNumber(obj.getInt(FIELD_NUMBER));
         release.setDate(tryGetDate(obj, FIELD_DATE));
         release.setPrice(tryGetDouble(obj, FIELD_PRICE));
-        release.setReminder(tryGetBoolean(obj, FIELD_REMINDER));
+//        release.setReminder(tryGetBoolean(obj, FIELD_REMINDER));
         release.setOrdered(tryGetBoolean(obj, FIELD_ORDERED));
         release.setPurchased(tryGetBoolean(obj, FIELD_PURCHASED));
         release.setNotes(tryGetString(obj, FIELD_NOTES));
@@ -233,7 +233,7 @@ public class FileHelper {
             writer.value(mDateFormat.format(release.getDate()));
         }
         writer.name(FIELD_PRICE).value(release.getPrice());
-        writer.name(FIELD_REMINDER).value(release.isReminder() ? TRUE : FALSE);
+//        writer.name(FIELD_REMINDER).value(release.isReminder() ? TRUE : FALSE);
         writer.name(FIELD_ORDERED).value(release.isOrdered() ? TRUE : FALSE);
         writer.name(FIELD_PURCHASED).value(release.isPurchased() ? TRUE : FALSE);
         writer.name(FIELD_NOTES).value(release.getNotes());
