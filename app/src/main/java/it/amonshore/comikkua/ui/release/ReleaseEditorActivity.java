@@ -24,13 +24,13 @@ import com.marvinlabs.widget.floatinglabel.instantpicker.JavaDateInstant;
 import java.text.SimpleDateFormat;
 import java.util.GregorianCalendar;
 import java.util.Locale;
+import java.util.regex.Pattern;
 
 import it.amonshore.comikkua.R;
 import it.amonshore.comikkua.Utils;
 import it.amonshore.comikkua.data.Comics;
 import it.amonshore.comikkua.data.DataManager;
 import it.amonshore.comikkua.data.Release;
-import it.amonshore.comikkua.ui.SettingsActivity;
 
 public class ReleaseEditorActivity extends ActionBarActivity {
 
@@ -41,11 +41,14 @@ public class ReleaseEditorActivity extends ActionBarActivity {
 
     private Comics mComics;
     private Release mRelease;
-    private boolean mIsNew;
+//    private boolean mIsNew;
 
     private FloatingLabelEditText mTxtNumber, mTxtPrice, mTxtNotes;
     private FloatingLabelDatePicker<JavaDateInstant> mTxtDate;
     private Switch mChkPurchased, mChkOrdered;
+
+    //A0056 regex per il controllo del cammpo number
+    private final Pattern mNumberPattern = Pattern.compile("^\\d+(\\s*[,\\-]\\s*\\d+)*$");
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
@@ -59,10 +62,10 @@ public class ReleaseEditorActivity extends ActionBarActivity {
         mComics = dataManager.getComics(comicsId);
         setTitle(mComics.getName());
         if (releaseNumber == RELEASE_NEW) {
-            mIsNew = true;
+//            mIsNew = true;
             mRelease = mComics.createRelease(dataManager.getPreference(DataManager.KEY_PREF_AUTOFILL_RELEASE, true));
         } else {
-            mIsNew = false;
+//            mIsNew = false;
             mRelease = mComics.getRelease(releaseNumber);
         }
         //Toolbar
@@ -74,6 +77,7 @@ public class ReleaseEditorActivity extends ActionBarActivity {
         //imposto i valori e creo i listener
         mTxtNumber = (FloatingLabelEditText)findViewById(R.id.txt_editor_release_number);
         mTxtNumber.setInputWidgetText(mRelease.getNumber() < 0 ? "" : Integer.toString(mRelease.getNumber()));
+        mTxtNumber.getInputWidget().selectAll();
         //
         mTxtDate = (FloatingLabelDatePicker<JavaDateInstant>)findViewById(R.id.txt_editor_release_date);
         mTxtDate.setInstantPrinter(new ReleaseDatePrinter());
@@ -87,7 +91,7 @@ public class ReleaseEditorActivity extends ActionBarActivity {
             instant = new JavaDateInstant(calendar);
             mTxtDate.setSelectedInstant(instant);
         }
-        mTxtDate.setWidgetListener(new FloatingLabelInstantPicker.OnWidgetEventListener() {
+        mTxtDate.setWidgetListener(new FloatingLabelInstantPicker.OnWidgetEventListener<JavaDateInstant>() {
             @Override
             public void onShowInstantPickerDialog(FloatingLabelInstantPicker floatingLabelInstantPicker) {
                 DatePickerDialog.newInstance(new DatePickerDialog.OnDateSetListener() {
@@ -153,7 +157,9 @@ public class ReleaseEditorActivity extends ActionBarActivity {
             if (validateAll()) {
                 //TODO eseguire i controlli sui dati
                 //preparo i dati per la risposta
-                mRelease.setNumber(getViewInt(mTxtNumber.getInputWidget(),0));
+
+                //A0056 mRelease verrà usata come base per le release vere e proprie
+//                mRelease.setNumber(getViewInt(mTxtNumber.getInputWidget(),0));
                 mRelease.setPrice(getViewDouble(mTxtPrice.getInputWidget()));
                 mRelease.setNotes(getViewText(mTxtNotes.getInputWidget()));
                 JavaDateInstant instant = mTxtDate.getSelectedInstant();
@@ -167,16 +173,28 @@ public class ReleaseEditorActivity extends ActionBarActivity {
                 mRelease.setPurchased(mChkPurchased.isChecked());
                 mRelease.setOrdered(mChkOrdered.isChecked());
 
-                if (mIsNew) {
-                    if (!mComics.putRelease(mRelease)) {
-                        Utils.w("Release editor: release wasn't new");
-                    }
+                //A0056 preparo le release da inserire/aggiornare
+                final DataManager dataManager = DataManager.getDataManager();
+                //parse del campo number, es: 1,4-6 -> 1,4,5,6
+                int[] numbers = Utils.parseInterval(getViewText(mTxtNumber.getInputWidget()), ",", "-");
+                Release release;
+                for (int number : numbers) {
+                    release = mRelease.cloneRelease();
+                    release.setNumber(number);
+                    dataManager.updateData(mComics.putRelease(release) ? DataManager.ACTION_ADD : DataManager.ACTION_UPD,
+                            mComics.getId(), number);
                 }
 
-                //
+//                if (mIsNew) {
+//                    if (!mComics.putRelease(mRelease)) {
+//                        Utils.w("Release editor: release wasn't new");
+//                    }
+//                }
+
+                //A0056 aggiorno il db direttamente qua, quindi EXTRA_RELEASE_NUMBER non ha più senso restituirlo
                 Intent intent = new Intent();
                 intent.putExtra(EXTRA_COMICS_ID, mRelease.getComicsId());
-                intent.putExtra(EXTRA_RELEASE_NUMBER, mRelease.getNumber());
+//                intent.putExtra(EXTRA_RELEASE_NUMBER, mRelease.getNumber());
                 setResult(Activity.RESULT_OK, intent);
                 finish();
             }
@@ -211,29 +229,38 @@ public class ReleaseEditorActivity extends ActionBarActivity {
             mTxtNumber.getInputWidget().setError(getString(R.string.editor_release_number_empty));
             return false;
         } else {
-            int number = getViewInt(mTxtNumber.getInputWidget(), -1);
-            if (number < 0) {
-                mTxtNumber.getInputWidget().setError(getString(R.string.editor_release_number_negative));
+            //A0056 non controllo più se un numero è già censito
+//            int number = getViewInt(mTxtNumber.getInputWidget(), -1);
+//            if (number < 0) {
+//                mTxtNumber.getInputWidget().setError(getString(R.string.editor_release_number_negative));
+//                return false;
+//            }else if (mIsNew) {
+//                if (mComics.getRelease(number) == null) {
+//                    mTxtNumber.getInputWidget().setError(null);
+//                    return true;
+//                } else {
+//                    mTxtNumber.getInputWidget().setError(getString(R.string.editor_release_number_duplicate));
+//                    return false;
+//                }
+//            } else {
+//                //se non è nuovo, può essere uguale a quello attuale
+//                Release release = mComics.getRelease(number);
+//                if (release == null || release.getNumber() == mRelease.getNumber()) {
+//                    mTxtNumber.getInputWidget().setError(null);
+//                    return true;
+//                } else {
+//                    mTxtNumber.getInputWidget().setError(getString(R.string.editor_release_number_duplicate));
+//                    return false;
+//                }
+//            }
+
+            if (!mNumberPattern.matcher(getViewText(mTxtNumber.getInputWidget())).matches()) {
+                mTxtNumber.getInputWidget().setError(getString(R.string.editor_release_number_pattern_error));
                 return false;
-            }else if (mIsNew) {
-                if (mComics.getRelease(number) == null) {
-                    mTxtNumber.getInputWidget().setError(null);
-                    return true;
-                } else {
-                    mTxtNumber.getInputWidget().setError(getString(R.string.editor_release_number_duplicate));
-                    return false;
-                }
             } else {
-                //se non è nuovo, può essere uguale a quello attuale
-                Release release = mComics.getRelease(number);
-                if (release == null || release.getNumber() == mRelease.getNumber()) {
-                    mTxtNumber.getInputWidget().setError(null);
-                    return true;
-                } else {
-                    mTxtNumber.getInputWidget().setError(getString(R.string.editor_release_number_duplicate));
-                    return false;
-                }
+                return true;
             }
+
         }
     }
 

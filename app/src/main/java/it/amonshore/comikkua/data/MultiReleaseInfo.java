@@ -17,7 +17,7 @@ public class MultiReleaseInfo extends ReleaseInfo implements Iterable<Release> {
         this(group, false, false, release);
     }
 
-    public MultiReleaseInfo(int group, boolean releasedToday, boolean expired, Release release) {
+    private MultiReleaseInfo(int group, boolean releasedToday, boolean expired, Release release) {
         super(group, releasedToday, expired, release);
         mInnerReleases = new ArrayList<>();
         addInnerRelease(release);

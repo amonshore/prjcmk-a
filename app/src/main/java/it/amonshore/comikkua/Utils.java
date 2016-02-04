@@ -1,18 +1,17 @@
 package it.amonshore.comikkua;
 
 import android.content.Context;
+import android.os.Looper;
+import android.support.annotation.NonNull;
 import android.text.TextUtils;
 import android.util.Log;
 
-import java.io.File;
-import java.io.FileInputStream;
-import java.io.FileOutputStream;
-import java.io.IOException;
-import java.nio.channels.FileChannel;
 import java.text.ParseException;
 import java.text.SimpleDateFormat;
 import java.util.Date;
+import java.util.Iterator;
 import java.util.Locale;
+import java.util.TreeSet;
 
 import hirondelle.date4j.DateTime;
 
@@ -21,7 +20,7 @@ import hirondelle.date4j.DateTime;
  */
 public class Utils {
 
-    public final static String LOG_TAG = "COMIKKU-A";
+    private final static String LOG_TAG = "COMIKKU-A";
 
     private static SimpleDateFormat SDF_COMICS;
     private static SimpleDateFormat SDF_RELEASE;
@@ -32,7 +31,7 @@ public class Utils {
         SDF_COMICS = new SimpleDateFormat(context.getString(R.string.format_comics_date), Locale.getDefault());
         SDF_RELEASE = new SimpleDateFormat(context.getString(R.string.format_release_date), Locale.getDefault());
         SDF_RELEASE_LONG = new SimpleDateFormat(context.getString(R.string.format_release_longdate), Locale.getDefault());
-        SDF_DB_RELASE = new SimpleDateFormat("yyyy-MM-dd");
+        SDF_DB_RELASE = new SimpleDateFormat("yyyy-MM-dd", Locale.getDefault());
     }
 
     public static String formatComicsDate(Date date) {
@@ -47,10 +46,19 @@ public class Utils {
         return SDF_RELEASE_LONG.format(date);
     }
 
+    public static String formatDbRelease(long date) {
+        return formatDbRelease(new Date(date));
+    }
+
     public static String formatDbRelease(Date date) {
         return date == null ? null : SDF_DB_RELASE.format(date);
     }
 
+    /**
+     *
+     * @param date  data nel formato yyyy-MM-dd
+     * @return null se il formato non è corretto
+     */
     public static Date parseDbRelease(String date) {
         if (isNullOrEmpty(date)) {
             return null;
@@ -61,6 +69,20 @@ public class Utils {
                 Log.e("Utils", "Error parsing " + date, pex);
                 return null;
             }
+        }
+    }
+
+    /**
+     *
+     * @param date  data nel formato yyyy-MM-dd
+     * @return conversione della data in millisecondi, oppure 0 se il formato non è corretto
+     */
+    public static long parseDbReleaseMilliseconds(@NonNull String date) {
+        try {
+            return SDF_DB_RELASE.parse(date).getTime();
+        } catch (ParseException pex) {
+            Log.e("Utils", "Error parsing " + date, pex);
+            return 0;
         }
     }
 
@@ -162,6 +184,37 @@ public class Utils {
     }
 
     /**
+     *
+     * @param text testo da interpretare
+     * @param separator separatore di intervalli
+     * @param sequenceSeparator separatore di sequenze
+     * @return elenco ordinato di interi
+     */
+    public static int[] parseInterval(String text, String separator, String sequenceSeparator) {
+        TreeSet<Integer> list = new TreeSet<>();
+        for (String token : text.split(separator)) {
+            String[] range = token.split(sequenceSeparator);
+            if (range.length == 1) {
+                list.add(Integer.parseInt(range[0].trim()));
+            } else if (range.length == 2) {
+                int from = Integer.parseInt(range[0].trim());
+                int to = Integer.parseInt(range[1].trim());
+                do {
+                    list.add(from);
+                } while (++from <= to);
+            }
+        }
+        return toIntArray(list.iterator(), new int[list.size()]);
+    }
+
+    private static int[] toIntArray(Iterator<Integer> src, int[] dst) {
+        for (int ii=0; src.hasNext() ;ii++) {
+            dst[ii] = src.next();
+        }
+        return dst;
+    }
+
+    /**
      * Log.d(LOG_TAG, msg)
      *
      * @param msg
@@ -189,6 +242,16 @@ public class Utils {
     public static void w(String msg) {
         if (BuildConfig.DEBUG)
             Log.w(LOG_TAG, msg);
+    }
+
+    /**
+     *
+     * @param aClass
+     * @param msg
+     */
+    public static void w(Class aClass, String msg) {
+        if (BuildConfig.DEBUG)
+            Log.w(aClass.getName(), msg);
     }
 
     /**
@@ -227,6 +290,14 @@ public class Utils {
             else day--;
         }
         return date.minusDays(day);
+    }
+
+    /**
+     *
+     * @return true il thread corrente è quello principale
+     */
+    public static boolean isMainThread() {
+        return Looper.myLooper() == Looper.getMainLooper();
     }
 
 }

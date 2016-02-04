@@ -23,6 +23,7 @@ import java.text.SimpleDateFormat;
 import java.util.ArrayList;
 import java.util.Date;
 import java.util.List;
+import java.util.Locale;
 
 import it.amonshore.comikkua.Utils;
 
@@ -58,7 +59,7 @@ public class FileHelper {
 
     public FileHelper() {
         mLastComicsId = System.currentTimeMillis();
-        mDateFormat = new SimpleDateFormat("yyyy-MM-dd");
+        mDateFormat = new SimpleDateFormat("yyyy-MM-dd", Locale.getDefault());
     }
 
     /**
@@ -156,7 +157,7 @@ public class FileHelper {
         release.setNumber(obj.getInt(FIELD_NUMBER));
         release.setDate(tryGetDate(obj, FIELD_DATE));
         release.setPrice(tryGetDouble(obj, FIELD_PRICE));
-        release.setReminder(tryGetBoolean(obj, FIELD_REMINDER));
+//        release.setReminder(tryGetBoolean(obj, FIELD_REMINDER));
         release.setOrdered(tryGetBoolean(obj, FIELD_ORDERED));
         release.setPurchased(tryGetBoolean(obj, FIELD_PURCHASED));
         release.setNotes(tryGetString(obj, FIELD_NOTES));
@@ -232,7 +233,7 @@ public class FileHelper {
             writer.value(mDateFormat.format(release.getDate()));
         }
         writer.name(FIELD_PRICE).value(release.getPrice());
-        writer.name(FIELD_REMINDER).value(release.isReminder() ? TRUE : FALSE);
+//        writer.name(FIELD_REMINDER).value(release.isReminder() ? TRUE : FALSE);
         writer.name(FIELD_ORDERED).value(release.isOrdered() ? TRUE : FALSE);
         writer.name(FIELD_PURCHASED).value(release.isPurchased() ? TRUE : FALSE);
         writer.name(FIELD_NOTES).value(release.getNotes());
@@ -300,10 +301,10 @@ public class FileHelper {
             try {
                 fcSource = new FileInputStream(source).getChannel();
                 fcDestination = new FileOutputStream(dest).getChannel();
-                if (fcDestination != null && fcSource != null) {
+//                if (fcDestination != null && fcSource != null) {
                     fcDestination.transferFrom(fcSource, 0, fcSource.size());
                     res = true;
-                }
+//                }
             } finally {
                 if (fcSource != null) {
                     fcSource.close();

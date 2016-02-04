@@ -17,7 +17,7 @@ import it.amonshore.comikkua.ui.release.ReleaseListFragment;
 /**
  * Created by Narsenico on 06/05/2015.
  */
-public class TabPageAdapter extends FragmentStatePagerAdapter {
+class TabPageAdapter extends FragmentStatePagerAdapter {
 
     private final Context mContext;
     private final ArrayList<AFragment> mPages;

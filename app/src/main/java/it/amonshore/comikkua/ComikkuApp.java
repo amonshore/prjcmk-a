@@ -19,6 +19,7 @@ public class ComikkuApp extends Application {
         DataManager
                 .init(this, "default")
                 .readComics()
+                .initReminderEngine() //A0033
                 .removeDirtyImages(false); //A0055
     }
 }

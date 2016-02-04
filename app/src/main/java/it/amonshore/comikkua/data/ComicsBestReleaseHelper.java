@@ -12,7 +12,7 @@ import hirondelle.date4j.DateTime;
 /**
  * Created by Narsenico on 24/05/2015.
  */
-public class ComicsBestReleaseHelper {
+class ComicsBestReleaseHelper {
 
     /**
      * A0046

@@ -20,7 +20,6 @@ import com.marvinlabs.widget.floatinglabel.itempicker.StringPickerDialogFragment
 
 import java.util.ArrayList;
 import java.util.Arrays;
-import java.util.Collection;
 
 import it.amonshore.comikkua.R;
 import it.amonshore.comikkua.data.Comics;
@@ -158,11 +157,15 @@ public class ComicsEditorActivity extends ActionBarActivity implements ItemPicke
                     mComics.setPeriodicity(mPeriodicityKeys[selPer[0]]);
                 }
 
-                if (mIsNew) {
-                    if (!mDataManager.put(mComics)) {
-                        Utils.w("Comics editor: comics wasn't new");
-                    }
-                }
+                //A0056 aggiorno i dati direttamente qua
+//                if (mIsNew) {
+//                    if (!mDataManager.put(mComics)) {
+//                        Utils.w("Comics editor: comics wasn't new");
+//                    }
+//                }
+
+                mDataManager.updateData(mDataManager.put(mComics) ? DataManager.ACTION_ADD : DataManager.ACTION_UPD,
+                        mComics.getId(), DataManager.NO_RELEASE);
 
                 //
                 Intent intent = new Intent();

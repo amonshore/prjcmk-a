@@ -6,7 +6,6 @@ import android.content.Intent;
 import android.content.SharedPreferences;
 import android.os.Bundle;
 import android.os.Handler;
-import android.preference.PreferenceManager;
 import android.view.ActionMode;
 import android.view.LayoutInflater;
 import android.view.Menu;
@@ -36,7 +35,6 @@ import it.amonshore.comikkua.data.UndoHelper;
 import it.amonshore.comikkua.ui.AFragment;
 import it.amonshore.comikkua.ui.MainActivity;
 import it.amonshore.comikkua.ui.ScrollToTopListener;
-import it.amonshore.comikkua.ui.SettingsActivity;
 import it.amonshore.comikkua.ui.comics.ComicsDetailActivity;
 import se.emilsjolander.stickylistheaders.StickyListHeadersListView;
 
@@ -257,6 +255,17 @@ public class ReleaseListFragment extends AFragment implements ScrollToTopListene
                     intent.putExtra(SearchManager.QUERY, query);
                     startActivity(intent);
                     return true;
+                } else if (menuId == R.id.action_release_ordered) { //A0057
+                    long[] ags = mListView.getCheckedItemIds();
+                    boolean ordered = false;
+                    for (int ii = 0; ii < ags.length; ii++) {
+                        ReleaseInfo ri = (ReleaseInfo)mAdapter.getItem((int) ags[ii]);
+                        if (ii == 0) ordered = !ri.getRelease().isOrdered();
+                        ri.getRelease().setOrdered(ordered);
+                        dataManager.updateData(DataManager.ACTION_UPD, ri.getRelease().getComicsId(), ri.getRelease().getNumber());
+                    }
+                    dataManager.notifyChanged(DataManager.CAUSE_RELEASE_CHANGED);
+                    return true;
                 } else {
                     return false;
                 }
@@ -286,9 +295,10 @@ public class ReleaseListFragment extends AFragment implements ScrollToTopListene
                 if (comicsId != ReleaseEditorActivity.COMICS_ID_NONE) {
                     dataManager.updateBestRelease(comicsId);
                     dataManager.notifyChanged(DataManager.CAUSE_RELEASE_CHANGED);
-                    //A0049
-                    final int releaseNumber = data.getIntExtra(ReleaseEditorActivity.EXTRA_RELEASE_NUMBER, DataManager.NO_RELEASE);
-                    dataManager.updateData(DataManager.ACTION_UPD, comicsId, releaseNumber);
+                    //A0056
+//                    //A0049
+//                    final int releaseNumber = data.getIntExtra(ReleaseEditorActivity.EXTRA_RELEASE_NUMBER, DataManager.NO_RELEASE);
+//                    dataManager.updateData(DataManager.ACTION_UPD, comicsId, releaseNumber);
                 }
             }
         }

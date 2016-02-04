@@ -1,9 +1,7 @@
 package it.amonshore.comikkua.ui.comics;
 
 import android.app.Activity;
-import android.app.AlertDialog;
 import android.app.SearchManager;
-import android.content.DialogInterface;
 import android.content.Intent;
 import android.content.SharedPreferences;
 import android.os.Bundle;
@@ -251,8 +249,9 @@ public class ComicsListFragment extends AFragment implements ScrollToTopListener
             final DataManager dataManager = DataManager.getDataManager();
             final long comicsId = data.getLongExtra(ComicsEditorActivity.EXTRA_COMICS_ID, DataManager.NO_COMICS);
             dataManager.notifyChangedButMe(DataManager.CAUSE_COMICS_CHANGED, this);
+            //A0056
             //A0049
-            dataManager.updateData(DataManager.ACTION_ADD, comicsId, DataManager.NO_RELEASE);
+//            dataManager.updateData(DataManager.ACTION_ADD, comicsId, DataManager.NO_RELEASE);
             //A0047 mostro il dettaglio del comics, mi pare un'idea migliore
             // rispetto all'editare una nuova release
             showComicsDetail(comicsId);

@@ -27,7 +27,7 @@ import it.amonshore.comikkua.data.ReleaseInfo;
  *
  * L'id di ogni elemento della lista è dato da Comics.getId()
  */
-public class ComicsListAdapter extends BaseAdapter implements SectionIndexer {
+class ComicsListAdapter extends BaseAdapter implements SectionIndexer {
 
     public final static int ORDER_BY_NAME = 2;
     public final static int ORDER_BY_BEST_RELEASE = 4;

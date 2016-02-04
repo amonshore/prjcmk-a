@@ -4,7 +4,7 @@
 
     <string name="action_settings">Settings</string>
     <string name="action_info">Info</string>
-    <string name="action_share_data">Share data</string>
+    <!--<string name="action_share_data">Share data</string>-->
     <string name="action_save">Save</string>
     <string name="action_data_options">Data</string>
 
@@ -20,6 +20,7 @@
     <string name="action_release_calendar">Calendar</string>
     <string name="action_release_wishlist">Wishlist</string>
     <string name="action_release_share">Share</string>
+    <string name="action_release_ordered">Ordered</string>
 
     <string name="title_activity_comics_new">New comics</string>
     <string name="title_activity_comics_edit">Edit comics</string>
@@ -29,9 +30,9 @@
     <string name="title_activity_data_options">Data</string>
 
     <string name="share">Share</string>
-    <string name="share_data">Share all data</string>
-    <string name="selected_item">%1d selected</string>
-    <string name="selected_items">%1d selected</string>
+    <!--<string name="share_data">Share all data</string>-->
+    <string name="selected_item">%1d</string>
+    <string name="selected_items">%1d</string>
     <string name="placeholder_wishlist" translatable="false">wish</string>
     <string name="undo">Undo</string>
     <string name="comics_removed">Comics removed</string>
@@ -49,8 +50,10 @@
 
     <!-- settings -->
     <string name="title_activity_settings">Settings</string>
-    <string name="pref_main_settings_title">Options</string>
-    <string name="pref_data_settings_title">Data</string>
+    <!--<string name="pref_main_settings_title">Options</string>-->
+    <!--<string name="pref_data_settings_title">Data</string>-->
+    <string name="pref_category_general">General</string>
+    <string name="pref_category_reminder">Reminder</string>
     <string name="pref_group_by_month_title">Group releases by month</string>
     <string name="pref_group_by_month_on">The releases are grouped by month</string>
     <string name="pref_group_by_month_off">The releases are grouped by week</string>
@@ -63,6 +66,11 @@
     <string name="pref_autofill_release_title">Automatically fill release data</string>
     <string name="pref_autofill_release_on">The fields of the new release will be automatically set according to the previous release</string>
     <string name="pref_autofill_release_off">The fields of the new release will be empty</string>
+    <string name="pref_reminder_title">Enable release reminder</string>
+    <string name="pref_reminder_time_title">Reminder time</string>
+    <string name="pref_reminder_time_summary">%1$02d:%2$02d</string>
+    <string name="pref_reminder_time_summary_day_before">%1$02d:%2$02d of the day before</string>
+    <string name="pref_reminder_time_day_before">Remind me the day before</string>
 
     <!-- options -->
     <string name="opt_backup_now_title">Create bakcup</string>
@@ -71,7 +79,7 @@
     <string name="opt_backup_now_confirm_ok">Create now</string>
     <string name="opt_backup_now_done">Backup created</string>
     <string name="opt_backup_now_fail">There was a problem with backup</string>
-    <string name="opt_backup_now_wait">Backup data to file...</string>
+    <string name="opt_backup_now_wait">Backup data to file&#8230;</string>
 
     <string name="opt_restore_now_title">Restore bakcup</string>
     <string name="opt_restore_now_confirm_title">Restore bakcup?</string>
@@ -80,20 +88,20 @@
     <string name="opt_restore_now_done">Backup restored</string>
     <string name="opt_restore_now_fail">There was a problem with restore</string>
     <string name="last_restored">Last backup was on %1$tB %1$te, %1$tY at %1$tl:%1$tM %1$tp</string>
-    <string name="opt_restore_now_wait">Restore data from file...</string>
+    <string name="opt_restore_now_wait">Restore data from file&#8230;</string>
 
     <string name="opt_restore_old_title">Restore data from old version of Comikku app</string>
     <string name="opt_restore_old_confirm_title">Restore data?</string>
     <string name="opt_restore_old_confirm_message">Current data will be removed and restored from the old version of the application.</string>
     <string name="opt_restore_old_confirm_ok">Restore now</string>
-    <string name="opt_restore_old_wait">Restore data from old app file...</string>
+    <string name="opt_restore_old_wait">Restore data from old app file&#8230;</string>
 
     <string name="opt_clear_data_title">Remove all data</string>
     <string name="opt_clear_data_confirm_title">Remove all data?</string>
     <string name="opt_clear_data_confirm_message">Current data will be removed. It\'s recommended backing up data before proceed.</string>
     <string name="opt_clear_data_confirm_ok">Remove all</string>
     <string name="opt_clear_data_done">Data removed</string>
-    <string name="opt_clear_data_wait">Removing data...</string>
+    <string name="opt_clear_data_wait">Removing data&#8230;</string>
 
     <string name="dialog_backup_wait_title">Please wait</string>
 
@@ -103,7 +111,7 @@
     <string name="title_page_calendar">CALENDAR</string>
     <string name="title_page_shopping">SHOPPING</string>
     <string name="title_page_wishlist">WISHLIST</string>
-    <string name="title_page_detail">COMICS</string>
+    <!--<string name="title_page_detail">COMICS</string>-->
 
     <!-- release section titles -->
     <string name="title_release_group_lost">Lost</string>
@@ -151,10 +159,11 @@
     <string name="editor_comics_notes">Notes</string>
 
     <!-- release editor -->
-    <string name="editor_release_number">Number</string>
+    <string name="editor_release_number">Number or intervals of numbers (eg: 1,4&#8211;6)</string>
     <string name="editor_release_number_empty">The number is required</string>
-    <string name="editor_release_number_negative">Number must be positive</string>
-    <string name="editor_release_number_duplicate">The number is already being used</string>
+    <!--<string name="editor_release_number_negative">Number must be positive</string>-->
+    <!--<string name="editor_release_number_duplicate">The number is already being used</string>-->
+    <string name="editor_release_number_pattern_error">The value is not valid</string>
     <string name="editor_release_date">Date</string>
     <string name="editor_release_price">Price</string>
     <string name="editor_release_notes">Notes</string>
@@ -171,4 +180,11 @@
 
     <!-- comics detail -->
     <string name="comics_detail_choose_image">Choose Image</string>
+
+    <!-- notification -->
+    <string name="notification_release_title_single">1 new comic release</string>
+    <string name="notification_release_title_more">%1d new comic releases</string>
+    <string name="notification_release_today">Today</string>
+    <string name="notification_release_tomorrow">Tomorrow</string>
+    <string name="notification_release_next_days">%1$tA, %1$tB %1$te</string>
 </resources>

@@ -10,7 +10,7 @@ import java.util.Date;
 public class Release {
 
     public final static int FLAG_NONE = 0;
-    public final static int FLAG_REMINDER = 1;
+//    public final static int FLAG_REMINDER = 1;
     public final static int FLAG_ORDERED = 2;
     public final static int FLAG_PURCHASED = 4;
 
@@ -54,16 +54,16 @@ public class Release {
         this.price = price;
     }
 
-    public boolean isReminder() {
-        return (flags & FLAG_REMINDER) == FLAG_REMINDER;
-    }
-
-    public void setReminder(boolean reminder) {
-        if (reminder)
-            this.flags |= FLAG_REMINDER;
-        else
-            this.flags &= ~FLAG_REMINDER;
-    }
+//    public boolean isReminder() {
+//        return (flags & FLAG_REMINDER) == FLAG_REMINDER;
+//    }
+//
+//    public void setReminder(boolean reminder) {
+//        if (reminder)
+//            this.flags |= FLAG_REMINDER;
+//        else
+//            this.flags &= ~FLAG_REMINDER;
+//    }
 
     public boolean isOrdered() {
         return (flags & FLAG_ORDERED) == FLAG_ORDERED;
@@ -110,5 +110,27 @@ public class Release {
 
     public boolean isWishlist() {
         return date == null;
+    }
+
+    /**
+     * Copia tutte le proprietà tranne number
+     *
+     * @param release
+     */
+    public void copyFrom(Release release) {
+        this.setDate(release.getDate());
+        this.setPrice(release.getPrice());
+        this.setFlags(release.getFlags());
+        this.setNotes(release.getNotes());
+    }
+
+    public Release cloneRelease() {
+        Release clone = new Release(comicsId);
+        clone.setNumber(this.getNumber());
+        clone.setDate(this.getDate());
+        clone.setPrice(this.getPrice());
+        clone.setFlags(this.getFlags());
+        clone.setNotes(this.getNotes());
+        return clone;
     }
 }
