@@ -16,3 +16,4 @@
 #   public *;
 #}
 -dontwarn jp.co.cyberagent.android.gpuimage.**
+-dontwarn rx.internal.util.**
