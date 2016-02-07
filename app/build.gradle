@@ -3,7 +3,7 @@ apply plugin: 'com.android.application'
 android {
     signingConfigs {
         config {
-            storeFile file('/Users/narsenico/android_key_store/my-release-key.keystore')
+            storeFile file('/Users/narsenico/dev/android_key_store/my-release-key.keystore')
         }
     }
     compileSdkVersion 23
@@ -12,7 +12,7 @@ android {
         applicationId "it.amonshore.comikkua"
         minSdkVersion 16
         targetSdkVersion 23
-        versionCode 20
+        versionCode 21
         versionName 'v1.0.4'
         renderscriptTargetApi 23
         renderscriptSupportModeEnabled true
