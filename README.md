@@ -1,7 +1,7 @@
 # prjcmk-a
 Autore: narsenico
 
-## v1.0.4 (20)
+## v1.0.4 (21)
 - promemoria sulle uscite
 - deep link (http://www.amonshore.it/comikku)
 

@@ -187,4 +187,8 @@
     <string name="notification_release_today">Today</string>
     <string name="notification_release_tomorrow">Tomorrow</string>
     <string name="notification_release_next_days">%1$tA, %1$tB %1$te</string>
+
+    <!-- info -->
+    <string name="info_version">Version: %1$s (%2$s)</string>
+    <string name="info_author">Author: %1$s</string>
 </resources>

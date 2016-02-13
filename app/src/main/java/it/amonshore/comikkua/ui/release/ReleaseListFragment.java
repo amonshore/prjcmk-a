@@ -45,8 +45,6 @@ public class ReleaseListFragment extends AFragment implements ScrollToTopListene
 
     //usato per lo stato dell'istanza
     public final static String STATE_GROUP_MODE = " stateMode";
-    //public final static String ARG_MODE = "arg_mode";
-    //public final static String ARG_COMICS_ID = "arg_comics_id";
 
     private ListView mListView;
     private ReleaseListAdapter mAdapter;
@@ -85,16 +83,6 @@ public class ReleaseListFragment extends AFragment implements ScrollToTopListene
         super.onCreate(savedInstanceState);
         //deve essere chiamato in onCreate
         setHasOptionsMenu(true);
-//        //recupero i parametri
-//        int mode = ReleaseGroupHelper.MODE_SHOPPING;
-//        Bundle args = getArguments();
-//        if (args != null) {
-//            long comicsId = args.getLong(ARG_COMICS_ID);
-//            mGroupMode = args.getInt(ARG_MODE, ReleaseGroupHelper.MODE_SHOPPING);
-//            if (comicsId != 0) {
-//                mComics = mDataManager.getComics(comicsId);
-//            }
-//        }
         if (savedInstanceState != null) {
             //recupero la modalità in precedenza e salvato alla chiusura dell'activity
             mGroupMode = savedInstanceState.getInt(STATE_GROUP_MODE, ReleaseGroupHelper.MODE_CALENDAR);
@@ -102,12 +90,6 @@ public class ReleaseListFragment extends AFragment implements ScrollToTopListene
             //recupero la modalità dalle preferenze
             SharedPreferences settings = getActivity().getSharedPreferences(MainActivity.PREFS_NAME, 0);
             mGroupMode = settings.getInt(STATE_GROUP_MODE, ReleaseGroupHelper.MODE_CALENDAR);
-//A0040
-//            //traccio quale vista è usata
-//            ComikkuApp.trackEvent(ComikkuApp.CATEGORY_UI,
-//                    ComikkuApp.ACTION_RELEASE_VIEW_START,
-//                    ComikkuApp.LABEL_RELEASE_VIEW,
-//                    mGroupMode);
         }
     }
 
@@ -115,7 +97,6 @@ public class ReleaseListFragment extends AFragment implements ScrollToTopListene
     public void onSaveInstanceState(Bundle savedInstanceState) {
         //salvo la modalità
         savedInstanceState.putInt(STATE_GROUP_MODE, mGroupMode);
-        //
         super.onSaveInstanceState(savedInstanceState);
     }
 
@@ -212,13 +193,6 @@ public class ReleaseListFragment extends AFragment implements ScrollToTopListene
                 if (menuId == R.id.action_release_delete) {
                     //sono già ordinati in ordine crescente
                     long[] ags = mListView.getCheckedItemIds();
-//A0040
-//                    Integer[] igs = new Integer[ags.length];
-//                    //ma ho bisogno di rimuoverli in ordine inverso
-//                    for (int ii = ags.length - 1, jj = 0; ii >= 0; ii--, jj++) {
-//                        igs[jj] = (int) ags[ii];
-//                    }
-//                    new RemoveReleasesAsyncTask().execute(igs);
                     //visto che l'adapter considera come id la posizione dell'elemento
                     //posso usare l'id come posizione per rimuoverli dall'adapter
                     for (int ii = ags.length - 1; ii >= 0; ii--) {
@@ -249,8 +223,10 @@ public class ReleaseListFragment extends AFragment implements ScrollToTopListene
                     long[] ags = mListView.getCheckedItemIds();
                     ReleaseInfo ri = (ReleaseInfo) mAdapter.getItem((int) ags[0]);
                     Comics comics = dataManager.getComics(ri.getRelease().getComicsId());
-                    String query = Utils.join(" ", true, comics.getName(), comics.getAuthors(),
-                            comics.getPublisher());
+//                    String query = Utils.join(" ", true, comics.getName(), comics.getAuthors(),
+//                            comics.getPublisher());
+                    String query = Utils.join(" ", true, comics.getPublisher(),
+                            comics.getName(), "" + ri.getRelease().getNumber());
                     Intent intent = new Intent(Intent.ACTION_WEB_SEARCH);
                     intent.putExtra(SearchManager.QUERY, query);
                     startActivity(intent);
@@ -295,10 +271,6 @@ public class ReleaseListFragment extends AFragment implements ScrollToTopListene
                 if (comicsId != ReleaseEditorActivity.COMICS_ID_NONE) {
                     dataManager.updateBestRelease(comicsId);
                     dataManager.notifyChanged(DataManager.CAUSE_RELEASE_CHANGED);
-                    //A0056
-//                    //A0049
-//                    final int releaseNumber = data.getIntExtra(ReleaseEditorActivity.EXTRA_RELEASE_NUMBER, DataManager.NO_RELEASE);
-//                    dataManager.updateData(DataManager.ACTION_UPD, comicsId, releaseNumber);
                 }
             }
         }
@@ -325,34 +297,16 @@ public class ReleaseListFragment extends AFragment implements ScrollToTopListene
             mGroupMode = ReleaseGroupHelper.MODE_CALENDAR;
             getDataManager().notifyChanged(DataManager.CAUSE_RELEASES_MODE_CHANGED);
             getActivity().invalidateOptionsMenu();
-//A0040
-//            //traccio quale vista è usata
-//            ComikkuApp.trackEvent(ComikkuApp.CATEGORY_UI,
-//                    ComikkuApp.ACTION_RELEASE_VIEW_CHANGED,
-//                    ComikkuApp.LABEL_RELEASE_VIEW,
-//                    mGroupMode);
             return true;
         } else if (id == R.id.action_releases_mode_shopping) {
             mGroupMode = ReleaseGroupHelper.MODE_SHOPPING;
             getDataManager().notifyChanged(DataManager.CAUSE_RELEASES_MODE_CHANGED);
             getActivity().invalidateOptionsMenu();
-//A0040
-//            //traccio quale vista è usata
-//            ComikkuApp.trackEvent(ComikkuApp.CATEGORY_UI,
-//                    ComikkuApp.ACTION_RELEASE_VIEW_CHANGED,
-//                    ComikkuApp.LABEL_RELEASE_VIEW,
-//                    mGroupMode);
             return true;
         } else if (id == R.id.action_releases_mode_law) {
             mGroupMode = ReleaseGroupHelper.MODE_LAW;
             getDataManager().notifyChanged(DataManager.CAUSE_RELEASES_MODE_CHANGED);
             getActivity().invalidateOptionsMenu();
-//A0040
-//            //traccio quale vista è usata
-//            ComikkuApp.trackEvent(ComikkuApp.CATEGORY_UI,
-//                    ComikkuApp.ACTION_RELEASE_VIEW_CHANGED,
-//                    ComikkuApp.LABEL_RELEASE_VIEW,
-//                    mGroupMode);
             return true;
         }
         //
@@ -483,102 +437,5 @@ public class ReleaseListFragment extends AFragment implements ScrollToTopListene
             mListView.smoothScrollToPosition(0);
         }
     }
-
-//    private void loadComicsBackground() {
-////        //TODO A0024 recuperare l'immagine associata al comics
-////        //getView().setBackground(Utils.convertToGrayscale(getResources().getDrawable(R.drawable.bck_detail)));
-////        //getView().setBackground(getResources().getDrawable(R.drawable.bck_detail));
-////        Context context = getActivity();
-////        Glide.with(context).load(R.drawable.bck_detail)
-////                .bitmapTransform(
-////                        new GrayscaleTransformation(context),
-//////                        new BlurTransformation(context, 12, 2),
-////                        new ColorFilterTransformation(context, Color.parseColor("#AAFFFFFF"))
-////                )
-////                .into(new SimpleTarget<GlideDrawable>() {
-////                    @Override
-////                    public void onResourceReady(GlideDrawable resource, GlideAnimation<? super GlideDrawable> glideAnimation) {
-////                        getView().setBackground(resource);
-////                    }
-////                });
-//
-//        final Context context = getActivity();
-//        final Uri backgroundUri = Uri.fromFile(FileHelper.getExternalFile(context, "20140712_153945.jpg"));
-//        new AsyncTask<Uri, Void, DrawableRequestBuilder<Uri>>() {
-//            @Override
-//            protected DrawableRequestBuilder<Uri> doInBackground(Uri... params) {
-//                return
-//                        Glide.with(context).load(params[0])
-//                                .bitmapTransform(
-//                                        new CenterCrop(context),
-//                                        new GrayscaleTransformation(context),
-////                        new BlurTransformation(this, 12, 2),
-//                                        new ColorFilterTransformation(context, Color.parseColor("#AAFFFFFF"))
-//                                );
-//            }
-//
-//            @Override
-//            protected void onPostExecute(DrawableRequestBuilder<Uri> integerDrawableRequestBuilder) {
-//                integerDrawableRequestBuilder.into(new SimpleTarget<GlideDrawable>() {
-//                    @Override
-//                    public void onResourceReady(GlideDrawable resource, GlideAnimation<? super GlideDrawable> glideAnimation) {
-//                        getView().setBackground(resource);
-//                    }
-//                });
-//            }
-//        }.execute(backgroundUri);
-//    }
-
-
-//A0040 sembra provocare un crash della VM per qualche strana ragione
-//    /**
-//     * Task asincrono per la lettura dei dati
-//     */
-//    private class ReadReleasesAsyncTask extends AsyncTask<Void, Release, Integer> {
-//        @Override
-//        protected Integer doInBackground(Void... params) {
-//            //TODO settings -> che schifo! rivedere dove leggere le preferenze
-//            SharedPreferences sharedPref = PreferenceManager.getDefaultSharedPreferences(getActivity());
-//            mGroupByMonth = sharedPref.getBoolean(SettingsActivity.KEY_PREF_GROUP_BY_MONTH, false);
-//            mWeekStartOnMonday = sharedPref.getBoolean(SettingsActivity.KEY_PREF_WEEK_START_ON_MONDAY, false);
-//
-//            return mAdapter.refresh(mComics,
-//                    mGroupMode,
-//                    mGroupByMonth,
-//                    mWeekStartOnMonday);
-//        }
-//
-//        @Override
-//        protected void onPostExecute(Integer result) {
-//            Utils.d("ReadReleasesAsyncTask " + result);
-//            mAdapter.notifyDataSetInvalidated();
-//        }
-//    }
-
-//A0040
-//    /**
-//     * Task asincrono per la rimoazione dei dati
-//     */
-//    private class RemoveReleasesAsyncTask extends AsyncTask<Integer, Integer, Integer> {
-//        @Override
-//        protected Integer doInBackground(Integer... params) {
-//            for (Integer position : params) {
-//                publishProgress(position);
-//            }
-//            return params.length;
-//        }
-//
-//        @Override
-//        protected void onProgressUpdate(Integer... values) {
-//            //boolean res =
-//            ReleaseListFragment.this.mAdapter.remove(values[0]);
-//            //Utils.d("delete release " + values[0] + " -> " + res);
-//        }
-//
-//        @Override
-//        protected void onPostExecute(Integer integer) {
-//            ReleaseListFragment.this.getDataManager().notifyChanged(DataManager.CAUSE_RELEASE_REMOVED);
-//        }
-//    }
 
 }

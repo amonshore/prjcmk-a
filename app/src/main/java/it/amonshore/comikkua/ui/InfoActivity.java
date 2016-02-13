@@ -10,11 +10,15 @@ import com.evernote.android.job.JobManager;
 import com.evernote.android.job.JobRequest;
 
 import java.text.DateFormat;
+import java.util.Comparator;
 import java.util.Date;
-import java.util.Set;
+import java.util.Locale;
+import java.util.SortedSet;
+import java.util.TreeSet;
 
 import it.amonshore.comikkua.BuildConfig;
 import it.amonshore.comikkua.R;
+import it.amonshore.comikkua.Utils;
 import it.amonshore.comikkua.data.DataManager;
 import it.amonshore.comikkua.reminder.ReleaseReminderJob;
 
@@ -28,22 +32,29 @@ public class InfoActivity extends ActionBarActivity {
         super.onCreate(savedInstanceState);
         setContentView(R.layout.activity_info);
         //Toolbar
-        Toolbar toolbar = (Toolbar)findViewById(R.id.toolbar_actionbar);
+        final Toolbar toolbar = (Toolbar)findViewById(R.id.toolbar_actionbar);
         setSupportActionBar(toolbar);
         getSupportActionBar().setDisplayHomeAsUpEnabled(true);
         //
-        ArrayAdapter<String> adapter = new ArrayAdapter<>(this,
+        final ArrayAdapter<String> adapter = new ArrayAdapter<>(this,
                 android.R.layout.simple_list_item_1);
-        adapter.add(String.format("Version: %s (%s)", BuildConfig.VERSION_NAME, BuildConfig.VERSION_CODE));
-        adapter.add("Author: narsenico");
-        adapter.add("Comics count: " + DataManager.getDataManager().getComics().size());
+        adapter.add(getString(R.string.info_version, BuildConfig.VERSION_NAME, BuildConfig.VERSION_CODE));
+        adapter.add(getString(R.string.info_author, "narsenico"));
 
         if (BuildConfig.DEBUG) {
-            final Set<JobRequest> jobRequests = JobManager.instance().getAllJobRequestsForTag(ReleaseReminderJob.TAG);
+            adapter.add("Locale: " + Locale.getDefault().getCountry() + " - " + Locale.getDefault().getISO3Country());
+            adapter.add("Comics count: " + DataManager.getDataManager().getComics().size());
+            final SortedSet<JobRequest> jobRequests = new TreeSet<>(new Comparator<JobRequest>() {
+                @Override
+                public int compare(JobRequest lhs, JobRequest rhs) {
+                    return lhs.getStartMs() - rhs.getStartMs() <= 0 ? -1 : 1;
+                }
+            });
+            jobRequests.addAll(JobManager.instance().getAllJobRequestsForTag(ReleaseReminderJob.TAG));
             adapter.add("Reminder count: " + jobRequests.size());
-            DateFormat dateFormat = DateFormat.getDateTimeInstance();
+            final DateFormat dateFormat = DateFormat.getDateTimeInstance();
             for (JobRequest req : jobRequests) {
-                Date date = new Date(System.currentTimeMillis() + req.getStartMs());
+                final Date date = new Date(System.currentTimeMillis() + req.getStartMs());
                 adapter.add(String.format("id: %s when: %s", req.getJobId(), dateFormat.format(date)));
             }
         }
