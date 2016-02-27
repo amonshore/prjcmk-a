@@ -6,7 +6,6 @@ import android.preference.PreferenceManager;
 import android.support.v4.view.ViewPager;
 import android.os.Bundle;
 import android.support.v7.app.AppCompatActivity;
-import android.support.v7.widget.SearchView;
 import android.support.v7.widget.Toolbar;
 import android.view.Menu;
 import android.view.MenuItem;
@@ -32,8 +31,6 @@ public class MainActivity extends AppCompatActivity implements ComicsObserver {
     private DataManager mDataManager;
     //salvo la page/fragment precedente
     private int mPreviousPage;
-    //A0061
-    private RxSearchViewQueryTextListener mOnQueryTextListener;
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
@@ -88,19 +85,6 @@ public class MainActivity extends AppCompatActivity implements ComicsObserver {
             }
         });
         slidingTabLayout.setViewPager(viewPager);
-        //A0061
-        mOnQueryTextListener = RxSearchViewQueryTextListener
-                .create()
-                .setOnQueryListener(new RxSearchViewQueryTextListener.OnQueryListener() {
-
-                    @Override
-                    public void onQuery(String query) {
-                        Utils.d("A0061", "onQuery " + query + " " + Utils.isMainThread());
-
-                        mDataManager.setComicsFilter(query);
-                        mDataManager.notifyChanged(DataManager.CAUSE_COMICS_FILTERED | DataManager.CAUSE_LOADING);
-                    }
-                });
     }
 
     @Override
@@ -131,8 +115,6 @@ public class MainActivity extends AppCompatActivity implements ComicsObserver {
     @Override
     protected void onDestroy() {
         super.onDestroy();
-        //A0061
-        mOnQueryTextListener.unbind();
         Utils.d(this.getClass(), "*********** MAIN onDestroy -> unregister observer and stop WH");
         mDataManager.unregisterObserver(this);
         mDataManager.stopWriteHandler();
@@ -142,22 +124,6 @@ public class MainActivity extends AppCompatActivity implements ComicsObserver {
     public boolean onCreateOptionsMenu(Menu menu) {
         // Inflate the menu; this adds items to the action bar if it is present.
         getMenuInflater().inflate(R.menu.menu_main, menu);
-
-        //A0061
-        final MenuItem menuItem = menu.findItem(R.id.action_search);
-        final SearchView searchView = (SearchView) menuItem.getActionView();
-        // associo la view al listener e bindo gli eventi
-        mOnQueryTextListener
-                .listenOn(searchView)
-                .bind();
-        // se i comics sono filtrati apro la searchview e imposto il filtro
-        // ma solo nel fragment dei comics
-        if (!Utils.isNullOrEmpty(mDataManager.getComicsFilter()) &&
-                mPreviousPage == TabPageAdapter.PAGE_COMICS) {
-            menuItem.expandActionView();
-            // non ho bisogno di rieseguire la query perché i fumetti dovrebbero essere già filtrati
-            searchView.setQuery(mDataManager.getComicsFilter(), false);
-        }
 
         return true;
     }

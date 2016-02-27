@@ -41,7 +41,7 @@
     <string name="release_removed">Release removed</string>
     <string name="also_releases">Also: %1s</string>
     <string name="cancel">Cancel</string>
-    <string name="search_hint">Type a comic name</string>
+    <string name="search_hint">Search comics...</string>
 
     <string name="comics_empty_list">You have no comics</string>
     <string name="release_empty_list">You have no releases</string>

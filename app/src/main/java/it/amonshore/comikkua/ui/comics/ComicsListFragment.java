@@ -2,10 +2,14 @@ package it.amonshore.comikkua.ui.comics;
 
 import android.app.Activity;
 import android.app.SearchManager;
+import android.content.Context;
 import android.content.Intent;
+import android.content.SearchRecentSuggestionsProvider;
 import android.content.SharedPreferences;
 import android.os.Bundle;
 import android.os.Handler;
+import android.provider.SearchRecentSuggestions;
+import android.support.v7.widget.SearchView;
 import android.view.ActionMode;
 import android.view.LayoutInflater;
 import android.view.Menu;
@@ -31,13 +35,10 @@ import it.amonshore.comikkua.data.DataManager;
 import it.amonshore.comikkua.data.UndoHelper;
 import it.amonshore.comikkua.ui.AFragment;
 import it.amonshore.comikkua.ui.MainActivity;
+import it.amonshore.comikkua.ui.RxSearchViewQueryTextListener;
 import it.amonshore.comikkua.ui.ScrollToTopListener;
-import rx.Observable;
-import rx.Subscriber;
-import rx.android.schedulers.AndroidSchedulers;
-import rx.functions.Func0;
-import rx.functions.Func1;
-import rx.schedulers.Schedulers;
+import it.amonshore.comikkua.ui.SearchSuggestionProvider;
+
 
 /**
  * A fragment representing a list of Items.
@@ -55,6 +56,9 @@ public class ComicsListFragment extends AFragment implements ScrollToTopListener
     private ComicsListAdapter mAdapter;
     private ActionMode mActionMode;
     private FloatingActionButton mBtnAdd;
+    //A0061
+    private DataManager mDataManager;
+    private RxSearchViewQueryTextListener mOnQueryTextListener;
 
     @Override
     public void onCreate(Bundle savedInstanceState) {
@@ -72,6 +76,21 @@ public class ComicsListFragment extends AFragment implements ScrollToTopListener
             order = settings.getInt(STATE_ORDER, ComicsListAdapter.ORDER_BY_NAME);
         }
         mAdapter = new ComicsListAdapter(getActivity().getApplicationContext(), order);
+        //A0061
+        mDataManager = DataManager.getDataManager();
+        mOnQueryTextListener = RxSearchViewQueryTextListener
+                .create()
+                .provideSuggestions(SearchSuggestionProvider.AUTHORITY, SearchSuggestionProvider.MODE)
+                .setOnQueryListener(new RxSearchViewQueryTextListener.OnQueryListener() {
+
+                    @Override
+                    public void onQuery(String query) {
+                        Utils.d("A0061", "onQuery " + query + " " + Utils.isMainThread());
+
+                        mDataManager.setComicsFilter(query);
+                        mDataManager.notifyChanged(DataManager.CAUSE_COMICS_FILTERED | DataManager.CAUSE_LOADING);
+                    }
+                });
     }
 
     @Override
@@ -207,8 +226,32 @@ public class ComicsListFragment extends AFragment implements ScrollToTopListener
     }
 
     @Override
+    public void onDestroy() {
+        super.onDestroy();
+        //A0061
+        mOnQueryTextListener.unbind();
+    }
+
+    @Override
     public void onCreateOptionsMenu(Menu menu, MenuInflater inflater) {
         inflater.inflate(R.menu.menu_comics, menu);
+
+        //A0061
+        final MenuItem menuItem = menu.findItem(R.id.action_search);
+        final SearchView searchView = (SearchView) menuItem.getActionView();
+        final SearchManager searchManager = (SearchManager) this.getActivity().getSystemService(Context.SEARCH_SERVICE);
+        searchView.setSearchableInfo(searchManager.getSearchableInfo(this.getActivity().getComponentName()));
+
+        // associo la view al listener e bindo gli eventi
+        mOnQueryTextListener
+                .listenOn(searchView)
+                .bind();
+        // se i comics sono filtrati apro la searchview e imposto il filtro
+        if (!Utils.isNullOrEmpty(mDataManager.getComicsFilter())) {
+            menuItem.expandActionView();
+            // non ho bisogno di rieseguire la query perché i fumetti dovrebbero essere già filtrati
+            searchView.setQuery(mDataManager.getComicsFilter(), false);
+        }
     }
 
     @Override

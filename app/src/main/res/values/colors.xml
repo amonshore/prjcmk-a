@@ -94,4 +94,6 @@
     <!-- sfondo scuro -->
     <color name="comikku_background_dark">#222222</color>
 
+    <color name="comikku_popup_background">#E3F2FD</color>
+
 </resources>

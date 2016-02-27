@@ -641,7 +641,7 @@ public class DataManager extends Observable<ComicsObserver> {
         if (!TextUtils.equals(filter, mComicsFilter)) {
             mComicsFilter = filter;
             mApplyFilterAgain = true;
-            Utils.d("A0061", "setComicsFilter");
+            Utils.d("A0061", "setComicsFilter " + mComicsFilter);
         }
     }
 

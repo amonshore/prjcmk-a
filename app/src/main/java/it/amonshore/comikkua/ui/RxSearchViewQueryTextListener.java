@@ -1,5 +1,8 @@
 package it.amonshore.comikkua.ui;
 
+import android.app.SearchManager;
+import android.database.Cursor;
+import android.provider.SearchRecentSuggestions;
 import android.support.v7.widget.SearchView;
 
 import java.util.concurrent.TimeUnit;
@@ -10,7 +13,6 @@ import rx.Observable;
 import rx.Observer;
 import rx.Subscription;
 import rx.android.schedulers.AndroidSchedulers;
-import rx.functions.Func1;
 
 /**
  * Created by narsenico on 21/02/16.
@@ -18,6 +20,7 @@ import rx.functions.Func1;
  * RxSearchViewQueryTextListener
  *      .create()                   -> crea nuova istanza
  *      .setOnQueryListener(...)    -> imposta listener eventi
+ *      .provideSuggestions(...)    -> suggerimenti
  *      .listenOn(...)              -> SearchView da ascoltare
  *      .bind()                     -> attiva collegamenti
  *
@@ -29,6 +32,9 @@ public class RxSearchViewQueryTextListener {
     private Observable<String> mObservable;
     private Subscription mSubscription;
     private OnQueryListener mListener;
+    private String mSuggestionAurhority;
+    private int mSuggestionMode;
+    private SearchRecentSuggestions mSearchRecentSuggestions;
 
     private RxSearchViewQueryTextListener() {
         mEventBus = new RxBus<>();
@@ -43,11 +49,37 @@ public class RxSearchViewQueryTextListener {
         return new RxSearchViewQueryTextListener();
     }
 
-    public RxSearchViewQueryTextListener listenOn(SearchView searchView) {
+    public RxSearchViewQueryTextListener provideSuggestions(String authority, int mode) {
+        mSuggestionAurhority = authority;
+        mSuggestionMode = mode;
+
+        return this;
+    }
+
+    public RxSearchViewQueryTextListener listenOn(final SearchView searchView) {
+        if (!Utils.isNullOrEmpty(mSuggestionAurhority)) {
+            mSearchRecentSuggestions = new SearchRecentSuggestions(searchView.getContext(),
+                    mSuggestionAurhority, mSuggestionMode);
+            searchView.setOnSuggestionListener(new SearchView.OnSuggestionListener() {
+                @Override
+                public boolean onSuggestionSelect(int position) {
+                    return true;
+                }
+
+                @Override
+                public boolean onSuggestionClick(int position) {
+                    // recupero il suggerimento selezionato ed eseguo la query
+                    Cursor cursor = (Cursor) searchView.getSuggestionsAdapter().getItem(position);
+                    int indexColumnSuggestion = cursor.getColumnIndex( SearchManager.SUGGEST_COLUMN_TEXT_1 );
+                    searchView.setQuery(cursor.getString(indexColumnSuggestion), false);
+                    return true;
+                }
+            });
+        }
         searchView.setOnQueryTextListener(new SearchView.OnQueryTextListener() {
             @Override
             public boolean onQueryTextSubmit(String query) {
-                Utils.d("A0061", "onQueryTextSubmit " + query);
+//                Utils.d("A0061", "onQueryTextSubmit " + query);
                 mEventBus.send(query);
                 return true;
             }
@@ -87,6 +119,10 @@ public class RxSearchViewQueryTextListener {
 
                     @Override
                     public void onNext(String s) {
+                        if (mSearchRecentSuggestions != null) {
+                            mSearchRecentSuggestions.saveRecentQuery(s, "prova prova");
+                        }
+
                         mListener.onQuery(s);
                     }
                 });
@@ -103,7 +139,6 @@ public class RxSearchViewQueryTextListener {
         return this;
     }
 
-    // TODO: gestire eventi per "chiusura search view" e query vuota
     public interface OnQueryListener {
 
         void onQuery(String query);

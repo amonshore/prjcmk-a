@@ -44,6 +44,10 @@
         <!-- Colore di sfondo dell'action mode -->
         <item name="actionModeBackground">@color/comikku_primary_color_dark</item>
         <item name="android:actionModeBackground">@color/comikku_primary_color_dark</item>
+
+        <!-- Stile search view -->
+        <item name="autoCompleteTextViewStyle">@style/DefaultAutoCompleteTextViewStyle</item>
+        <item name="android:autoCompleteTextViewStyle">@style/DefaultAutoCompleteTextViewStyle</item>
     </style>
 
     <!-- Toolbar -->
@@ -55,6 +59,12 @@
 
     <style name="DefaultToolbarTitle" parent="@style/TextAppearance.Widget.AppCompat.Toolbar.Title">
         <item name="android:textSize">20sp</item>
+    </style>
+
+    <!-- SearchView -->
+    <style name="DefaultAutoCompleteTextViewStyle" parent="@style/Widget.AppCompat.Light.AutoCompleteTextView">
+        <!--<item name="android:popupBackground">@color/comikku_popup_background</item>-->
+        <!--<item name="android:textColor">@color/comikku_background_dark</item>-->
     </style>
 
 </resources>

@@ -74,22 +74,6 @@ class ComicsListAdapter extends BaseAdapter implements SectionIndexer {
         }
     }
 
-//    /**
-//     *
-//     * @param id
-//     * @return
-//     */
-//    public boolean remove(long id) {
-//        // TODO: non mi piace per niente, non dovrebbe essere fatto qua la rimozione dal DataManager
-//        if (mDataManager.remove(id)) {
-//            mSortedIds.remove(id);
-//            prepareFastScrollSections();
-//            return true;
-//        } else {
-//            return false;
-//        }
-//    }
-
     /**
      *
      * @return
