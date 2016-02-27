@@ -53,6 +53,7 @@ class ReleaseListAdapter extends BaseAdapter implements StickyListHeadersAdapter
      * @return
      */
     public boolean remove(int position) {
+        // TODO: non mi piace per niente, non dovrebbe essere fatto qua la rimozione dal DataManager
         ReleaseInfo ri = (ReleaseInfo)getItem(position);
         long comicsId = ri.getRelease().getComicsId();
         //A0041 se multi rimuovo tutte le release

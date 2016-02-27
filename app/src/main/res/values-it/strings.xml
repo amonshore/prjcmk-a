@@ -135,4 +135,5 @@
     <string name="notification_release_next_days">%1$tA, %1$tB %1$te</string>
     <string name="info_version">Versione: %1$s (%2$s)</string>
     <string name="info_author">Autore: %1$s</string>
+    <string name="periodicity_single">Volume unico</string>
 </resources>

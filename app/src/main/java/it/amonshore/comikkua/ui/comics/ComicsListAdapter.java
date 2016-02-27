@@ -74,20 +74,21 @@ class ComicsListAdapter extends BaseAdapter implements SectionIndexer {
         }
     }
 
-    /**
-     *
-     * @param id
-     * @return
-     */
-    public boolean remove(long id) {
-        if (mDataManager.remove(id)) {
-            mSortedIds.remove(id);
-            prepareFastScrollSections();
-            return true;
-        } else {
-            return false;
-        }
-    }
+//    /**
+//     *
+//     * @param id
+//     * @return
+//     */
+//    public boolean remove(long id) {
+//        // TODO: non mi piace per niente, non dovrebbe essere fatto qua la rimozione dal DataManager
+//        if (mDataManager.remove(id)) {
+//            mSortedIds.remove(id);
+//            prepareFastScrollSections();
+//            return true;
+//        } else {
+//            return false;
+//        }
+//    }
 
     /**
      *
@@ -95,7 +96,8 @@ class ComicsListAdapter extends BaseAdapter implements SectionIndexer {
      */
     public int refresh() {
         mSortedIds.clear();
-        mSortedIds.addAll(mDataManager.getComics());
+        //A0061 mSortedIds.addAll(mDataManager.getComics());
+        mSortedIds.addAll(mDataManager.getFilteredComics());
         Collections.sort(mSortedIds, mComparator);
         prepareFastScrollSections();
         return mSortedIds.size();

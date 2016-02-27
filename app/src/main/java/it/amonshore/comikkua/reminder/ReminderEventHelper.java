@@ -63,7 +63,9 @@ public class ReminderEventHelper extends AIncrementalStart {
                         }
                     })
                     //tengo un timeout volutamente alto perché tanto verranno aggiornati alla chiamata di stop()
-                    .debounce(1000, TimeUnit.MILLISECONDS)
+                    //A0061 portato da 1 a 2 sec altrimenti non ce la faceva durante il restore dei dati da file
+                    //  e se dovesse rallentare ancora all'aumentare dei dati???
+                    .debounce(2000, TimeUnit.MILLISECONDS)
                     .subscribe(new Subscriber<Integer>() {
 
                         @Override

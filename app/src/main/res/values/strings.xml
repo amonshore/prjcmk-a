@@ -7,6 +7,7 @@
     <!--<string name="action_share_data">Share data</string>-->
     <string name="action_save">Save</string>
     <string name="action_data_options">Data</string>
+    <string name="action_search">Search</string>
 
     <string name="action_comics_delete">Remove</string>
     <string name="action_comics_sort_by_name">Sort by name</string>
@@ -28,6 +29,7 @@
     <string name="title_activity_comics_detail">Comics detail</string>
     <string name="title_activity_info">Info</string>
     <string name="title_activity_data_options">Data</string>
+    <string name="title_activity_comics_search">Search</string>
 
     <string name="share">Share</string>
     <!--<string name="share_data">Share all data</string>-->
@@ -39,6 +41,7 @@
     <string name="release_removed">Release removed</string>
     <string name="also_releases">Also: %1s</string>
     <string name="cancel">Cancel</string>
+    <string name="search_hint">Type a comic name</string>
 
     <string name="comics_empty_list">You have no comics</string>
     <string name="release_empty_list">You have no releases</string>
@@ -128,6 +131,7 @@
 
     <!-- periodicity -->
     <string name="periodicity_unknown">Nothing</string>
+    <string name="periodicity_single">Single volume</string>
     <string name="periodicity_weekly">Weekly</string>
     <string name="periodicity_monthly">Monthly</string>
     <string name="periodicity_every_2_months">Every 2 months</string>
@@ -137,6 +141,7 @@
     <string name="periodicity_every_year">Every year</string>
     <string-array name="periodicity_value_array">
         <item>@string/periodicity_unknown</item>
+        <item>@string/periodicity_single</item>
         <item>@string/periodicity_weekly</item>
         <item>@string/periodicity_monthly</item>
         <item>@string/periodicity_every_2_months</item>

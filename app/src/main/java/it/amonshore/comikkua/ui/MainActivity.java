@@ -2,11 +2,11 @@ package it.amonshore.comikkua.ui;
 
 import android.content.Intent;
 import android.content.SharedPreferences;
-import android.os.Handler;
 import android.preference.PreferenceManager;
 import android.support.v4.view.ViewPager;
-import android.support.v7.app.ActionBarActivity;
 import android.os.Bundle;
+import android.support.v7.app.AppCompatActivity;
+import android.support.v7.widget.SearchView;
 import android.support.v7.widget.Toolbar;
 import android.view.Menu;
 import android.view.MenuItem;
@@ -24,7 +24,7 @@ import it.amonshore.comikkua.ui.release.ReleaseListFragment;
 /**
  * http://developer.android.com/training/implementing-navigation/lateral.html#tabs
  */
-public class MainActivity extends ActionBarActivity implements ComicsObserver {
+public class MainActivity extends AppCompatActivity implements ComicsObserver {
 
     public final static String PREFS_NAME = "ComikkuPrefs";
 
@@ -32,6 +32,8 @@ public class MainActivity extends ActionBarActivity implements ComicsObserver {
     private DataManager mDataManager;
     //salvo la page/fragment precedente
     private int mPreviousPage;
+    //A0061
+    private RxSearchViewQueryTextListener mOnQueryTextListener;
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
@@ -48,9 +50,6 @@ public class MainActivity extends ActionBarActivity implements ComicsObserver {
         //impsota i valori di default, il parametro false assicura che questo venga fatto una sola volta
         //  indipendentemente da quante volte viene chiamato il metodo
         PreferenceManager.setDefaultValues(this, R.xml.preferences, false);
-//        //registro il listerner per il cambiamento dei settings
-//        SharedPreferences prefs = PreferenceManager.getDefaultSharedPreferences(this);
-//        prefs.registerOnSharedPreferenceChangeListener(this);
         //Toolbar
         final Toolbar toolbar = (Toolbar)findViewById(R.id.toolbar_actionbar);
         setSupportActionBar(toolbar);
@@ -75,7 +74,7 @@ public class MainActivity extends ActionBarActivity implements ComicsObserver {
         slidingTabLayout.setOnPageChangeListener(new ViewPager.SimpleOnPageChangeListener() {
             @Override
             public void onPageSelected(int position) {
-                Utils.d("slidingTabLayout OnPageChangeListener " + mPreviousPage + " -> " + position);
+//                Utils.d("slidingTabLayout OnPageChangeListener " + mPreviousPage + " -> " + position);
                 if (mPreviousPage != position) {
                     //chiudo l'ActionBar contestuale del fragment precedente
                     ((AFragment) mTabPageAdapter.getItem(mPreviousPage)).finishActionMode();
@@ -89,45 +88,52 @@ public class MainActivity extends ActionBarActivity implements ComicsObserver {
             }
         });
         slidingTabLayout.setViewPager(viewPager);
-    }
+        //A0061
+        mOnQueryTextListener = RxSearchViewQueryTextListener
+                .create()
+                .setOnQueryListener(new RxSearchViewQueryTextListener.OnQueryListener() {
 
-    //spostato in DataManager
-//    @Override
-//    public void onSharedPreferenceChanged(SharedPreferences sharedPreferences, String key) {
-//        Utils.d("onSharedPreferenceChanged " + key + " " + sharedPreferences.getBoolean(key, false));
-//        //A0046 aggiorno le best release di tutti i fumetti
-//        if (DataManager.KEY_PREF_LAST_PURCHASED.equals(key)) {
-//            mDataManager.updateBestRelease();
-//        }
-//    }
+                    @Override
+                    public void onQuery(String query) {
+                        Utils.d("A0061", "onQuery " + query + " " + Utils.isMainThread());
+
+                        mDataManager.setComicsFilter(query);
+                        mDataManager.notifyChanged(DataManager.CAUSE_COMICS_FILTERED | DataManager.CAUSE_LOADING);
+                    }
+                });
+    }
 
     @Override
     protected void onPostResume() {
         super.onPostResume();
+        //A0061 non nserve più ricaricare i dati al resume
+        // se ne occupa DataManager stando in ascolto sui cambiamenti delle preferenze
         //A0040 new ReadDataAsyncTask().execute();
-        Handler mh = new Handler(getMainLooper());
-        Runnable runnable = new Runnable() {
-            @Override
-            public void run() {
-                try {
-                    mDataManager.readComics();
-                    //forzo l'aggiornamento del titolo della tab
-                    onChanged(DataManager.CAUSE_RELEASES_MODE_CHANGED);
-                    mDataManager.notifyChanged(DataManager.CAUSE_LOADING);
-                } catch (Exception ex) {
-                    Utils.e("A0040 read comics", ex);
-                }
-            }
-        };
-        mh.post(runnable);
+//        Handler mh = new Handler(getMainLooper());
+//        Runnable runnable = new Runnable() {
+//            @Override
+//            public void run() {
+//                try {
+//                    mDataManager.readComics();
+//                    //forzo l'aggiornamento del titolo della tab
+//                    onChanged(DataManager.CAUSE_RELEASES_MODE_CHANGED);
+//                    mDataManager.notifyChanged(DataManager.CAUSE_LOADING);
+//                } catch (Exception ex) {
+//                    Utils.e("A0040 read comics", ex);
+//                }
+//            }
+//        };
+//        mh.post(runnable);
+        onChanged(DataManager.CAUSE_RELEASES_MODE_CHANGED);
+        Utils.d("A0061", "onPostResume");
     }
 
     @Override
     protected void onDestroy() {
         super.onDestroy();
+        //A0061
+        mOnQueryTextListener.unbind();
         Utils.d(this.getClass(), "*********** MAIN onDestroy -> unregister observer and stop WH");
-//        SharedPreferences prefs = PreferenceManager.getDefaultSharedPreferences(this);
-//        prefs.unregisterOnSharedPreferenceChangeListener(this);
         mDataManager.unregisterObserver(this);
         mDataManager.stopWriteHandler();
     }
@@ -136,6 +142,23 @@ public class MainActivity extends ActionBarActivity implements ComicsObserver {
     public boolean onCreateOptionsMenu(Menu menu) {
         // Inflate the menu; this adds items to the action bar if it is present.
         getMenuInflater().inflate(R.menu.menu_main, menu);
+
+        //A0061
+        final MenuItem menuItem = menu.findItem(R.id.action_search);
+        final SearchView searchView = (SearchView) menuItem.getActionView();
+        // associo la view al listener e bindo gli eventi
+        mOnQueryTextListener
+                .listenOn(searchView)
+                .bind();
+        // se i comics sono filtrati apro la searchview e imposto il filtro
+        // ma solo nel fragment dei comics
+        if (!Utils.isNullOrEmpty(mDataManager.getComicsFilter()) &&
+                mPreviousPage == TabPageAdapter.PAGE_COMICS) {
+            menuItem.expandActionView();
+            // non ho bisogno di rieseguire la query perché i fumetti dovrebbero essere già filtrati
+            searchView.setQuery(mDataManager.getComicsFilter(), false);
+        }
+
         return true;
     }
 
@@ -164,11 +187,26 @@ public class MainActivity extends ActionBarActivity implements ComicsObserver {
         return super.onOptionsItemSelected(item);
     }
 
+    //A0061 serve ancora a qualcosa?
+//    @Override
+//    protected void onNewIntent(Intent intent) {
+////        super.onNewIntent(intent);
+//        //A0061 filtro fumetti
+//        if (Intent.ACTION_SEARCH.equals(intent.getAction())) {
+//            final String query = intent.getStringExtra(SearchManager.QUERY);
+//            Utils.d("A0061", "ACTION_SEARCH " + query);
+//
+//            final ComicsListFragment fragment = (ComicsListFragment)mTabPageAdapter.getItem(TabPageAdapter.PAGE_COMICS);
+//            fragment.setFilter(query.toUpperCase());
+//            mDataManager.notifyChanged(DataManager.CAUSE_COMICS_FILTERED | DataManager.CAUSE_PAGE_CHANGED);
+//        }
+//    }
+
     @Override
     public void onChanged(int cause) {
         switch (cause) {
             case DataManager.CAUSE_RELEASES_MODE_CHANGED:
-                ReleaseListFragment fragment = (ReleaseListFragment)mTabPageAdapter.getItem(1);
+                ReleaseListFragment fragment = (ReleaseListFragment)mTabPageAdapter.getItem(TabPageAdapter.PAGE_RELEASES);
                 SlidingTabLayout slidingTabLayout = (SlidingTabLayout) findViewById(R.id.sliding_tabs);
                 int groupMode = fragment.getGroupMode();
                 if (groupMode == 0) {
@@ -177,16 +215,16 @@ public class MainActivity extends ActionBarActivity implements ComicsObserver {
                 }
                 switch (groupMode) {
                     case ReleaseGroupHelper.MODE_LAW:
-                        slidingTabLayout.setPageTitle(1, getString(R.string.title_page_wishlist));
+                        slidingTabLayout.setPageTitle(TabPageAdapter.PAGE_RELEASES, getString(R.string.title_page_wishlist));
                         break;
                     case ReleaseGroupHelper.MODE_CALENDAR:
-                        slidingTabLayout.setPageTitle(1, getString(R.string.title_page_calendar));
+                        slidingTabLayout.setPageTitle(TabPageAdapter.PAGE_RELEASES, getString(R.string.title_page_calendar));
                         break;
                     case ReleaseGroupHelper.MODE_SHOPPING:
-                        slidingTabLayout.setPageTitle(1, getString(R.string.title_page_shopping));
+                        slidingTabLayout.setPageTitle(TabPageAdapter.PAGE_RELEASES, getString(R.string.title_page_shopping));
                         break;
                     default:
-                        slidingTabLayout.setPageTitle(1, getString(R.string.title_page_releases));
+                        slidingTabLayout.setPageTitle(TabPageAdapter.PAGE_RELEASES, getString(R.string.title_page_releases));
                         break;
                 }
                 break;
@@ -199,26 +237,5 @@ public class MainActivity extends ActionBarActivity implements ComicsObserver {
                 break;
         }
     }
-
-//    A0040
-//    /**
-//     * Task asincrono per la lettura dei dati
-//     */
-//    private class ReadDataAsyncTask extends AsyncTask<Void, Comics, Integer> {
-//        @Override
-//        protected Integer doInBackground(Void... params) {
-//            Utils.d(this.getClass(), "readComics");
-//            MainActivity.this.mDataManager.readComics();
-//            return DataManager.CAUSE_LOADING;
-//        }
-//
-//        @Override
-//        protected void onPostExecute(Integer result) {
-//            //forzo l'aggiornamento del titolo della tab
-//            MainActivity.this.onChanged(DataManager.CAUSE_RELEASES_MODE_CHANGED);
-//            //
-//            MainActivity.this.mDataManager.notifyChanged(result);
-//        }
-//    }
 
 }

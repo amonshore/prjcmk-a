@@ -19,6 +19,9 @@ import it.amonshore.comikkua.ui.release.ReleaseListFragment;
  */
 class TabPageAdapter extends FragmentStatePagerAdapter {
 
+    public final static int PAGE_COMICS = 0;
+    public final static int PAGE_RELEASES = 1;
+
     private final Context mContext;
     private final ArrayList<AFragment> mPages;
 
@@ -69,7 +72,7 @@ class TabPageAdapter extends FragmentStatePagerAdapter {
 
     @Override
     public CharSequence getPageTitle(int position) {
-        if (position == 0) {
+        if (position == PAGE_COMICS) {
             return mContext.getString(R.string.title_page_comics);
 //        } else if (position == 1) {
 //            return mContext.getString(R.string.title_page_calendar);

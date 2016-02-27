@@ -32,6 +32,12 @@ import it.amonshore.comikkua.data.UndoHelper;
 import it.amonshore.comikkua.ui.AFragment;
 import it.amonshore.comikkua.ui.MainActivity;
 import it.amonshore.comikkua.ui.ScrollToTopListener;
+import rx.Observable;
+import rx.Subscriber;
+import rx.android.schedulers.AndroidSchedulers;
+import rx.functions.Func0;
+import rx.functions.Func1;
+import rx.schedulers.Schedulers;
 
 /**
  * A fragment representing a list of Items.
@@ -137,17 +143,15 @@ public class ComicsListFragment extends AFragment implements ScrollToTopListener
                 long menuId = item.getItemId();
                 if (menuId == R.id.action_comics_delete) {
                     long[] ags = mListView.getCheckedItemIds();
-//A0040
-//                    Long[] lgs = new Long[ags.length];
-//                    for (int ii = 0; ii < ags.length; ii++) {
-//                        lgs[ii] = ags[ii];
-//                    }
-//                    new RemoveComicsAsyncTask().execute(lgs);
                     for (int ii = ags.length - 1; ii >= 0; ii--) {
-                        mAdapter.remove(ags[ii]);
-                        //A0049
-                        dataManager.updateData(DataManager.ACTION_DEL, ags[ii], DataManager.NO_RELEASE);
+                        // TODO: rimuovere con DataManager e non con l'adapter
+//                        mAdapter.remove(ags[ii]);
+                        if (dataManager.remove(ags[ii])) {
+                            //A0049
+                            dataManager.updateData(DataManager.ACTION_DEL, ags[ii], DataManager.NO_RELEASE);
+                        }
                     }
+                    mAdapter.refresh();
                     dataManager.notifyChanged(DataManager.CAUSE_COMICS_REMOVED);
                     finishActionMode();
                     return true;
@@ -164,7 +168,7 @@ public class ComicsListFragment extends AFragment implements ScrollToTopListener
                     sendIntent.setType("text/plain");
                     startActivity(Intent.createChooser(sendIntent, getResources().getText(R.string.share)));
                     return true;
-                } else if (menuId == R.id.action_comics_search) {
+                } else if (menuId == R.id.action_comics_web_search) {
                     //A0042 cerco solo il primo elemento selezionato
                     Comics comics = getDataManager().getComics(mListView.getCheckedItemIds()[0]);
                     String query = Utils.join(" ", true, comics.getName(), comics.getAuthors(),
@@ -248,7 +252,8 @@ public class ComicsListFragment extends AFragment implements ScrollToTopListener
             mAdapter.notifyDataSetChanged();
             final DataManager dataManager = DataManager.getDataManager();
             final long comicsId = data.getLongExtra(ComicsEditorActivity.EXTRA_COMICS_ID, DataManager.NO_COMICS);
-            dataManager.notifyChangedButMe(DataManager.CAUSE_COMICS_CHANGED, this);
+            //A0061 dataManager.notifyChangedButMe(DataManager.CAUSE_COMICS_CHANGED, this);
+            dataManager.notifyChanged(DataManager.CAUSE_COMICS_CHANGED);
             //A0056
             //A0049
 //            dataManager.updateData(DataManager.ACTION_ADD, comicsId, DataManager.NO_RELEASE);
@@ -329,33 +334,31 @@ public class ComicsListFragment extends AFragment implements ScrollToTopListener
 
                             }),
                     getActivity());
-        } else
-        //se la causa è la modifica dela modalità di visualizzazione delle release non mi ineressa
-        if (cause != DataManager.CAUSE_RELEASES_MODE_CHANGED) {
+        } else if (cause != DataManager.CAUSE_RELEASES_MODE_CHANGED &&
+                ((cause & DataManager.CAUSE_PAGE_CHANGED) != DataManager.CAUSE_PAGE_CHANGED || mAdapter.isEmpty())) {
+            //se la causa è la modifica della modalità di visualizzazione delle release non mi ineressa
             //se la causa è il cambio pagina aggiorno i dati solo se l'adapter è vuoto
-            if ((cause & DataManager.CAUSE_PAGE_CHANGED) != DataManager.CAUSE_PAGE_CHANGED || mAdapter.isEmpty()) {
-                //A0040 new UpdateListAsyncTask().execute();
-                Handler mh = new Handler(getActivity().getMainLooper());
-                Runnable runnable = new Runnable() {
-                    @Override
-                    public void run() {
-                        try {
-                            mAdapter.refresh();
-                            mAdapter.notifyDataSetChanged();
-                            if (mAdapter.getOrder() == ComicsListAdapter.ORDER_BY_NAME) {
-                                mListView.setFastScrollEnabled(true);
-                                mListView.setFastScrollAlwaysVisible(true);
-                            } else {
-                                mListView.setFastScrollEnabled(false);
-                                mListView.setFastScrollAlwaysVisible(false);
-                            }
-                        } catch (Exception ex) {
-                            Utils.e("A0040 update comics list", ex);
+            //A0040 new UpdateListAsyncTask().execute();
+            Handler mh = new Handler(getActivity().getMainLooper());
+            Runnable runnable = new Runnable() {
+                @Override
+                public void run() {
+                    try {
+                        mAdapter.refresh();
+                        mAdapter.notifyDataSetChanged();
+                        if (mAdapter.getOrder() == ComicsListAdapter.ORDER_BY_NAME) {
+                            mListView.setFastScrollEnabled(true);
+                            mListView.setFastScrollAlwaysVisible(true);
+                        } else {
+                            mListView.setFastScrollEnabled(false);
+                            mListView.setFastScrollAlwaysVisible(false);
                         }
+                    } catch (Exception ex) {
+                        Utils.e("A0040 update comics list", ex);
                     }
-                };
-                mh.post(runnable);
-            }
+                }
+            };
+            mh.post(runnable);
         }
     }
 

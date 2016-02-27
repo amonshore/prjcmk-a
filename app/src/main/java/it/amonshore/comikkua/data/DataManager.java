@@ -12,7 +12,9 @@ import com.evernote.android.job.JobManager;
 
 import java.io.File;
 import java.io.IOException;
+import java.util.ArrayList;
 import java.util.HashSet;
+import java.util.List;
 import java.util.Set;
 import java.util.TimeZone;
 import java.util.TreeMap;
@@ -23,6 +25,8 @@ import hirondelle.date4j.DateTime;
 import it.amonshore.comikkua.Utils;
 import it.amonshore.comikkua.reminder.ReleaseReminderJobCreator;
 import it.amonshore.comikkua.reminder.ReminderEventHelper;
+import rx.functions.Action1;
+import rx.functions.Func1;
 
 /**
  * Created by Narsenico on 07/05/2015.
@@ -53,6 +57,7 @@ public class DataManager extends Observable<ComicsObserver> {
     public static final int CAUSE_RELEASE_REMOVED = 1 << 10;
     public static final int CAUSE_RELEASES_MODE_CHANGED = 1 << 11;
     public static final int CAUSE_CREATED = 1 << 12; // 4096
+    public static final int CAUSE_COMICS_FILTERED = 1 << 13;
 
     public static final long NO_COMICS = -1;
     public static final int NO_RELEASE = -1;
@@ -144,7 +149,12 @@ public class DataManager extends Observable<ComicsObserver> {
             new SharedPreferences.OnSharedPreferenceChangeListener() {
                 @Override
                 public void onSharedPreferenceChanged(SharedPreferences sharedPreferences, String key) {
-                    if (KEY_PREF_LAST_PURCHASED.equals(key)) {
+                    if (KEY_PREF_LAST_PURCHASED.equals(key) ||
+                            KEY_PREF_GROUP_BY_MONTH.equals(key) ||
+                            KEY_PREF_WEEK_START_ON_MONDAY.equals(key)) { //A0061
+                        updateBestRelease();
+                        notifyChanged(CAUSE_LOADING);
+                    } else if (KEY_PREF_LAST_PURCHASED.equals(key)) {
                         updateBestRelease();
                     } else if (KEY_PREF_REMINDER.equals(key)) {
                         if (sharedPreferences.getBoolean(key, false)) {
@@ -302,9 +312,9 @@ public class DataManager extends Observable<ComicsObserver> {
      * @return  info sulla best release
      */
     public ReleaseInfo updateBestRelease(long id) {
-        Comics comics = getComics(id);
-        boolean showLastPurchased = mPreferences.getBoolean(KEY_PREF_LAST_PURCHASED, false);
-        ReleaseInfo ri = ComicsBestReleaseHelper.getComicsBestRelease(comics, showLastPurchased);
+        final Comics comics = getComics(id);
+        final boolean showLastPurchased = mPreferences.getBoolean(KEY_PREF_LAST_PURCHASED, false);
+        final ReleaseInfo ri = ComicsBestReleaseHelper.getComicsBestRelease(comics, showLastPurchased);
         mBestReleases.put(comics.getId(), ri);
         return ri;
     }
@@ -546,6 +556,8 @@ public class DataManager extends Observable<ComicsObserver> {
     public DataManager updateData(int action, long comicsId, int releaseNumber) {
         //se è un evento di tipo data lo invio al gestore degli eventi
         if ((action & ACTION_DATA) == ACTION_DATA) {
+            //A0061 occorre applicare nuovamente i filtri a causa della modifica dei dati
+            mApplyFilterAgain = true;
             mDataEventHelper.send(action, comicsId, releaseNumber);
         }
         //invio all'osservatore un nuovo evento da gestire indipendentemente dal tipo
@@ -614,6 +626,91 @@ public class DataManager extends Observable<ComicsObserver> {
         mPreferences.unregisterOnSharedPreferenceChangeListener(mSharedPreferenceChangeListener);
         unregisterAll();
         stopWriteHandler();
+    }
+
+    //A0061 gestione filtri
+    private Set<Long> mFilteredComics = new HashSet<>();
+    private String mComicsFilter = "";
+    private boolean mApplyFilterAgain = true;
+
+    public String getComicsFilter() {
+        return mComicsFilter;
+    }
+
+    public void setComicsFilter(String filter) {
+        if (!TextUtils.equals(filter, mComicsFilter)) {
+            mComicsFilter = filter;
+            mApplyFilterAgain = true;
+            Utils.d("A0061", "setComicsFilter");
+        }
+    }
+
+    public Set<Long> getFilteredComics() {
+        if (mApplyFilterAgain) {
+            Utils.d("A0061", "filter again");
+            filterComics(mComicsFilter);
+            mApplyFilterAgain = false;
+        }
+        return mFilteredComics;
+    }
+
+    private void filterComics(final String terms) {
+        mFilteredComics.clear();
+        if (Utils.isNullOrEmpty(terms)) {
+            // se i termini della ricerca sono vuoti considerare tutti i fumetti locali
+            mFilteredComics.addAll(getComics());
+        } else {
+            // TODO: usare .toUpperCase(Locale) per le maiuscole accentate?
+            final String[] aterms = terms.toLowerCase() // minuscolo
+//                    .replaceAll("\\b\\w{1,2}\\b", "") // elimino parole più piccole di 3 caratteri -> è un problema con le lingue orientali
+                    .trim().split("\\s"); // divido le parole
+
+            // lista dei fumetti locali già censiti
+            final rx.Observable<Comics> localComics = rx.Observable.from(getComics())
+                    .map(new Func1<Long, Comics>() {
+                        @Override
+                        public Comics call(Long aLong) {
+                            return getComics(aLong);
+                        }
+                    });
+            // TODO: lista dei fumetti remoti recuperati in precedenza
+            final rx.Observable<Comics> remoteComics = rx.Observable.from(new Long[0])
+                    .map(new Func1<Long, Comics>() {
+                        @Override
+                        public Comics call(Long aLong) {
+                            return null;
+                        }
+                    });
+            // unisco, filtro e rendo unici i fumetti
+            rx.Observable.merge(localComics, remoteComics)
+                    .filter(new Func1<Comics, Boolean>() {
+                        @Override
+                        public Boolean call(Comics comics) {
+                            final String sc = comics.getSearchableContent();
+                            for (final String term : aterms) {
+                                if (sc.indexOf(term) < 0) return false;
+                            }
+                            return true;
+                        }
+                    })
+                    .distinct(new Func1<Comics, Long>() {
+                        @Override
+                        public Long call(Comics comics) {
+                            // TODO: usare remoteId?
+                            return comics.getId();
+                        }
+                    })
+                    .subscribe(new Action1<Comics>() {
+                        @Override
+                        public void call(Comics comics) {
+                            Utils.d("A0061", "add " + comics.getName());
+                            mFilteredComics.add(comics.getId());
+                        }
+                    });
+
+            Utils.d("A0061", "mFilteredComics " + mFilteredComics.size());
+        }
+
     }
 
 }

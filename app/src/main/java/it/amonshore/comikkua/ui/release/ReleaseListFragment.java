@@ -219,7 +219,7 @@ public class ReleaseListFragment extends AFragment implements ScrollToTopListene
                     sendIntent.setType("text/plain");
                     startActivity(Intent.createChooser(sendIntent, getResources().getText(R.string.share)));
                     return true;
-                } else if (menuId == R.id.action_comics_search) {
+                } else if (menuId == R.id.action_comics_web_search) {
                     long[] ags = mListView.getCheckedItemIds();
                     ReleaseInfo ri = (ReleaseInfo) mAdapter.getItem((int) ags[0]);
                     Comics comics = dataManager.getComics(ri.getRelease().getComicsId());

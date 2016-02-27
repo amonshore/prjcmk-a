@@ -174,7 +174,7 @@ public class ComicsDetailActivity extends ActionBarActivity {
             sendIntent.setType("text/plain");
             startActivity(Intent.createChooser(sendIntent, getResources().getText(R.string.share)));
             return true;
-        } else if (id == R.id.action_comics_search) {
+        } else if (id == R.id.action_comics_web_search) {
             //A0042
             String query = Utils.join(" ", true, mComics.getName(), mComics.getAuthors(),
                     mComics.getPublisher());

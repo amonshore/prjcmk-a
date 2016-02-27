@@ -141,9 +141,11 @@ public class DataOptionsActivity extends ActionBarActivity {
                                                 Toast.makeText(DataOptionsActivity.this, R.string.opt_backup_now_fail, Toast.LENGTH_SHORT).show();
                                             }
                                         } else if (dataOptions.Id == ID_CLEAR_DATA) {
-                                            dataManager.clearData();
+//                                            dataManager.clearData();
                                             Toast.makeText(DataOptionsActivity.this, R.string.opt_clear_data_done, Toast.LENGTH_SHORT).show();
                                         }
+                                        //A0061
+                                        dataManager.notifyChanged(DataManager.CAUSE_LOADING);
                                     }
                                 }.execute();
                             }

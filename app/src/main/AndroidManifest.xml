@@ -1,6 +1,6 @@
 <?xml version="1.0" encoding="utf-8"?>
 <manifest xmlns:android="http://schemas.android.com/apk/res/android"
-    package="it.amonshore.comikkua" >
+    package="it.amonshore.comikkua">
 
     <uses-permission android:name="android.permission.WRITE_EXTERNAL_STORAGE" />
     <uses-permission android:name="android.permission.RECEIVE_BOOT_COMPLETED" />
@@ -10,12 +10,11 @@
         android:allowBackup="true"
         android:icon="@mipmap/ic_launcher_white"
         android:label="@string/app_name"
-        android:theme="@style/AppTheme" >
-
+        android:theme="@style/AppTheme">
         <activity
             android:name=".ui.MainActivity"
             android:label="@string/title_activity_main"
-            android:launchMode="singleTop" >
+            android:launchMode="singleTop">
             <intent-filter>
                 <action android:name="android.intent.action.MAIN" />
 
@@ -23,17 +22,26 @@
             </intent-filter>
             <intent-filter>
                 <action android:name="android.intent.action.VIEW" />
-                <data android:scheme="http"
+
+                <data
                     android:host="www.amonshore.it"
-                    android:pathPrefix="/comikku" />
+                    android:pathPrefix="/comikku"
+                    android:scheme="http" />
+
                 <category android:name="android.intent.category.DEFAULT" />
                 <category android:name="android.intent.category.BROWSABLE" />
             </intent-filter>
+            <intent-filter>
+                <action android:name="android.intent.action.SEARCH" />
+            </intent-filter>
+            <meta-data
+                android:name="android.app.searchable"
+                android:resource="@xml/searchable" />
         </activity>
         <activity
             android:name=".ui.SettingsActivity"
             android:label="@string/title_activity_settings"
-            android:parentActivityName=".ui.MainActivity" >
+            android:parentActivityName=".ui.MainActivity">
             <meta-data
                 android:name="android.support.PARENT_ACTIVITY"
                 android:value="it.amonshore.comikkua.ui.MainActivity" />
@@ -42,7 +50,7 @@
             android:name=".ui.comics.ComicsEditorActivity"
             android:label="@string/title_activity_comics_new"
             android:parentActivityName=".ui.MainActivity"
-            android:windowSoftInputMode="stateUnchanged" >
+            android:windowSoftInputMode="stateUnchanged">
             <meta-data
                 android:name="android.support.PARENT_ACTIVITY"
                 android:value="it.amonshore.comikkua.ui.MainActivity" />
@@ -51,7 +59,7 @@
             android:name=".ui.release.ReleaseEditorActivity"
             android:label="@string/title_activity_release_editor"
             android:parentActivityName=".ui.MainActivity"
-            android:windowSoftInputMode="stateUnchanged" >
+            android:windowSoftInputMode="stateUnchanged">
             <meta-data
                 android:name="android.support.PARENT_ACTIVITY"
                 android:value="it.amonshore.comikkua.ui.MainActivity" />
@@ -59,7 +67,7 @@
         <activity
             android:name=".ui.comics.ComicsDetailActivity"
             android:label="@string/title_activity_comics_detail"
-            android:parentActivityName=".ui.MainActivity" >
+            android:parentActivityName=".ui.MainActivity">
             <meta-data
                 android:name="android.support.PARENT_ACTIVITY"
                 android:value="it.amonshore.comikkua.ui.MainActivity" />
@@ -67,7 +75,7 @@
         <activity
             android:name=".ui.InfoActivity"
             android:label="@string/title_activity_info"
-            android:parentActivityName=".ui.MainActivity" >
+            android:parentActivityName=".ui.MainActivity">
             <meta-data
                 android:name="android.support.PARENT_ACTIVITY"
                 android:value="it.amonshore.comikkua.ui.MainActivity" />
@@ -75,13 +83,12 @@
         <activity
             android:name=".ui.options.DataOptionsActivity"
             android:label="@string/title_activity_data_options"
-            android:parentActivityName=".ui.MainActivity" >
+            android:parentActivityName=".ui.MainActivity">
             <meta-data
                 android:name="android.support.PARENT_ACTIVITY"
                 android:value="it.amonshore.comikkua.ui.MainActivity" />
         </activity>
-        <activity android:name=".ui.comics.ComicsCropActivity" >
-        </activity>
+        <activity android:name=".ui.comics.ComicsCropActivity"></activity>
     </application>
 
 </manifest>

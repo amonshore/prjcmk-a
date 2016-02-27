@@ -226,6 +226,16 @@ public class Utils {
 
     /**
      *
+     * @param tag
+     * @param msg
+     */
+    public static void d(String tag, String msg) {
+        if (BuildConfig.DEBUG)
+            Log.d(tag, msg);
+    }
+
+    /**
+     *
      * @param aClass
      * @param msg
      */

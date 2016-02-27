@@ -6,6 +6,8 @@ import java.util.ArrayList;
 import java.util.Calendar;
 import java.util.GregorianCalendar;
 
+import it.amonshore.comikkua.Utils;
+
 /**
  * Created by Narsenico on 07/05/2015.
  */
@@ -21,6 +23,7 @@ public class Comics {
     public final static String PERIODICITY_MONTHLY_X4 = "M4";
     public final static String PERIODICITY_MONTHLY_X6 = "M6";
     public final static String PERIODICITY_YEARLY = "Y1";
+    public final static String PERIODICITY_SINGLE = "S0";
 
     private final long id;
     private String name;
@@ -32,6 +35,11 @@ public class Comics {
     private boolean reserved;
     private String notes;
     private String image;
+    //A0061
+    private long remoteId; // è valorizzato se il fumetto è recuperato da remoto
+    private String categories;
+    private String searchableContent;
+    private boolean contentChanged;
     private final ArrayList<Release> releases;
 
     public Comics(long id) {
@@ -48,7 +56,10 @@ public class Comics {
     }
 
     public void setName(String name) {
-        this.name = name;
+        if (!TextUtils.equals(this.name, name)) {
+            this.name = name;
+            contentChanged = true;
+        }
     }
 
     public String getSeries() {
@@ -56,7 +67,10 @@ public class Comics {
     }
 
     public void setSeries(String series) {
-        this.series = series;
+        if (!TextUtils.equals(this.series, series)) {
+            this.series = series;
+            contentChanged = true;
+        }
     }
 
     public String getPublisher() {
@@ -64,7 +78,10 @@ public class Comics {
     }
 
     public void setPublisher(String publisher) {
-        this.publisher = publisher;
+        if (!TextUtils.equals(this.publisher, publisher)) {
+            this.publisher = publisher;
+            contentChanged = true;
+        }
     }
 
     public String getAuthors() {
@@ -72,7 +89,10 @@ public class Comics {
     }
 
     public void setAuthors(String authors) {
-        this.authors = authors;
+        if (!TextUtils.equals(this.authors, authors)) {
+            this.authors = authors;
+            contentChanged = true;
+        }
     }
 
     public double getPrice() {
@@ -80,7 +100,10 @@ public class Comics {
     }
 
     public void setPrice(double price) {
-        this.price = price;
+        if (this.price != price) {
+            this.price = price;
+            contentChanged = true;
+        }
     }
 
     public String getPeriodicity() {
@@ -88,7 +111,10 @@ public class Comics {
     }
 
     public void setPeriodicity(String periodicity) {
-        this.periodicity = periodicity;
+        if (!TextUtils.equals(this.periodicity, periodicity)) {
+            this.periodicity = periodicity;
+            contentChanged = true;
+        }
     }
 
     public boolean isReserved() {
@@ -96,7 +122,10 @@ public class Comics {
     }
 
     public void setReserved(boolean reserved) {
-        this.reserved = reserved;
+        if (this.reserved != reserved) {
+            this.reserved = reserved;
+            contentChanged = true;
+        }
     }
 
     public String getNotes() {
@@ -104,7 +133,10 @@ public class Comics {
     }
 
     public void setNotes(String notes) {
-        this.notes = notes;
+        if (!TextUtils.equals(this.notes, notes)) {
+            this.notes = notes;
+            contentChanged = true;
+        }
     }
 
     public String getImage() {
@@ -112,7 +144,34 @@ public class Comics {
     }
 
     public void setImage(String image) {
-        this.image = image;
+        if (!TextUtils.equals(this.image, image)) {
+            this.image = image;
+            contentChanged = true;
+        }
+    }
+
+    /**
+     * Identificativo del fumetto se recuperato da remoto.
+     *
+     * @return 0 se il fumetto è solo locale
+     */
+    public long getRemoteId() {
+        return remoteId;
+    }
+
+    public void setRemoteId(long remoteId) {
+        this.remoteId = remoteId;
+    }
+
+    public String getCategories() {
+        return categories;
+    }
+
+    public void setCategories(String categories) {
+        if (!TextUtils.equals(this.categories, categories)) {
+            this.categories = categories;
+            contentChanged = true;
+        }
     }
 
     private int indexOf(int number) {
@@ -228,5 +287,25 @@ public class Comics {
     public static String getDefaultImageFileName(long id) {
         return IMAGE_PREFIX + id + ".jpg";
 //        return UUID.randomUUID().toString() + ".jpg";
+    }
+
+    /**
+     *
+     * @return  una stringa rappresentante il fumetto su cui basare una ricerca
+     */
+    public String getSearchableContent() {
+        //A0061
+        if (contentChanged) {
+            final StringBuilder sb = new StringBuilder();
+            sb.append(name).append(' ')
+                    .append(series).append(' ')
+                    .append(publisher).append(' ')
+                    .append(authors).append(' ')
+                    .append(notes).append(' ')
+                    .append(categories);
+            searchableContent = sb.toString().toLowerCase(); // TODO: locale?
+            contentChanged = false;
+        }
+        return searchableContent;
     }
 }
