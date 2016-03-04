@@ -159,8 +159,12 @@ public class Comics {
         return remoteId;
     }
 
-    public void setRemoteId(long remoteId) {
-        this.remoteId = remoteId;
+    /**
+     *
+     * @return true se il fumetto è stato recuperato dal server e non creato dall'utente
+     */
+    public boolean isRemote() {
+        return remoteId != 0 && id == remoteId;
     }
 
     public String getCategories() {
@@ -307,5 +311,16 @@ public class Comics {
             contentChanged = false;
         }
         return searchableContent;
+    }
+
+    /**
+     *
+     * @param id
+     * @return  fumetto recuperato dal server
+     */
+    public static Comics createRemote(long id) {
+        Comics comics = new Comics(id);
+        comics.remoteId = id;
+        return comics;
     }
 }

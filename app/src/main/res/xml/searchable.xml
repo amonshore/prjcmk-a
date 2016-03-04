@@ -5,4 +5,5 @@
     android:hint="@string/search_hint"
     android:queryAfterZeroResults="true"
     android:searchSuggestAuthority="it.amonshore.comikkua.ui.SearchSuggestionProvider"
+    android:searchSuggestIntentAction="android.intent.action.VIEW"
     android:searchSuggestSelection=" ?" />

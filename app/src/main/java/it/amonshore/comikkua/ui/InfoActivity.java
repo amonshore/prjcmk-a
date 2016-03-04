@@ -18,7 +18,6 @@ import java.util.TreeSet;
 
 import it.amonshore.comikkua.BuildConfig;
 import it.amonshore.comikkua.R;
-import it.amonshore.comikkua.Utils;
 import it.amonshore.comikkua.data.DataManager;
 import it.amonshore.comikkua.reminder.ReleaseReminderJob;
 

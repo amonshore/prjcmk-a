@@ -12,9 +12,7 @@ import com.evernote.android.job.JobManager;
 
 import java.io.File;
 import java.io.IOException;
-import java.util.ArrayList;
 import java.util.HashSet;
-import java.util.List;
 import java.util.Set;
 import java.util.TimeZone;
 import java.util.TreeMap;
@@ -641,13 +639,11 @@ public class DataManager extends Observable<ComicsObserver> {
         if (!TextUtils.equals(filter, mComicsFilter)) {
             mComicsFilter = filter;
             mApplyFilterAgain = true;
-            Utils.d("A0061", "setComicsFilter " + mComicsFilter);
         }
     }
 
     public Set<Long> getFilteredComics() {
         if (mApplyFilterAgain) {
-            Utils.d("A0061", "filter again");
             filterComics(mComicsFilter);
             mApplyFilterAgain = false;
         }
@@ -657,32 +653,19 @@ public class DataManager extends Observable<ComicsObserver> {
     private void filterComics(final String terms) {
         mFilteredComics.clear();
         if (Utils.isNullOrEmpty(terms)) {
-            // se i termini della ricerca sono vuoti considerare tutti i fumetti locali
             mFilteredComics.addAll(getComics());
         } else {
-            // TODO: usare .toUpperCase(Locale) per le maiuscole accentate?
             final String[] aterms = terms.toLowerCase() // minuscolo
 //                    .replaceAll("\\b\\w{1,2}\\b", "") // elimino parole più piccole di 3 caratteri -> è un problema con le lingue orientali
                     .trim().split("\\s"); // divido le parole
 
-            // lista dei fumetti locali già censiti
-            final rx.Observable<Comics> localComics = rx.Observable.from(getComics())
+            rx.Observable.from(getComics())
                     .map(new Func1<Long, Comics>() {
                         @Override
                         public Comics call(Long aLong) {
                             return getComics(aLong);
                         }
-                    });
-            // TODO: lista dei fumetti remoti recuperati in precedenza
-            final rx.Observable<Comics> remoteComics = rx.Observable.from(new Long[0])
-                    .map(new Func1<Long, Comics>() {
-                        @Override
-                        public Comics call(Long aLong) {
-                            return null;
-                        }
-                    });
-            // unisco, filtro e rendo unici i fumetti
-            rx.Observable.merge(localComics, remoteComics)
+                    })
                     .filter(new Func1<Comics, Boolean>() {
                         @Override
                         public Boolean call(Comics comics) {
@@ -696,7 +679,6 @@ public class DataManager extends Observable<ComicsObserver> {
                     .distinct(new Func1<Comics, Long>() {
                         @Override
                         public Long call(Comics comics) {
-                            // TODO: usare remoteId?
                             return comics.getId();
                         }
                     })

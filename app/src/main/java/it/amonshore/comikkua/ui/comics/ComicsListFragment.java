@@ -80,15 +80,20 @@ public class ComicsListFragment extends AFragment implements ScrollToTopListener
         mDataManager = DataManager.getDataManager();
         mOnQueryTextListener = RxSearchViewQueryTextListener
                 .create()
-                .provideSuggestions(SearchSuggestionProvider.AUTHORITY, SearchSuggestionProvider.MODE)
                 .setOnQueryListener(new RxSearchViewQueryTextListener.OnQueryListener() {
 
                     @Override
-                    public void onQuery(String query) {
-                        Utils.d("A0061", "onQuery " + query + " " + Utils.isMainThread());
+                    public void onLocalQuery(String query) {
+                        Utils.d("A0061", "onLocalQuery " + query);
 
                         mDataManager.setComicsFilter(query);
                         mDataManager.notifyChanged(DataManager.CAUSE_COMICS_FILTERED | DataManager.CAUSE_LOADING);
+                    }
+
+                    @Override
+                    public void onRemoteQuery(String query) {
+                        Utils.d("A0061", "onRemoteQuery " + query);
+                        // TODO: aprire l'activity per la ricerca remota
                     }
                 });
     }
@@ -244,6 +249,7 @@ public class ComicsListFragment extends AFragment implements ScrollToTopListener
 
         // associo la view al listener e bindo gli eventi
         mOnQueryTextListener
+                .enableRemoteQuery(true) // TODO: leggere da preferenze
                 .listenOn(searchView)
                 .bind();
         // se i comics sono filtrati apro la searchview e imposto il filtro
