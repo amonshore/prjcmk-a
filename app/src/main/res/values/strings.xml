@@ -42,6 +42,8 @@
     <string name="also_releases">Also: %1s</string>
     <string name="cancel">Cancel</string>
     <string name="search_hint">Search comics...</string>
+    <string name="fab_comics_add_label">Add new comcis</string>
+    <string name="fab_comics_search_label">Add from remote list</string>
 
     <string name="comics_empty_list">You have no comics</string>
     <string name="release_empty_list">You have no releases</string>

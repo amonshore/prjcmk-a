@@ -4,11 +4,9 @@ import android.app.Activity;
 import android.app.SearchManager;
 import android.content.Context;
 import android.content.Intent;
-import android.content.SearchRecentSuggestionsProvider;
 import android.content.SharedPreferences;
 import android.os.Bundle;
 import android.os.Handler;
-import android.provider.SearchRecentSuggestions;
 import android.support.v7.widget.SearchView;
 import android.view.ActionMode;
 import android.view.LayoutInflater;
@@ -23,6 +21,7 @@ import android.widget.ListView;
 import android.widget.TextView;
 
 import com.github.clans.fab.FloatingActionButton;
+import com.github.clans.fab.FloatingActionMenu;
 import com.nispok.snackbar.Snackbar;
 import com.nispok.snackbar.SnackbarManager;
 import com.nispok.snackbar.listeners.ActionClickListener;
@@ -37,7 +36,7 @@ import it.amonshore.comikkua.ui.AFragment;
 import it.amonshore.comikkua.ui.MainActivity;
 import it.amonshore.comikkua.ui.RxSearchViewQueryTextListener;
 import it.amonshore.comikkua.ui.ScrollToTopListener;
-import it.amonshore.comikkua.ui.SearchSuggestionProvider;
+import it.amonshore.comikkua.ui.remote.RemoteComicsActivity;
 
 
 /**
@@ -55,7 +54,7 @@ public class ComicsListFragment extends AFragment implements ScrollToTopListener
     private ListView mListView;
     private ComicsListAdapter mAdapter;
     private ActionMode mActionMode;
-    private FloatingActionButton mBtnAdd;
+    private FloatingActionMenu mBtnMenu;
     //A0061
     private DataManager mDataManager;
     private RxSearchViewQueryTextListener mOnQueryTextListener;
@@ -89,12 +88,6 @@ public class ComicsListFragment extends AFragment implements ScrollToTopListener
                         mDataManager.setComicsFilter(query);
                         mDataManager.notifyChanged(DataManager.CAUSE_COMICS_FILTERED | DataManager.CAUSE_LOADING);
                     }
-
-                    @Override
-                    public void onRemoteQuery(String query) {
-                        Utils.d("A0061", "onRemoteQuery " + query);
-                        // TODO: aprire l'activity per la ricerca remota
-                    }
                 });
     }
 
@@ -122,7 +115,25 @@ public class ComicsListFragment extends AFragment implements ScrollToTopListener
                              Bundle savedInstanceState) {
         View view = inflater.inflate(R.layout.fragment_comics_list, container, false);
 
-        // Set the adapter
+        // listener fab
+        mBtnMenu = (FloatingActionMenu) view.findViewById(R.id.fab_comics_menu);
+        final FloatingActionButton btnAdd = (FloatingActionButton)view.findViewById(R.id.fab_comics_add);
+        btnAdd.setOnClickListener(new View.OnClickListener() {
+            @Override
+            public void onClick(View v) {
+                showComicsEditor();
+            }
+        });
+        final Context context = getActivity();
+        final FloatingActionButton btnSearchRemote = (FloatingActionButton)view.findViewById(R.id.fab_comics_search);
+        btnSearchRemote.setOnClickListener(new View.OnClickListener() {
+            @Override
+            public void onClick(View v) {
+                Intent intent = new Intent(context, RemoteComicsActivity.class);
+                startActivityForResult(intent, RequestCodes.QUERY_REMOTE_REQUEST);
+            }
+        });
+        //
         mListView = (ListView) view.findViewById(android.R.id.list);
         mListView.setAdapter(mAdapter);
         //A0022
@@ -155,7 +166,7 @@ public class ComicsListFragment extends AFragment implements ScrollToTopListener
                 MenuInflater inflater = mode.getMenuInflater();
                 inflater.inflate(R.menu.menu_comics_cab, menu);
                 mActionMode = mode;
-                mBtnAdd.setVisibility(View.INVISIBLE);
+                mBtnMenu.setVisibility(View.INVISIBLE);
                 return true;
             }
 
@@ -214,16 +225,7 @@ public class ComicsListFragment extends AFragment implements ScrollToTopListener
             @Override
             public void onDestroyActionMode(ActionMode mode) {
                 mActionMode = null;
-                mBtnAdd.setVisibility(View.VISIBLE);
-            }
-        });
-
-        //listener fab
-        mBtnAdd = ((FloatingActionButton)view.findViewById(R.id.fab_comics_add));
-        mBtnAdd.setOnClickListener(new View.OnClickListener() {
-            @Override
-            public void onClick(View v) {
-                showComicsEditor();
+                mBtnMenu.setVisibility(View.VISIBLE);
             }
         });
 
@@ -249,7 +251,7 @@ public class ComicsListFragment extends AFragment implements ScrollToTopListener
 
         // associo la view al listener e bindo gli eventi
         mOnQueryTextListener
-                .enableRemoteQuery(true) // TODO: leggere da preferenze
+//                .enableRemoteQuery(true) // TODO: leggere da preferenze
                 .listenOn(searchView)
                 .bind();
         // se i comics sono filtrati apro la searchview e imposto il filtro

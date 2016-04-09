@@ -43,9 +43,9 @@
     <color name="comikku_fab_pressed_color">#03A9F4</color>
     <color name="comikku_fab_ripple_color">#B3E5FC</color>
 
-    <!--<color name="comikku_fab_mini_normal_color">#E91E63</color>-->
-    <!--<color name="comikku_fab_mini_pressed_color">#F8BBD0</color>-->
-    <!--<color name="comikku_fab_mini_ripple_color">#EC407A</color>-->
+    <color name="comikku_fab_mini_normal_color">#E91E63</color>
+    <color name="comikku_fab_mini_pressed_color">#F8BBD0</color>
+    <color name="comikku_fab_mini_ripple_color">#EC407A</color>
 
     <color name="comikku_selected_tab_color">#FFFFFF</color>
 

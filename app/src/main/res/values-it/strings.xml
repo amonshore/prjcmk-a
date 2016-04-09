@@ -136,4 +136,7 @@
     <string name="info_version">Versione: %1$s (%2$s)</string>
     <string name="info_author">Autore: %1$s</string>
     <string name="periodicity_single">Volume unico</string>
+    <string name="fab_comics_add_label">Aggiungi un fumetto</string>
+    <string name="search_hint">Cerca...</string>
+    <string name="title_activity_comics_search">Cerca</string>
 </resources>

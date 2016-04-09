@@ -287,6 +287,17 @@ public class Utils {
     }
 
     /**
+     *
+     * @param tag
+     * @param msg
+     * @param err
+     */
+    public static void e(String tag, String msg, Throwable err) {
+        if (BuildConfig.DEBUG)
+            Log.e(tag, msg, err);
+    }
+
+    /**
      * Calcola il primo giorno della settimana
      * @param date
      * @param weekStartOnMonday

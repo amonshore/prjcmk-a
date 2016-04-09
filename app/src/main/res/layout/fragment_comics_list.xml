@@ -18,17 +18,53 @@
         android:layout_height="match_parent" android:gravity="center"
         tools:text="@string/comics_empty_list" />
 
-    <com.github.clans.fab.FloatingActionButton
-        android:id="@+id/fab_comics_add"
+    <com.github.clans.fab.FloatingActionMenu
+        android:id="@+id/fab_comics_menu"
         android:layout_width="wrap_content"
         android:layout_height="wrap_content"
         android:layout_gravity="bottom|right"
         android:layout_marginBottom="@dimen/floating_action_margin_bottom"
         android:layout_marginRight="@dimen/floating_action_margin_right"
-        android:src="@drawable/ic_plus"
-        app:fab_colorNormal="@color/comikku_fab_normal_color"
-        app:fab_colorPressed="@color/comikku_fab_pressed_color"
-        app:fab_colorRipple="@color/comikku_fab_ripple_color"
-        app:fab_elevationCompat="@dimen/floating_action_elevation"/>
+        app:menu_colorNormal="@color/comikku_fab_normal_color"
+        app:menu_colorPressed="@color/comikku_fab_pressed_color"
+        app:menu_colorRipple="@color/comikku_fab_ripple_color"
+        app:fab_elevationCompat="@dimen/floating_action_elevation">
+
+        <com.github.clans.fab.FloatingActionButton
+            android:id="@+id/fab_comics_add"
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:src="@drawable/ic_edit"
+            app:fab_colorNormal="@color/comikku_fab_mini_normal_color"
+            app:fab_colorPressed="@color/comikku_fab_mini_pressed_color"
+            app:fab_colorRipple="@color/comikku_fab_mini_ripple_color"
+            app:fab_size="mini"
+            app:fab_label="@string/fab_comics_add_label" />
+
+        <com.github.clans.fab.FloatingActionButton
+            android:id="@+id/fab_comics_search"
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:src="@drawable/ic_magnify"
+            app:fab_colorNormal="@color/comikku_fab_mini_normal_color"
+            app:fab_colorPressed="@color/comikku_fab_mini_pressed_color"
+            app:fab_colorRipple="@color/comikku_fab_mini_ripple_color"
+            app:fab_size="mini"
+            app:fab_label="@string/fab_comics_search_label" />
+
+    </com.github.clans.fab.FloatingActionMenu>
+
+    <!--<com.github.clans.fab.FloatingActionButton-->
+        <!--android:id="@+id/fab_comics_add"-->
+        <!--android:layout_width="wrap_content"-->
+        <!--android:layout_height="wrap_content"-->
+        <!--android:layout_gravity="bottom|right"-->
+        <!--android:layout_marginBottom="@dimen/floating_action_margin_bottom"-->
+        <!--android:layout_marginRight="@dimen/floating_action_margin_right"-->
+        <!--android:src="@drawable/ic_plus"-->
+        <!--app:fab_colorNormal="@color/comikku_fab_normal_color"-->
+        <!--app:fab_colorPressed="@color/comikku_fab_pressed_color"-->
+        <!--app:fab_colorRipple="@color/comikku_fab_ripple_color"-->
+        <!--app:fab_elevationCompat="@dimen/floating_action_elevation"/>-->
 
 </FrameLayout>

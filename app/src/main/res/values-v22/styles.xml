@@ -45,12 +45,12 @@
         <!-- Colore di sfondo dell'action mode -->
         <item name="actionModeBackground">@color/comikku_primary_color_dark</item>
         <item name="android:actionModeBackground">@color/comikku_primary_color_dark</item>
-        <!--<item name="autoCompleteTextViewStyle">@style/DefaultAutoCompleteTextViewStyle</item>-->
-        <!--<item name="textAppearanceSearchResultTitle">@style/DefaultTextAppearanceSearchResultTitle</item>-->
+        <!-- Stile search view -->
+        <item name="android:autoCompleteTextViewStyle">@style/DefaultSearchView</item>
     </style>
 
     <!-- Toolbar -->
-    <style name="DefaultToolBarStyle" parent="Theme.AppCompat">
+    <style name="DefaultToolBarStyle" parent="">
         <item name="popupTheme">@style/ThemeOverlay.AppCompat.Light</item>
         <item name="theme">@style/ThemeOverlay.AppCompat.Dark.ActionBar</item>
         <item name="titleTextAppearance">@style/DefaultToolbarTitle</item>
@@ -60,12 +60,8 @@
         <item name="android:textSize">20sp</item>
     </style>
 
-    <!--<style name="DefaultAutoCompleteTextViewStyle" parent="Widget.AppCompat.Light.AutoCompleteTextView">-->
-        <!--<item name="android:popupBackground">@color/comikku_popup_background</item>-->
-    <!--</style>-->
-
-    <!--<style name="DefaultTextAppearanceSearchResultTitle" parent="@style/TextAppearance.AppCompat.SearchResult.Title">-->
-        <!--<item name="android:textColor">@color/comikku_primary_color_dark</item>-->
-    <!--</style>-->
+    <style name="DefaultSearchView" parent="Widget.AppCompat.AutoCompleteTextView">
+        <item name="android:textColor">#ff0000</item>
+    </style>
 
 </resources>

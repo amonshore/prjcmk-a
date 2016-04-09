@@ -4,6 +4,7 @@
 
     <uses-permission android:name="android.permission.WRITE_EXTERNAL_STORAGE" />
     <uses-permission android:name="android.permission.RECEIVE_BOOT_COMPLETED" />
+    <uses-permission android:name="android.permission.INTERNET" />
 
     <application
         android:name=".ComikkuApp"
@@ -11,7 +12,6 @@
         android:icon="@mipmap/ic_launcher_white"
         android:label="@string/app_name"
         android:theme="@style/AppTheme">
-
         <meta-data
             android:name="android.app.default_searchable"
             android:value=".ui.MainActivity" />
@@ -39,6 +39,7 @@
             <intent-filter>
                 <action android:name="android.intent.action.SEARCH" />
             </intent-filter>
+
             <meta-data
                 android:name="android.app.searchable"
                 android:resource="@xml/searchable" />
@@ -93,10 +94,14 @@
                 android:name="android.support.PARENT_ACTIVITY"
                 android:value="it.amonshore.comikkua.ui.MainActivity" />
         </activity>
-        <activity android:name=".ui.comics.ComicsCropActivity"></activity>
-        <provider
-            android:authorities="it.amonshore.comikkua.ui.SearchSuggestionProvider"
-            android:name=".ui.SearchSuggestionProvider" />
+        <activity android:name=".ui.comics.ComicsCropActivity" />
+        <activity android:name=".ui.remote.RemoteComicsActivity"
+            android:label="Remote"
+            android:parentActivityName=".ui.MainActivity">
+            <meta-data
+                android:name="android.support.PARENT_ACTIVITY"
+                android:value="it.amonshore.comikkua.ui.MainActivity" />
+        </activity>
     </application>
 
 </manifest>

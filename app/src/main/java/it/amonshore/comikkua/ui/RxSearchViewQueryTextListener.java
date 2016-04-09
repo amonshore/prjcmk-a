@@ -1,8 +1,5 @@
 package it.amonshore.comikkua.ui;
 
-import android.app.SearchManager;
-import android.database.Cursor;
-import android.provider.SearchRecentSuggestions;
 import android.support.v7.widget.SearchView;
 
 import java.util.concurrent.TimeUnit;
@@ -32,8 +29,6 @@ public class RxSearchViewQueryTextListener {
     private Observable<String> mObservable;
     private Subscription mSubscription;
     private OnQueryListener mListener;
-    private SearchRecentSuggestions mSearchRecentSuggestions;
-    private boolean mEnableRemoteQuery;
 
     private RxSearchViewQueryTextListener() {
         mEventBus = new RxBus<>();
@@ -48,39 +43,7 @@ public class RxSearchViewQueryTextListener {
         return new RxSearchViewQueryTextListener();
     }
 
-    public RxSearchViewQueryTextListener enableRemoteQuery(boolean enableRemoteQuery) {
-        mEnableRemoteQuery = enableRemoteQuery;
-        return this;
-    }
-
     public RxSearchViewQueryTextListener listenOn(final SearchView searchView) {
-        if (mEnableRemoteQuery) {
-            mSearchRecentSuggestions = new SearchRecentSuggestions(searchView.getContext(),
-                    SearchSuggestionProvider.AUTHORITY, SearchSuggestionProvider.MODE);
-        } else {
-            // TODO: search suggestions classica (senza l'item per la ricerca remota)
-        }
-        searchView.setOnSuggestionListener(new SearchView.OnSuggestionListener() {
-            @Override
-            public boolean onSuggestionSelect(int position) {
-                return true;
-            }
-
-            @Override
-            public boolean onSuggestionClick(int position) {
-                // recupero il suggerimento selezionato ed eseguo la query
-                Cursor cursor = (Cursor) searchView.getSuggestionsAdapter().getItem(position);
-                final String query = cursor.getString(cursor.getColumnIndex( SearchManager.SUGGEST_COLUMN_TEXT_1 ));
-                // se è abilitata la ricerca remota, la voce alla posizione 0 è sempre la ricerca remota
-                if (mEnableRemoteQuery && position == 0) {
-                    mListener.onRemoteQuery(query);
-                } else {
-                    searchView.setQuery(query, false);
-                }
-                return true;
-            }
-        });
-        //
         searchView.setOnQueryTextListener(new SearchView.OnQueryTextListener() {
             @Override
             public boolean onQueryTextSubmit(String query) {
@@ -114,7 +77,6 @@ public class RxSearchViewQueryTextListener {
                 .subscribe(new Action1<String>() {
                     @Override
                     public void call(String query) {
-                        mSearchRecentSuggestions.saveRecentQuery(query, null);
                         mListener.onLocalQuery(query);
                     }
                 });
@@ -134,7 +96,6 @@ public class RxSearchViewQueryTextListener {
     public interface OnQueryListener {
 
         void onLocalQuery(String query);
-        void onRemoteQuery(String query);
     }
 
 }

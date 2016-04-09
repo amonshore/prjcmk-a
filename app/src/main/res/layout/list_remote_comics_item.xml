@@ -1,0 +1,44 @@
+<?xml version="1.0" encoding="utf-8"?>
+<RelativeLayout
+    xmlns:android="http://schemas.android.com/apk/res/android"
+    android:layout_width="match_parent"
+    android:layout_height="match_parent"
+    android:layout_marginBottom="@dimen/list_item_padding_top"
+    android:layout_marginLeft="@dimen/list_item_padding_left"
+    android:layout_marginRight="@dimen/list_item_padding_right"
+    android:layout_marginTop="@dimen/list_item_padding_top"
+    android:background="@drawable/selector_remote_comics_item" >
+
+    <ImageView
+        android:id="@+id/movieThumbnail"
+        android:layout_width="54dp"
+        android:layout_height="54dp"
+        android:layout_centerVertical="true"
+        android:src="@drawable/ic_notification" />
+
+    <TextView
+        android:id="@+id/txt_list_comics_name"
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:layout_alignParentLeft="true"
+        android:layout_alignParentRight="true"
+        android:layout_alignTop="@+id/movieThumbnail"
+        android:layout_marginLeft="56dp"
+        android:alpha="0.87"
+        android:gravity="right"
+        android:padding="4dp"
+        android:text="Comics name"
+        android:textSize="16sp" />
+
+    <!--<TextView-->
+        <!--android:id="@+id/movieReleaseDate"-->
+        <!--android:layout_width="wrap_content"-->
+        <!--android:layout_height="wrap_content"-->
+        <!--android:layout_alignParentRight="true"-->
+        <!--android:layout_below="@id/movieTitle"-->
+        <!--android:alpha="0.87"-->
+        <!--android:padding="@dimen/size_half_byte"-->
+        <!--android:text="31-31-31"-->
+        <!--android:textSize="@dimen/size_text_secondary" />-->
+
+</RelativeLayout>
