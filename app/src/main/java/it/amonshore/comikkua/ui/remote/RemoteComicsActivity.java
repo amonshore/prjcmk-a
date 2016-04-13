@@ -47,6 +47,7 @@ public class RemoteComicsActivity extends AppCompatActivity {
             @Override
             public void onItemClick(RecyclerView.ViewHolder viewHolder, View view, int position) {
                 Toast.makeText(view.getContext(), "Item @ position " + position, Toast.LENGTH_SHORT).show();
+                adapter.toggleSelection(position);
             }
         });
         // recupero l'elenco dei fumetti remoti
@@ -71,6 +72,13 @@ public class RemoteComicsActivity extends AppCompatActivity {
             @Override
             public void onErrorResponse(VolleyError error) {
                 Utils.e("A0061", "onErrorResponse", error);
+                // TODO: fake da togliere
+                final Comics comics = new Comics(-999);
+                comics.setName("fake");
+                comics.setPublisher("publisher");
+                final ArrayList<Comics> remoteComics = new ArrayList<>();
+                remoteComics.add(comics);
+                adapter.setComics(remoteComics);
             }
         };
         // TODO: leggere parametro query di ricerca e usarla nella query

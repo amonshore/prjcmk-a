@@ -10,6 +10,7 @@
     <dimen name="header_elevation">3dp</dimen>
 
     <!-- Liste -->
+    <dimen name="list_item_padding">8dp</dimen>
     <!--<dimen name="list_padding_top">8dp</dimen>-->
     <dimen name="list_item_padding_top">8dp</dimen>
     <!--<dimen name="list_item_padding_bottom">8dp</dimen>-->

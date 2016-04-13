@@ -1,10 +1,14 @@
 package it.amonshore.comikkua.ui.remote;
 
 import android.content.Context;
+import android.graphics.Color;
 import android.support.v7.widget.RecyclerView;
+import android.util.SparseArray;
 import android.view.LayoutInflater;
 import android.view.View;
 import android.view.ViewGroup;
+import android.widget.CheckBox;
+import android.widget.ImageView;
 import android.widget.TextView;
 
 import java.util.ArrayList;
@@ -20,6 +24,7 @@ public class RemoteComicsAdapter extends RecyclerView.Adapter<RemoteComicsAdapte
     private LayoutInflater mLayoutInflater;
     private ArrayList<Comics> mComics;
     private OnItemClickListener mOnItemClickListener;
+    private SparseArray<Boolean> mSelectedItems;
 
     public RemoteComicsAdapter(Context context) {
         mLayoutInflater = LayoutInflater.from(context);
@@ -28,6 +33,7 @@ public class RemoteComicsAdapter extends RecyclerView.Adapter<RemoteComicsAdapte
 
     public void setComics(ArrayList<Comics> comics) {
         mComics = comics;
+        mSelectedItems = new SparseArray<>();
         notifyItemRangeChanged(0, mComics.size());
     }
 
@@ -35,17 +41,27 @@ public class RemoteComicsAdapter extends RecyclerView.Adapter<RemoteComicsAdapte
         this.mOnItemClickListener = onItemClickListener;
     }
 
+    public void toggleSelection(int position) {
+        if (mSelectedItems.get(position, false)) {
+            mSelectedItems.delete(position);
+        } else {
+            mSelectedItems.put(position, true);
+        }
+        notifyItemChanged(position);
+    }
+
     @Override
     public ViewHolderRemoteComic onCreateViewHolder(ViewGroup parent, int viewType) {
         final View view = mLayoutInflater.inflate(R.layout.list_remote_comics_item, parent, false);
-        final ViewHolderRemoteComic viewHolderRemoteComic = new ViewHolderRemoteComic(view, mOnItemClickListener);
-        return viewHolderRemoteComic;
+        return new ViewHolderRemoteComic(view, mOnItemClickListener);
     }
 
     @Override
     public void onBindViewHolder(ViewHolderRemoteComic holder, int position) {
         final Comics currentComics = mComics.get(position);
-        holder.mTextView.setText(currentComics.getName());
+        holder.mTxtName.setText(currentComics.getName());
+        holder.mTxtPublisher.setText(currentComics.getPublisher());
+        holder.mChkToimport.setChecked(mSelectedItems.get(position, false));
     }
 
     @Override
@@ -53,12 +69,20 @@ public class RemoteComicsAdapter extends RecyclerView.Adapter<RemoteComicsAdapte
         return mComics.size();
     }
 
+    /**
+     *
+     */
     static class ViewHolderRemoteComic extends RecyclerView.ViewHolder {
-        private TextView mTextView;
+        private TextView mTxtName;
+        private TextView mTxtPublisher;
+        private CheckBox mChkToimport;
 
-        public ViewHolderRemoteComic(View itemView, final OnItemClickListener onItemClickListener) {
+        public ViewHolderRemoteComic(final View itemView, final OnItemClickListener onItemClickListener) {
             super(itemView);
-            itemView.setClickable(true);
+            mTxtName = (TextView) itemView.findViewById(R.id.txt_list_comics_name);
+            mTxtPublisher = (TextView) itemView.findViewById(R.id.txt_list_comics_publisher);
+            mChkToimport = (CheckBox) itemView.findViewById(R.id.chk_list_comics_toimport);
+
             if (onItemClickListener != null) {
                 itemView.setOnClickListener(new View.OnClickListener() {
                     @Override
@@ -66,8 +90,13 @@ public class RemoteComicsAdapter extends RecyclerView.Adapter<RemoteComicsAdapte
                         onItemClickListener.onItemClick(ViewHolderRemoteComic.this, v, getAdapterPosition());
                     }
                 });
+                mChkToimport.setOnClickListener(new View.OnClickListener() {
+                    @Override
+                    public void onClick(View v) {
+                        onItemClickListener.onItemClick(ViewHolderRemoteComic.this, v, getAdapterPosition());
+                    }
+                });
             }
-            mTextView = (TextView) itemView.findViewById(R.id.txt_list_comics_name);
         }
     }
 

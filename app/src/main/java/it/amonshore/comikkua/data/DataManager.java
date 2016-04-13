@@ -685,12 +685,12 @@ public class DataManager extends Observable<ComicsObserver> {
                     .subscribe(new Action1<Comics>() {
                         @Override
                         public void call(Comics comics) {
-                            Utils.d("A0061", "add " + comics.getName());
+//                            Utils.d("A0061", "add " + comics.getName());
                             mFilteredComics.add(comics.getId());
                         }
                     });
 
-            Utils.d("A0061", "mFilteredComics " + mFilteredComics.size());
+//            Utils.d("A0061", "mFilteredComics " + mFilteredComics.size());
         }
 
     }

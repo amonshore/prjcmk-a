@@ -35,7 +35,7 @@ public class RxSearchViewQueryTextListener {
         mObservable = mEventBus.toObserverable()
                 .distinctUntilChanged()
                 .debounce(500, TimeUnit.MILLISECONDS)
-//                .skip(1) // salto il primo evento perché scatenato dall'apertura della SearchView ed è vuoto
+                .skip(1) // salto il primo evento perché scatenato dall'apertura della SearchView ed è vuoto
                 .observeOn(AndroidSchedulers.mainThread());
     }
 
@@ -47,14 +47,14 @@ public class RxSearchViewQueryTextListener {
         searchView.setOnQueryTextListener(new SearchView.OnQueryTextListener() {
             @Override
             public boolean onQueryTextSubmit(String query) {
-//                Utils.d("A0061", "onQueryTextSubmit " + query);
+                Utils.d("A0061", "onQueryTextSubmit " + query);
                 mEventBus.send(query);
                 return true;
             }
 
             @Override
             public boolean onQueryTextChange(String newText) {
-//                Utils.d("A0061", "onQueryTextChange " + newText);
+                Utils.d("A0061", "onQueryTextChange " + newText);
                 mEventBus.send(newText);
                 return true;
             }

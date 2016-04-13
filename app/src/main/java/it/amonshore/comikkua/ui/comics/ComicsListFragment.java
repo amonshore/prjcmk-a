@@ -15,6 +15,8 @@ import android.view.MenuInflater;
 import android.view.MenuItem;
 import android.view.View;
 import android.view.ViewGroup;
+import android.view.animation.Animation;
+import android.view.animation.AnimationUtils;
 import android.widget.AbsListView;
 import android.widget.AdapterView;
 import android.widget.ListView;
@@ -58,6 +60,9 @@ public class ComicsListFragment extends AFragment implements ScrollToTopListener
     //A0061
     private DataManager mDataManager;
     private RxSearchViewQueryTextListener mOnQueryTextListener;
+    //
+    private Animation mSlideDownAnimation;
+    private Animation mSlideUpAnimation;
 
     @Override
     public void onCreate(Bundle savedInstanceState) {
@@ -89,6 +94,9 @@ public class ComicsListFragment extends AFragment implements ScrollToTopListener
                         mDataManager.notifyChanged(DataManager.CAUSE_COMICS_FILTERED | DataManager.CAUSE_LOADING);
                     }
                 });
+        //
+        mSlideDownAnimation = AnimationUtils.loadAnimation(getActivity(), R.anim.slide_down);
+        mSlideUpAnimation = AnimationUtils.loadAnimation(getActivity(), R.anim.slide_up);
     }
 
     @Override
@@ -166,6 +174,9 @@ public class ComicsListFragment extends AFragment implements ScrollToTopListener
                 MenuInflater inflater = mode.getMenuInflater();
                 inflater.inflate(R.menu.menu_comics_cab, menu);
                 mActionMode = mode;
+                // chiudo il menu, avvio l'animazione e nascondo
+                mBtnMenu.close(false);
+                mBtnMenu.startAnimation(mSlideDownAnimation);
                 mBtnMenu.setVisibility(View.INVISIBLE);
                 return true;
             }
@@ -225,6 +236,7 @@ public class ComicsListFragment extends AFragment implements ScrollToTopListener
             @Override
             public void onDestroyActionMode(ActionMode mode) {
                 mActionMode = null;
+                mBtnMenu.startAnimation(mSlideUpAnimation);
                 mBtnMenu.setVisibility(View.VISIBLE);
             }
         });

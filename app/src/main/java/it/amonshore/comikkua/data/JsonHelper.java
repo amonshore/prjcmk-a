@@ -36,6 +36,7 @@ public class JsonHelper {
     private final static String FIELD_REMINDER = "reminder";
     private final static String FIELD_PURCHASED = "purchased";
     private final static String FIELD_ORDERED = "ordered";
+    private final static String FIELD_CATEGORIES = "categories";
 
     private long mLastComicsId;
     private final SimpleDateFormat mDateFormat;
