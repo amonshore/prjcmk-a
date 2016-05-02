@@ -1,6 +1,9 @@
 # prjcmk-a
 Autore: narsenico
 
+## v1.0.4 (22)
+- gestione permessi Android M
+
 ## v1.0.4 (21)
 - promemoria sulle uscite
 - deep link (http://www.amonshore.it/comikku)

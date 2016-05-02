@@ -140,5 +140,5 @@
     <string name="opt_permissions_need_title">Comikku richiede l\'accesso alla memoria</string>
     <string name="yes">Si</string>
     <string name="opt_permissions_need_message">Puoi sempre cambiare le impostazioni andando in Impostazioni / App / Comikku / Autorizzazioni</string>
-    <string name="opt_permissions_explanation">Non sarai in grado di salvare e leggere i dati di backup senza autorizzare l\'accesso alla memoria. Vuoi modificare le impostazioni?</string>
+    <string name="opt_permissions_explanation">Non sarai in grado di salvare e leggere i dati di backup senza autorizzare l\'accesso ai file sul dispositivo. Vuoi modificare le impostazioni?</string>
 </resources>
