@@ -15,6 +15,7 @@ public class ComikkuApp extends Application {
 
         Utils.init(this);
         //inizializzo il data manager e leggo i dati
+        Utils.d(this.getClass(), "init");
         //TODO ricavare il nome dell'utente dalle preferenze, se non c'è usare default
         DataManager
                 .init(this, "default")
