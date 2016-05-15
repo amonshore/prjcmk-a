@@ -147,7 +147,8 @@ public class ReminderEventHelper extends AIncrementalStart {
                     new JobRequest.Builder(ReleaseReminderJob.TAG)
                             .setExtras(extras)
                             .setExact(fromNow)
-                            .setPersisted(true) //ricarico tutto a mano al boot
+                            // A0066 tolgo visto che ricarico tutto da BootReceiver
+                            // .setPersisted(true) //ricarico tutto a mano al boot
                             .build()
                             .schedule();
                 }

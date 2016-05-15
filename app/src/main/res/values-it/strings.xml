@@ -139,4 +139,10 @@
     <string name="fab_comics_add_label">Aggiungi un fumetto</string>
     <string name="search_hint">Cerca...</string>
     <string name="title_activity_comics_search">Cerca</string>
+    <string name="no">No</string>
+    <string name="ok">Ok</string>
+    <string name="opt_permissions_need_title">Comikku richiede l\'accesso alla memoria</string>
+    <string name="yes">Si</string>
+    <string name="opt_permissions_need_message">Puoi sempre cambiare le impostazioni andando in Impostazioni / App / Comikku / Autorizzazioni</string>
+    <string name="opt_permissions_explanation">Non sarai in grado di salvare e leggere i dati di backup senza autorizzare l\'accesso ai file sul dispositivo. Vuoi modificare le impostazioni?</string>
 </resources>

@@ -10,6 +10,8 @@ public abstract class RequestCodes {
     public final static int LOAD_IMAGE = 3001;
     public final static int CROP_IMAGE = 3010;
     public final static int QUERY_REMOTE_REQUEST = 4001;
+    //i codici di richiesta per i permessi possono essere solo da 0 a 255
+    public final static int WRITE_EXTERNAL_STORAGE_PERMISSION_REQUEST = 101;
 
     //TODO completare con gli altri codici
 }

@@ -40,7 +40,10 @@
     <string name="comics_removed">Comics removed</string>
     <string name="release_removed">Release removed</string>
     <string name="also_releases">Also: %1s</string>
+    <string name="ok">Ok</string>
     <string name="cancel">Cancel</string>
+    <string name="yes">Yes</string>
+    <string name="no">No</string>
     <string name="search_hint">Search comics...</string>
     <string name="fab_comics_add_label">Add new comcis</string>
     <string name="fab_comics_search_label">Add from remote list</string>
@@ -85,6 +88,9 @@
     <string name="opt_backup_now_done">Backup created</string>
     <string name="opt_backup_now_fail">There was a problem with backup</string>
     <string name="opt_backup_now_wait">Backup data to file&#8230;</string>
+    <string name="opt_permissions_explanation">You won\'t be able to save and read backup data without giving access to your device\'s sotrage. Do you want to change your settings?</string>
+    <string name="opt_permissions_need_title">Need access to storage</string>
+    <string name="opt_permissions_need_message">You can always change your permissions by going to Settings / Apps / Comikku / Persmissions</string>
 
     <string name="opt_restore_now_title">Restore bakcup</string>
     <string name="opt_restore_now_confirm_title">Restore bakcup?</string>

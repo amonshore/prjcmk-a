@@ -102,6 +102,13 @@
                 android:name="android.support.PARENT_ACTIVITY"
                 android:value="it.amonshore.comikkua.ui.MainActivity" />
         </activity>
+
+        <receiver android:name=".BootReceiver" android:enabled="true" android:exported="true">
+            <intent-filter>
+                <action android:name="android.intent.action.BOOT_COMPLETED" />
+                <category android:name="android.intent.category.DEFAULT" />
+            </intent-filter>
+        </receiver>
     </application>
 
 </manifest>
