@@ -13,6 +13,8 @@ import android.view.MenuInflater;
 import android.view.MenuItem;
 import android.view.View;
 import android.view.ViewGroup;
+import android.view.animation.Animation;
+import android.view.animation.AnimationUtils;
 import android.widget.AbsListView;
 import android.widget.AdapterView;
 import android.widget.ListView;
@@ -49,6 +51,9 @@ public class ComicsListFragment extends AFragment implements ScrollToTopListener
     private ComicsListAdapter mAdapter;
     private ActionMode mActionMode;
     private FloatingActionButton mBtnAdd;
+    private FloatingActionButton mBtnDel;
+    private Animation mButtonHideAnimation;
+    private Animation mButtonShowAnimation;
 
     @Override
     public void onCreate(Bundle savedInstanceState) {
@@ -66,6 +71,9 @@ public class ComicsListFragment extends AFragment implements ScrollToTopListener
             order = settings.getInt(STATE_ORDER, ComicsListAdapter.ORDER_BY_NAME);
         }
         mAdapter = new ComicsListAdapter(getActivity().getApplicationContext(), order);
+        //
+        mButtonHideAnimation = AnimationUtils.loadAnimation(getActivity(), R.anim.collapse_in);
+        mButtonShowAnimation = AnimationUtils.loadAnimation(getActivity(), R.anim.expand_in);
     }
 
     @Override
@@ -122,10 +130,14 @@ public class ComicsListFragment extends AFragment implements ScrollToTopListener
             @Override
             public boolean onCreateActionMode(ActionMode mode, Menu menu) {
                 //Utils.d("onCreateActionMode");
-                MenuInflater inflater = mode.getMenuInflater();
+                final MenuInflater inflater = mode.getMenuInflater();
                 inflater.inflate(R.menu.menu_comics_cab, menu);
                 mActionMode = mode;
+                // nascondo il pulsante add e mostro del
+                mBtnAdd.startAnimation(mButtonHideAnimation);
                 mBtnAdd.setVisibility(View.INVISIBLE);
+                mBtnDel.startAnimation(mButtonShowAnimation);
+                mBtnDel.setVisibility(View.VISIBLE);
                 return true;
             }
 
@@ -134,21 +146,16 @@ public class ComicsListFragment extends AFragment implements ScrollToTopListener
                 final DataManager dataManager = DataManager.getDataManager();
 //                Utils.d("onActionItemClicked " + item.getTitle());
                 //risponde alla selezione di una azione del menu_comics_cab
-                long menuId = item.getItemId();
+                final long menuId = item.getItemId();
                 if (menuId == R.id.action_comics_delete) {
-                    long[] ags = mListView.getCheckedItemIds();
-//A0040
-//                    Long[] lgs = new Long[ags.length];
-//                    for (int ii = 0; ii < ags.length; ii++) {
-//                        lgs[ii] = ags[ii];
+//                    long[] ags = mListView.getCheckedItemIds();
+//                    for (int ii = ags.length - 1; ii >= 0; ii--) {
+//                        mAdapter.remove(ags[ii]);
+//                        //A0049
+//                        dataManager.updateData(DataManager.ACTION_DEL, ags[ii], DataManager.NO_RELEASE);
 //                    }
-//                    new RemoveComicsAsyncTask().execute(lgs);
-                    for (int ii = ags.length - 1; ii >= 0; ii--) {
-                        mAdapter.remove(ags[ii]);
-                        //A0049
-                        dataManager.updateData(DataManager.ACTION_DEL, ags[ii], DataManager.NO_RELEASE);
-                    }
-                    dataManager.notifyChanged(DataManager.CAUSE_COMICS_REMOVED);
+//                    dataManager.notifyChanged(DataManager.CAUSE_COMICS_REMOVED);
+                    removeSelectedComics();
                     finishActionMode();
                     return true;
                 } else if (menuId == R.id.action_comics_share) {
@@ -186,16 +193,27 @@ public class ComicsListFragment extends AFragment implements ScrollToTopListener
             @Override
             public void onDestroyActionMode(ActionMode mode) {
                 mActionMode = null;
+                mBtnAdd.startAnimation(mButtonShowAnimation);
                 mBtnAdd.setVisibility(View.VISIBLE);
+                mBtnDel.startAnimation(mButtonHideAnimation);
+                mBtnDel.setVisibility(View.GONE);
             }
         });
 
         //listener fab
-        mBtnAdd = ((FloatingActionButton)view.findViewById(R.id.fab_comics_add));
+        mBtnAdd = (FloatingActionButton) view.findViewById(R.id.fab_comics_add);
         mBtnAdd.setOnClickListener(new View.OnClickListener() {
             @Override
             public void onClick(View v) {
                 showComicsEditor();
+            }
+        });
+        mBtnDel = (FloatingActionButton) view.findViewById(R.id.fab_comics_del);
+        mBtnDel.setOnClickListener(new View.OnClickListener() {
+            @Override
+            public void onClick(View v) {
+                removeSelectedComics();
+                finishActionMode();
             }
         });
 
@@ -369,6 +387,17 @@ public class ComicsListFragment extends AFragment implements ScrollToTopListener
         Intent intent = new Intent(getActivity(), ComicsDetailActivity.class);
         intent.putExtra(ComicsDetailActivity.EXTRA_COMICS_ID, comicsId);
         startActivity(intent);
+    }
+
+    private void removeSelectedComics() {
+        final DataManager dataManager = DataManager.getDataManager();
+        final long[] ags = mListView.getCheckedItemIds();
+        for (int ii = ags.length - 1; ii >= 0; ii--) {
+            mAdapter.remove(ags[ii]);
+            //A0049
+            dataManager.updateData(DataManager.ACTION_DEL, ags[ii], DataManager.NO_RELEASE);
+        }
+        dataManager.notifyChanged(DataManager.CAUSE_COMICS_REMOVED);
     }
 
     @Override

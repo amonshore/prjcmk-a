@@ -1,9 +1,12 @@
 package it.amonshore.comikkua.ui.release;
 
 import android.app.Activity;
+import android.app.AlertDialog;
 import android.app.SearchManager;
+import android.content.DialogInterface;
 import android.content.Intent;
 import android.content.SharedPreferences;
+import android.net.Uri;
 import android.os.Bundle;
 import android.os.Handler;
 import android.view.ActionMode;
@@ -22,6 +25,9 @@ import com.nispok.snackbar.Snackbar;
 import com.nispok.snackbar.SnackbarManager;
 import com.nispok.snackbar.listeners.ActionClickListener;
 
+import java.io.UnsupportedEncodingException;
+import java.net.URLEncoder;
+
 import it.amonshore.comikkua.R;
 import it.amonshore.comikkua.RequestCodes;
 import it.amonshore.comikkua.data.Comics;
@@ -35,6 +41,7 @@ import it.amonshore.comikkua.data.UndoHelper;
 import it.amonshore.comikkua.ui.AFragment;
 import it.amonshore.comikkua.ui.MainActivity;
 import it.amonshore.comikkua.ui.ScrollToTopListener;
+import it.amonshore.comikkua.ui.SearchModeDialog;
 import it.amonshore.comikkua.ui.comics.ComicsDetailActivity;
 import se.emilsjolander.stickylistheaders.StickyListHeadersListView;
 
@@ -221,15 +228,44 @@ public class ReleaseListFragment extends AFragment implements ScrollToTopListene
                     return true;
                 } else if (menuId == R.id.action_comics_search) {
                     long[] ags = mListView.getCheckedItemIds();
-                    ReleaseInfo ri = (ReleaseInfo) mAdapter.getItem((int) ags[0]);
-                    Comics comics = dataManager.getComics(ri.getRelease().getComicsId());
+                    final ReleaseInfo ri = (ReleaseInfo) mAdapter.getItem((int) ags[0]);
+                    final Comics comics = dataManager.getComics(ri.getRelease().getComicsId());
 //                    String query = Utils.join(" ", true, comics.getName(), comics.getAuthors(),
 //                            comics.getPublisher());
-                    String query = Utils.join(" ", true, comics.getPublisher(),
-                            comics.getName(), "" + ri.getRelease().getNumber());
-                    Intent intent = new Intent(Intent.ACTION_WEB_SEARCH);
-                    intent.putExtra(SearchManager.QUERY, query);
-                    startActivity(intent);
+                    // A0067
+//                    String query = Utils.join(" ", true, comics.getPublisher(),
+//                            comics.getName(), "" + ri.getRelease().getNumber());
+//                    Intent intent = new Intent(Intent.ACTION_WEB_SEARCH);
+//                    intent.putExtra(SearchManager.QUERY, query);
+//                    startActivity(intent);
+
+                    SearchModeDialog.showDialog(getActivity(), new DialogInterface.OnClickListener() {
+                        @Override
+                        public void onClick(DialogInterface dialog, int which) {
+                            if (which == SearchModeDialog.ITEM_AMAZON) {
+                                try {
+                                    String query = "http://www.amazon.it/gp/search?ie=UTF8&camp=3370&creative=23322&index=books&linkCode=ur2&tag=comikku-21&keywords=" +
+                                            URLEncoder.encode(Utils.join(" ", true,
+                                                    comics.getPublisher(),
+                                                    comics.getName(),
+                                                    "" + ri.getRelease().getNumber()), "UTF-8");
+                                    // apre l'app predefinita per il contenuto (in questo caso un url)
+                                    Intent intent = new Intent(Intent.ACTION_VIEW);
+                                    intent.setData(Uri.parse(query));
+                                    startActivity(intent);
+                                } catch (UnsupportedEncodingException ueex) {
+                                    Utils.e(ReleaseListFragment.this.getClass(), "Amazon search link", ueex);
+                                }
+                            } else if (which == SearchModeDialog.ITEM_WEB_SEARCH) {
+                                String query = Utils.join(" ", true, comics.getPublisher(),
+                                        comics.getName(), "" + ri.getRelease().getNumber());
+                                Intent intent = new Intent(Intent.ACTION_WEB_SEARCH);
+                                intent.putExtra(SearchManager.QUERY, query);
+                                startActivity(intent);
+                            }
+                        }
+                    });
+
                     return true;
                 } else if (menuId == R.id.action_release_ordered) { //A0057
                     long[] ags = mListView.getCheckedItemIds();

@@ -49,4 +49,5 @@ dependencies {
     compile 'com.evernote:android-job:1.0.5'
     compile 'io.reactivex:rxjava:1.1.0'
     compile 'io.reactivex:rxandroid:1.1.0'
+    compile 'com.ogaclejapan.smarttablayout:library:1.6.1'
 }
