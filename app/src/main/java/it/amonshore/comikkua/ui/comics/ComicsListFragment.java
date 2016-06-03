@@ -32,6 +32,7 @@ import it.amonshore.comikkua.Utils;
 import it.amonshore.comikkua.data.DataManager;
 import it.amonshore.comikkua.data.UndoHelper;
 import it.amonshore.comikkua.ui.AFragment;
+import it.amonshore.comikkua.ui.AnimationHelper;
 import it.amonshore.comikkua.ui.MainActivity;
 import it.amonshore.comikkua.ui.ScrollToTopListener;
 
@@ -52,8 +53,7 @@ public class ComicsListFragment extends AFragment implements ScrollToTopListener
     private ActionMode mActionMode;
     private FloatingActionButton mBtnAdd;
     private FloatingActionButton mBtnDel;
-    private Animation mButtonHideAnimation;
-    private Animation mButtonShowAnimation;
+    private AnimationHelper mAnimationHelper;
 
     @Override
     public void onCreate(Bundle savedInstanceState) {
@@ -72,8 +72,7 @@ public class ComicsListFragment extends AFragment implements ScrollToTopListener
         }
         mAdapter = new ComicsListAdapter(getActivity().getApplicationContext(), order);
         //
-        mButtonHideAnimation = AnimationUtils.loadAnimation(getActivity(), R.anim.collapse_in);
-        mButtonShowAnimation = AnimationUtils.loadAnimation(getActivity(), R.anim.expand_in);
+        mAnimationHelper = new AnimationHelper(getActivity());
     }
 
     @Override
@@ -134,10 +133,8 @@ public class ComicsListFragment extends AFragment implements ScrollToTopListener
                 inflater.inflate(R.menu.menu_comics_cab, menu);
                 mActionMode = mode;
                 // nascondo il pulsante add e mostro del
-                mBtnAdd.startAnimation(mButtonHideAnimation);
-                mBtnAdd.setVisibility(View.INVISIBLE);
-                mBtnDel.startAnimation(mButtonShowAnimation);
-                mBtnDel.setVisibility(View.VISIBLE);
+                mAnimationHelper.popup(mBtnAdd, View.INVISIBLE);
+                mAnimationHelper.popup(mBtnDel, View.VISIBLE);
                 return true;
             }
 
@@ -193,10 +190,8 @@ public class ComicsListFragment extends AFragment implements ScrollToTopListener
             @Override
             public void onDestroyActionMode(ActionMode mode) {
                 mActionMode = null;
-                mBtnAdd.startAnimation(mButtonShowAnimation);
-                mBtnAdd.setVisibility(View.VISIBLE);
-                mBtnDel.startAnimation(mButtonHideAnimation);
-                mBtnDel.setVisibility(View.GONE);
+                mAnimationHelper.popup(mBtnAdd, View.VISIBLE);
+                mAnimationHelper.popup(mBtnDel, View.INVISIBLE);
             }
         });
 

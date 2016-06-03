@@ -76,13 +76,14 @@ public class ComicsDetailActivity extends ActionBarActivity {
         mTxtAuthors = ((TextView)findViewById(R.id.txt_detail_comics_authors));
         mTxtNotes = ((TextView)findViewById(R.id.txt_detail_comics_notes));
         updateHeader();
-        //listener fab
-        findViewById(R.id.fab_release_add).setOnClickListener(new View.OnClickListener() {
-            @Override
-            public void onClick(View v) {
-                showReleaseEditor(mComics.getId());
-            }
-        });
+        // gestito direttamente nel fragment
+//        //listener fab
+//        findViewById(R.id.fab_release_add).setOnClickListener(new View.OnClickListener() {
+//            @Override
+//            public void onClick(View v) {
+//                showReleaseEditor(mComics.getId());
+//            }
+//        });
         //
         ReleaseListFragment mReleaseListFragment = ((ReleaseListFragment)getSupportFragmentManager()
                 .findFragmentById(R.id.frg_release_list));
@@ -201,12 +202,13 @@ public class ComicsDetailActivity extends ActionBarActivity {
         startActivityForResult(intent, RequestCodes.EDIT_COMICS_REQUEST);
     }
 
-    private void showReleaseEditor(long comicsId) {
-        Intent intent = new Intent(this, ReleaseEditorActivity.class);
-        intent.putExtra(ReleaseEditorActivity.EXTRA_COMICS_ID, comicsId);
-        intent.putExtra(ReleaseEditorActivity.EXTRA_RELEASE_NUMBER, ReleaseEditorActivity.RELEASE_NEW);
-        startActivityForResult(intent, RequestCodes.EDIT_RELEASE_REQUEST);
-    }
+    // gestito direttamente nel fragment
+//    private void showReleaseEditor(long comicsId) {
+//        Intent intent = new Intent(this, ReleaseEditorActivity.class);
+//        intent.putExtra(ReleaseEditorActivity.EXTRA_COMICS_ID, comicsId);
+//        intent.putExtra(ReleaseEditorActivity.EXTRA_RELEASE_NUMBER, ReleaseEditorActivity.RELEASE_NEW);
+//        startActivityForResult(intent, RequestCodes.EDIT_RELEASE_REQUEST);
+//    }
 
     private void showComicsImageSelector() {
         Intent intent = new Intent(Intent.ACTION_GET_CONTENT);

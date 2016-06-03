@@ -21,6 +21,7 @@ import android.widget.AdapterView;
 import android.widget.ListView;
 import android.widget.TextView;
 
+import com.github.clans.fab.FloatingActionButton;
 import com.nispok.snackbar.Snackbar;
 import com.nispok.snackbar.SnackbarManager;
 import com.nispok.snackbar.listeners.ActionClickListener;
@@ -39,6 +40,7 @@ import it.amonshore.comikkua.Utils;
 import it.amonshore.comikkua.data.ReleaseInfo;
 import it.amonshore.comikkua.data.UndoHelper;
 import it.amonshore.comikkua.ui.AFragment;
+import it.amonshore.comikkua.ui.AnimationHelper;
 import it.amonshore.comikkua.ui.MainActivity;
 import it.amonshore.comikkua.ui.ScrollToTopListener;
 import it.amonshore.comikkua.ui.SearchModeDialog;
@@ -60,6 +62,10 @@ public class ReleaseListFragment extends AFragment implements ScrollToTopListene
     private int mGroupMode;
     private boolean mGroupByMonth;
     private boolean mWeekStartOnMonday;
+    private FloatingActionButton mBtnAdd;
+    private FloatingActionButton mBtnDel;
+    private FloatingActionButton mBtnSearchAmazon;
+    private AnimationHelper mAnimationHelper;
 
     /**
      *
@@ -80,8 +86,10 @@ public class ReleaseListFragment extends AFragment implements ScrollToTopListene
         //se il fragment è caricato nel dettaglio non faccio vedere il menu
         if (mComics != null) {
             setHasOptionsMenu(false);
+            mBtnAdd.setVisibility(View.VISIBLE);
         } else {
             setHasOptionsMenu(true);
+            mBtnAdd.setVisibility(View.GONE);
         }
     }
 
@@ -98,6 +106,8 @@ public class ReleaseListFragment extends AFragment implements ScrollToTopListene
             SharedPreferences settings = getActivity().getSharedPreferences(MainActivity.PREFS_NAME, 0);
             mGroupMode = settings.getInt(STATE_GROUP_MODE, ReleaseGroupHelper.MODE_CALENDAR);
         }
+        //
+        mAnimationHelper = new AnimationHelper(getActivity());
     }
 
     @Override
@@ -177,8 +187,10 @@ public class ReleaseListFragment extends AFragment implements ScrollToTopListene
                 int count = mListView.getCheckedItemCount();
                 if (count == 1) {
                     mode.setTitle(getString(R.string.selected_item, count));
+                    mAnimationHelper.popup(mBtnSearchAmazon, View.VISIBLE);
                 } else {
                     mode.setTitle(getString(R.string.selected_items, count));
+                    mAnimationHelper.popup(mBtnSearchAmazon, View.GONE);
                 }
             }
 
@@ -188,6 +200,12 @@ public class ReleaseListFragment extends AFragment implements ScrollToTopListene
                 MenuInflater inflater = mode.getMenuInflater();
                 inflater.inflate(R.menu.menu_releases_cab, menu);
                 mActionMode = mode;
+                // nascondo il pulsante add e mostro del
+                if (mComics != null) {
+                    mAnimationHelper.popup(mBtnAdd, View.GONE);
+                }
+                mAnimationHelper.popup(mBtnDel, View.VISIBLE);
+                mAnimationHelper.popup(mBtnSearchAmazon, View.VISIBLE);
                 return true;
             }
 
@@ -198,17 +216,7 @@ public class ReleaseListFragment extends AFragment implements ScrollToTopListene
                 //risponde alla selezione di una azione del menu_releases_cab
                 long menuId = item.getItemId();
                 if (menuId == R.id.action_release_delete) {
-                    //sono già ordinati in ordine crescente
-                    long[] ags = mListView.getCheckedItemIds();
-                    //visto che l'adapter considera come id la posizione dell'elemento
-                    //posso usare l'id come posizione per rimuoverli dall'adapter
-                    for (int ii = ags.length - 1; ii >= 0; ii--) {
-                        //A0049
-                        ReleaseInfo ri = (ReleaseInfo)mAdapter.getItem((int) ags[ii]);
-                        dataManager.updateData(DataManager.ACTION_DEL, ri.getRelease().getComicsId(), ri.getRelease().getNumber());
-                        mAdapter.remove((int) ags[ii]);
-                    }
-                    dataManager.notifyChanged(DataManager.CAUSE_RELEASE_REMOVED);
+                    removeSelectedReleases();
                     finishActionMode();
                     return true;
                 } else if (menuId == R.id.action_release_share) {
@@ -291,6 +299,51 @@ public class ReleaseListFragment extends AFragment implements ScrollToTopListene
             @Override
             public void onDestroyActionMode(ActionMode mode) {
                 mActionMode = null;
+                if (mComics != null) {
+                    mAnimationHelper.popup(mBtnAdd, View.VISIBLE);
+                }
+                mAnimationHelper.popup(mBtnDel, View.GONE);
+                mAnimationHelper.popup(mBtnSearchAmazon, View.GONE);
+            }
+        });
+
+        mBtnAdd = (FloatingActionButton) view.findViewById(R.id.fab_comics_add);
+        mBtnAdd.setVisibility(View.GONE);
+        mBtnAdd.setOnClickListener(new View.OnClickListener() {
+            @Override
+            public void onClick(View v) {
+                showReleaseEditor(mComics.getId(), ReleaseEditorActivity.RELEASE_NEW);
+            }
+        });
+        mBtnDel = (FloatingActionButton) view.findViewById(R.id.fab_comics_del);
+        mBtnDel.setOnClickListener(new View.OnClickListener() {
+            @Override
+            public void onClick(View v) {
+                removeSelectedReleases();
+                finishActionMode();
+            }
+        });
+        mBtnSearchAmazon = (FloatingActionButton) view.findViewById(R.id.fab_comics_search_amazon);
+        mBtnSearchAmazon.setOnClickListener(new View.OnClickListener() {
+            @Override
+            public void onClick(View v) {
+                // TODO search
+                final long[] ags = mListView.getCheckedItemIds();
+                final ReleaseInfo ri = (ReleaseInfo) mAdapter.getItem((int) ags[0]);
+                final Comics comics = DataManager.getDataManager().getComics(ri.getRelease().getComicsId());
+                try {
+                    String query = "http://www.amazon.it/gp/search?ie=UTF8&camp=3370&creative=23322&index=books&linkCode=ur2&tag=comikku-21&keywords=" +
+                            URLEncoder.encode(Utils.join(" ", true,
+                                    comics.getPublisher(),
+                                    comics.getName(),
+                                    "" + ri.getRelease().getNumber()), "UTF-8");
+                    // apre l'app predefinita per il contenuto (in questo caso un url)
+                    Intent intent = new Intent(Intent.ACTION_VIEW);
+                    intent.setData(Uri.parse(query));
+                    startActivity(intent);
+                } catch (UnsupportedEncodingException ueex) {
+                    Utils.e(ReleaseListFragment.this.getClass(), "Amazon search link", ueex);
+                }
             }
         });
 
@@ -464,6 +517,21 @@ public class ReleaseListFragment extends AFragment implements ScrollToTopListene
         Intent intent = new Intent(getActivity(), ComicsDetailActivity.class);
         intent.putExtra(ComicsDetailActivity.EXTRA_COMICS_ID, comicsId);
         startActivity(intent);
+    }
+
+    private void removeSelectedReleases() {
+        final DataManager dataManager = DataManager.getDataManager();
+        //sono già ordinati in ordine crescente
+        final long[] ags = mListView.getCheckedItemIds();
+        //visto che l'adapter considera come id la posizione dell'elemento
+        //posso usare l'id come posizione per rimuoverli dall'adapter
+        for (int ii = ags.length - 1; ii >= 0; ii--) {
+            //A0049
+            ReleaseInfo ri = (ReleaseInfo)mAdapter.getItem((int) ags[ii]);
+            dataManager.updateData(DataManager.ACTION_DEL, ri.getRelease().getComicsId(), ri.getRelease().getNumber());
+            mAdapter.remove((int) ags[ii]);
+        }
+        dataManager.notifyChanged(DataManager.CAUSE_RELEASE_REMOVED);
     }
 
     @Override
