@@ -11,6 +11,7 @@ import android.support.v7.widget.Toolbar;
 import android.view.Menu;
 import android.view.MenuItem;
 import android.widget.TextView;
+import android.widget.Toast;
 
 import com.ogaclejapan.smarttablayout.SmartTabLayout;
 
@@ -191,6 +192,10 @@ public class MainActivity extends AppCompatActivity implements ComicsObserver {
             Intent intent = new Intent(this, DataOptionsActivity.class);
             startActivity(intent);
             return true;
+        } else if (id == R.id.action_comics_sync) { //A0068
+            // TODO mostrare dialog per lettura codice sync
+            DataManager.getDataManager().enableRemoteSync("0000");
+            return true;
         }
 
         return super.onOptionsItemSelected(item);
@@ -226,6 +231,14 @@ public class MainActivity extends AppCompatActivity implements ComicsObserver {
                         tab.setText(getString(R.string.title_page_releases));
                         break;
                 }
+                break;
+            case DataManager.CAUSE_SYNC_OK:
+                // TODO
+                Toast.makeText(this, "sync ok", Toast.LENGTH_SHORT).show();
+                break;
+            case DataManager.CAUSE_SYNC_REFUSED:
+                // TODO
+                Toast.makeText(this, "sync refused", Toast.LENGTH_SHORT).show();
                 break;
             case DataManager.CAUSE_COMICS_ADDED:
             case DataManager.CAUSE_COMICS_CHANGED:
