@@ -54,8 +54,10 @@ public class DataManager extends Observable<ComicsObserver> {
     public static final int CAUSE_RELEASES_MODE_CHANGED = 1 << 11;
     public static final int CAUSE_CREATED = 1 << 12; // 4096
     public static final int CAUSE_SYNC = 1 << 13;
-    public static final int CAUSE_SYNC_OK = CAUSE_SYNC | 1 << 14;
+    public static final int CAUSE_SYNC_STARTED = CAUSE_SYNC | 1 << 14;
     public static final int CAUSE_SYNC_REFUSED = CAUSE_SYNC | 1 << 15;
+    public static final int CAUSE_SYNC_STOPPED = CAUSE_SYNC | 1 << 16;
+    public static final int CAUSE_SYNC_ERROR = CAUSE_SYNC | 1 << 17;
 
     public static final long NO_COMICS = -1;
     public static final int NO_RELEASE = -1;
@@ -570,22 +572,44 @@ public class DataManager extends Observable<ComicsObserver> {
 
     /**
      * Attiva la sincronizzazione remota.
-     * Se la presentazione va a buon fine verrà inviata la notifica CAUSE_SYNC_OK.
+     * Se la presentazione va a buon fine verrà inviata la notifica CAUSE_SYNC_STARTED.
      * In caso contrario CAUSE_SYNC_REFUSED.
      *
      * @param syncId    codice di sincronizzazione
      * @return this
      */
     public DataManager enableRemoteSync(String syncId) {
-        mIsSyncEnabled = true;
-        mSyncEventHelper.applySyncId(syncId, new SyncEventHelper.ApplySyncIdListener() {
+        mIsSyncEnabled = false; //riporto a false, sarà messo a true solo a sync avviata con successo
+        mSyncEventHelper.applySyncId(syncId, new SyncEventHelper.SyncListener() {
             @Override
             public void onResponse(int response) {
-                if (response == SyncEventHelper.APPLY_SYNC_OK) {
-                    notifyChanged(CAUSE_SYNC_OK);
-                } else {
+                if (response == SyncEventHelper.SYNC_STARTED) {
+                    mIsSyncEnabled = true;
+                    notifyChanged(CAUSE_SYNC_STARTED);
+                } else if (response == SyncEventHelper.SYNC_REFUSED) {
+                    mIsSyncEnabled = false;
+                    // segnalo che il codice di sincronizzazione è stato rifiutato
                     notifyChanged(CAUSE_SYNC_REFUSED);
+                } else if (response == SyncEventHelper.SYNC_RECEIVED) {
+                    // TODO dati ricevuti, aggionrare i dati locali
+                } else if (response == SyncEventHelper.SYNC_SENT) {
+                    // TODO dati inviati
+                } else if (response == SyncEventHelper.SYNC_TIMEOUT) {
+                    mIsSyncEnabled = false;
+                    disableRmoteSync();
+                    // segnalo che la sincronizzazione non è più attiva
+                    notifyChanged(CAUSE_SYNC_STOPPED);
+                } else {
+                    mIsSyncEnabled = false;
+                    disableRmoteSync();
+                    // segnalo che la sincronizzazione non è più attiva (a causa di un errore)
+                    notifyChanged(CAUSE_SYNC_ERROR);
                 }
+            }
+
+            @Override
+            public void onDataReceived(Object data) {
+                // TODO ho ricevuto nuovi dati... che me ne faccio?
             }
         });
 
@@ -600,6 +624,7 @@ public class DataManager extends Observable<ComicsObserver> {
     public DataManager disableRmoteSync() {
         // TODO disabilitare la sincronizzazione remota
         mIsSyncEnabled = false;
+        notifyChanged(CAUSE_SYNC_STOPPED);
 
         return this;
     }

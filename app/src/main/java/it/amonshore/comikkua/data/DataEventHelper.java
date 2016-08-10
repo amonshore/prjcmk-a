@@ -31,7 +31,7 @@ class DataEventHelper extends AIncrementalStart {
     /**
      * Invia una azione che verrà gestita insieme ad altre sucessivamente.
      *
-     * @param action    azione da eseguire sui dati (ACTION_ADD, ACTION_UPD, ACTION_DEL)
+     * @param action    azione da eseguire sui dati (ACTION_ADD, ACTION_UPD, ACTION_DEL, ACTION_CLEAR)
      * @param comicsId  id del comics su cui operare l'azione
      * @param releaseNumber numero della release su cui operare l'azione (NO_RELEASE per nessuna)
      */

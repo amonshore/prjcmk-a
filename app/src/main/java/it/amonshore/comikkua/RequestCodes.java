@@ -11,6 +11,7 @@ public abstract class RequestCodes {
     public final static int CROP_IMAGE = 3010;
     //i codici di richiesta per i permessi possono essere solo da 0 a 255
     public final static int WRITE_EXTERNAL_STORAGE_PERMISSION_REQUEST = 101;
+    public final static int CAMERA_PERMISSION_REQUEST = 102;
 
     //TODO completare con gli altri codici
 }

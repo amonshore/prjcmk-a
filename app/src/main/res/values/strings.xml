@@ -29,6 +29,7 @@
     <string name="title_activity_comics_detail">Comics detail</string>
     <string name="title_activity_info">Info</string>
     <string name="title_activity_data_options">Data</string>
+    <string name="title_activity_synccode_scanner">Scan sync code</string>
 
     <string name="share">Share</string>
     <!--<string name="share_data">Share all data</string>-->
@@ -200,4 +201,11 @@
     <!-- info -->
     <string name="info_version">Version: %1$s (%2$s)</string>
     <string name="info_author">Author: %1$s</string>
+
+    <!-- sync scanner -->
+    <string name="syncscanner_permissions_explanation">You won\'t be able to scan sync code without giving access to your device\'s camera. Do you want to change your settings?</string>
+    <string name="syncscanner_permissions_need_title">Need access to camera</string>
+    <string name="syncscanner_permissions_need_message">You can always change your permissions by going to Settings / Apps / Comikku / Persmissions</string>
+    <string name="syncscanner_help">Go to www.amonshore.it/comikku on your computer and scan the QR Code</string>
+
 </resources>

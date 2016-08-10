@@ -22,6 +22,7 @@ import it.amonshore.comikkua.data.DataManager;
 import it.amonshore.comikkua.data.ReleaseGroupHelper;
 import it.amonshore.comikkua.ui.options.DataOptionsActivity;
 import it.amonshore.comikkua.ui.release.ReleaseListFragment;
+import it.amonshore.comikkua.ui.sync.SyncScannerActivity;
 
 /**
  * http://developer.android.com/training/implementing-navigation/lateral.html#tabs
@@ -194,7 +195,9 @@ public class MainActivity extends AppCompatActivity implements ComicsObserver {
             return true;
         } else if (id == R.id.action_comics_sync) { //A0068
             // TODO mostrare dialog per lettura codice sync
-            DataManager.getDataManager().enableRemoteSync("0000");
+            //DataManager.getDataManager().enableRemoteSync("0000");
+            Intent intent = new Intent(this, SyncScannerActivity.class);
+            startActivity(intent);
             return true;
         }
 
@@ -232,13 +235,21 @@ public class MainActivity extends AppCompatActivity implements ComicsObserver {
                         break;
                 }
                 break;
-            case DataManager.CAUSE_SYNC_OK:
+            case DataManager.CAUSE_SYNC_STARTED:
                 // TODO
-                Toast.makeText(this, "sync ok", Toast.LENGTH_SHORT).show();
+                Toast.makeText(this, "sync started", Toast.LENGTH_SHORT).show();
                 break;
             case DataManager.CAUSE_SYNC_REFUSED:
                 // TODO
                 Toast.makeText(this, "sync refused", Toast.LENGTH_SHORT).show();
+                break;
+            case DataManager.CAUSE_SYNC_ERROR:
+                // TODO
+                Toast.makeText(this, "sync error", Toast.LENGTH_SHORT).show();
+                break;
+            case DataManager.CAUSE_SYNC_STOPPED:
+                // TODO
+                Toast.makeText(this, "sync stopped", Toast.LENGTH_SHORT).show();
                 break;
             case DataManager.CAUSE_COMICS_ADDED:
             case DataManager.CAUSE_COMICS_CHANGED:

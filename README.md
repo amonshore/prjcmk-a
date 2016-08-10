@@ -6,6 +6,7 @@ Autore: narsenico
 
 ## v1.0.4 (23)
 - integrazione con Amazon
+- (A0068)
 
 ## v1.0.4 (22)
 - gestione permessi Android M

@@ -14,6 +14,7 @@ import android.os.Handler;
 import android.support.v4.app.ActivityCompat;
 import android.support.v4.content.ContextCompat;
 import android.support.v7.app.ActionBarActivity;
+import android.support.v7.app.AppCompatActivity;
 import android.support.v7.widget.Toolbar;
 import android.view.LayoutInflater;
 import android.view.View;
@@ -32,7 +33,7 @@ import it.amonshore.comikkua.RequestCodes;
 import it.amonshore.comikkua.data.DataManager;
 import it.amonshore.comikkua.data.FileHelper;
 
-public class DataOptionsActivity extends ActionBarActivity {
+public class DataOptionsActivity extends AppCompatActivity {
 
     private static final String BACKUP_FILE_NAME = "comikku_data.bck";
     private static final String OLD_FILE_NAME = "data.json";
