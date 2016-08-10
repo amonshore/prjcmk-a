@@ -65,7 +65,8 @@ public class ComicsEditorActivity extends ActionBarActivity implements ItemPicke
         getSupportActionBar().setDisplayHomeAsUpEnabled(true);
         toolbar.setNavigationIcon(R.drawable.ic_close);
         //
-        mPeriodicityKeys = new String[] { Comics.PERIODICITY_UNKNOWN, Comics.PERIODICITY_WEEKLY,
+        mPeriodicityKeys = new String[] { Comics.PERIODICITY_UNKNOWN,
+                Comics.PERIODICITY_WEEKLY, Comics.PERIODICITY_WEEKLY_X2,
                 Comics.PERIODICITY_MONTHLY, Comics.PERIODICITY_MONTHLY_X2, Comics.PERIODICITY_MONTHLY_X3,
                 Comics.PERIODICITY_MONTHLY_X4, Comics.PERIODICITY_MONTHLY_X6, Comics.PERIODICITY_YEARLY };
         //imposto i valori e creo i listener

@@ -15,6 +15,7 @@ public class Comics {
 
     public final static String PERIODICITY_UNKNOWN = "";
     public final static String PERIODICITY_WEEKLY = "W1";
+    public final static String PERIODICITY_WEEKLY_X2 = "W2";
     public final static String PERIODICITY_MONTHLY = "M1";
     public final static String PERIODICITY_MONTHLY_X2 = "M2";
     public final static String PERIODICITY_MONTHLY_X3 = "M3";
@@ -130,7 +131,7 @@ public class Comics {
      * @return  nuova release
      */
     public Release createRelease(boolean autoFill) {
-        Release newRelease = new Release(this.getId());
+        final Release newRelease = new Release(this.getId());
         if (autoFill) {
             //calcolo numero e data
             Release maxRelease = null;
@@ -144,10 +145,10 @@ public class Comics {
             } else {
                 newRelease.setNumber(maxRelease.getNumber() + 1);
                 if (maxRelease.getDate() != null && !TextUtils.isEmpty(this.getPeriodicity())) {
-                    GregorianCalendar calendar = new GregorianCalendar();
+                    final GregorianCalendar calendar = new GregorianCalendar();
                     calendar.setTime(maxRelease.getDate());
-                    char type = this.getPeriodicity().charAt(0);
-                    int amout = Integer.parseInt(this.getPeriodicity().substring(1));
+                    final char type = this.getPeriodicity().charAt(0);
+                    final int amout = Integer.parseInt(this.getPeriodicity().substring(1));
                     if (type == 'W') {
                         calendar.add(Calendar.DAY_OF_MONTH, 7 * amout);
                     } else if (type == 'M') {

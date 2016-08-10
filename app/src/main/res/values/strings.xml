@@ -135,6 +135,7 @@
     <!-- periodicity -->
     <string name="periodicity_unknown">Nothing</string>
     <string name="periodicity_weekly">Weekly</string>
+    <string name="periodicity_weekly_2">Fortnightly</string>
     <string name="periodicity_monthly">Monthly</string>
     <string name="periodicity_every_2_months">Every 2 months</string>
     <string name="periodicity_every_3_months">Every 3 months</string>
@@ -144,6 +145,7 @@
     <string-array name="periodicity_value_array">
         <item>@string/periodicity_unknown</item>
         <item>@string/periodicity_weekly</item>
+        <item>@string/periodicity_weekly_2</item>
         <item>@string/periodicity_monthly</item>
         <item>@string/periodicity_every_2_months</item>
         <item>@string/periodicity_every_3_months</item>
