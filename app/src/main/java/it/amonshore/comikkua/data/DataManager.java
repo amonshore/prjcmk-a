@@ -53,6 +53,9 @@ public class DataManager extends Observable<ComicsObserver> {
     public static final int CAUSE_RELEASE_REMOVED = 1 << 10;
     public static final int CAUSE_RELEASES_MODE_CHANGED = 1 << 11;
     public static final int CAUSE_CREATED = 1 << 12; // 4096
+    public static final int CAUSE_SYNC = 1 << 13;
+    public static final int CAUSE_SYNC_OK = CAUSE_SYNC | 1 << 14;
+    public static final int CAUSE_SYNC_REFUSED = CAUSE_SYNC | 1 << 15;
 
     public static final long NO_COMICS = -1;
     public static final int NO_RELEASE = -1;
@@ -119,6 +122,9 @@ public class DataManager extends Observable<ComicsObserver> {
     //A0033
     private ReminderEventHelper mReminderEventHelper;
     private boolean mIsReminderEnabled = false;
+    //A0068
+    private SyncEventHelper mSyncEventHelper;
+    private boolean mIsSyncEnabled = false;
 
     private DataManager(Context context, String userName) {
         mContext = context;
@@ -138,6 +144,8 @@ public class DataManager extends Observable<ComicsObserver> {
         //creo i gestori eventi sui dati e sui reminder
         mDataEventHelper = new DataEventHelper(mContext);
         mReminderEventHelper = new ReminderEventHelper(mContext);
+        //A0068 gestore eventi per la sincronizzazione remota dei dati
+        mSyncEventHelper = new SyncEventHelper(mContext);
     }
 
     private SharedPreferences.OnSharedPreferenceChangeListener mSharedPreferenceChangeListener =
@@ -547,11 +555,51 @@ public class DataManager extends Observable<ComicsObserver> {
         //se è un evento di tipo data lo invio al gestore degli eventi
         if ((action & ACTION_DATA) == ACTION_DATA) {
             mDataEventHelper.send(action, comicsId, releaseNumber);
+            //A0068 se abilitato invio l'evento anche al gestore della sincronizzazione remota
+            if (mIsSyncEnabled) {
+                mSyncEventHelper.send(action, comicsId, releaseNumber);
+            }
         }
         //invio all'osservatore un nuovo evento da gestire indipendentemente dal tipo
         if (mIsReminderEnabled) {
             mReminderEventHelper.send(action);
         }
+
+        return this;
+    }
+
+    /**
+     * Attiva la sincronizzazione remota.
+     * Se la presentazione va a buon fine verrà inviata la notifica CAUSE_SYNC_OK.
+     * In caso contrario CAUSE_SYNC_REFUSED.
+     *
+     * @param syncId    codice di sincronizzazione
+     * @return this
+     */
+    public DataManager enableRemoteSync(String syncId) {
+        mIsSyncEnabled = true;
+        mSyncEventHelper.applySyncId(syncId, new SyncEventHelper.ApplySyncIdListener() {
+            @Override
+            public void onResponse(int response) {
+                if (response == SyncEventHelper.APPLY_SYNC_OK) {
+                    notifyChanged(CAUSE_SYNC_OK);
+                } else {
+                    notifyChanged(CAUSE_SYNC_REFUSED);
+                }
+            }
+        });
+
+        return this;
+    }
+
+    /**
+     * Disattiva la sincronizzazione remota.
+     *
+     * @return this
+     */
+    public DataManager disableRmoteSync() {
+        // TODO disabilitare la sincronizzazione remota
+        mIsSyncEnabled = false;
 
         return this;
     }
@@ -578,6 +626,8 @@ public class DataManager extends Observable<ComicsObserver> {
         //volta
         mDataEventHelper.start();
         mReminderEventHelper.start();
+        //A0068
+        mSyncEventHelper.start();
 
         return this;
     }
@@ -590,6 +640,8 @@ public class DataManager extends Observable<ComicsObserver> {
         //quante volte è stato chiamato start
         mDataEventHelper.stop();
         mReminderEventHelper.stop();
+        //A0068
+        mSyncEventHelper.stop();
 
         return this;
     }

@@ -31,4 +31,18 @@
         app:fab_colorRipple="@color/comikku_fab_ripple_color"
         app:fab_elevationCompat="@dimen/floating_action_elevation"/>
 
+    <com.github.clans.fab.FloatingActionButton
+        android:id="@+id/fab_comics_del"
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:layout_gravity="bottom|right"
+        android:layout_marginBottom="@dimen/floating_action_margin_bottom"
+        android:layout_marginRight="@dimen/floating_action_margin_right"
+        android:src="@drawable/ic_delete"
+        android:visibility="gone"
+        app:fab_colorNormal="@color/comikku_fab_danger_normal_color"
+        app:fab_colorPressed="@color/comikku_fab_danger_pressed_color"
+        app:fab_colorRipple="@color/comikku_fab_danger_ripple_color"
+        app:fab_elevationCompat="@dimen/floating_action_elevation"/>
+
 </FrameLayout>

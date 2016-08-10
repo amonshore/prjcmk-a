@@ -5,13 +5,15 @@ import android.content.SharedPreferences;
 import android.os.Handler;
 import android.preference.PreferenceManager;
 import android.support.v4.view.ViewPager;
-import android.support.v7.app.ActionBarActivity;
 import android.os.Bundle;
+import android.support.v7.app.AppCompatActivity;
 import android.support.v7.widget.Toolbar;
 import android.view.Menu;
 import android.view.MenuItem;
+import android.widget.TextView;
+import android.widget.Toast;
 
-import com.google.samples.apps.iosched.ui.widget.SlidingTabLayout;
+import com.ogaclejapan.smarttablayout.SmartTabLayout;
 
 import it.amonshore.comikkua.R;
 import it.amonshore.comikkua.Utils;
@@ -24,7 +26,7 @@ import it.amonshore.comikkua.ui.release.ReleaseListFragment;
 /**
  * http://developer.android.com/training/implementing-navigation/lateral.html#tabs
  */
-public class MainActivity extends ActionBarActivity implements ComicsObserver {
+public class MainActivity extends AppCompatActivity implements ComicsObserver {
 
     public final static String PREFS_NAME = "ComikkuPrefs";
 
@@ -32,6 +34,8 @@ public class MainActivity extends ActionBarActivity implements ComicsObserver {
     private DataManager mDataManager;
     //salvo la page/fragment precedente
     private int mPreviousPage;
+    //private SlidingTabLayout mSlidingTabLayout;
+    private SmartTabLayout mSmartTabLayout;
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
@@ -56,23 +60,42 @@ public class MainActivity extends ActionBarActivity implements ComicsObserver {
         setSupportActionBar(toolbar);
         //l'adapter fornisce i fragment che comporranno la vista a tab
         mTabPageAdapter = new TabPageAdapter(this, getSupportFragmentManager());
-        ViewPager viewPager = (ViewPager)findViewById(R.id.pager);
+        final ViewPager viewPager = (ViewPager)findViewById(R.id.pager);
         viewPager.setAdapter(mTabPageAdapter);
         mPreviousPage = 0;
-        // Give the SlidingTabLayout the ViewPager
-        SlidingTabLayout slidingTabLayout = (SlidingTabLayout) findViewById(R.id.sliding_tabs);
-        // Set custom tab layout
-        slidingTabLayout.setCustomTabView(R.layout.activity_main_tab, 0);
-        // Center the tabs in the layout
-        slidingTabLayout.setDistributeEvenly(true);
-        // Customize tab color
-        slidingTabLayout.setCustomTabColorizer(new SlidingTabLayout.TabColorizer() {
-            @Override
-            public int getIndicatorColor(int position) {
-                return getResources().getColor(R.color.comikku_selected_tab_color);
-            }
-        });
-        slidingTabLayout.setOnPageChangeListener(new ViewPager.SimpleOnPageChangeListener() {
+//        // Give the SlidingTabLayout the ViewPager
+//        mSlidingTabLayout = (SlidingTabLayout) findViewById(R.id.sliding_tabs);
+//        // Set custom tab layout
+//        mSlidingTabLayout.setCustomTabView(R.layout.activity_main_tab, 0);
+//        // Center the tabs in the layout
+//        mSlidingTabLayout.setDistributeEvenly(true);
+//        // Customize tab color
+//        mSlidingTabLayout.setCustomTabColorizer(new SlidingTabLayout.TabColorizer() {
+//            @Override
+//            public int getIndicatorColor(int position) {
+//                return getResources().getColor(R.color.comikku_selected_tab_color);
+//            }
+//        });
+//        mSlidingTabLayout.setOnPageChangeListener(new ViewPager.SimpleOnPageChangeListener() {
+//            @Override
+//            public void onPageSelected(int position) {
+//                Utils.d("slidingTabLayout OnPageChangeListener " + mPreviousPage + " -> " + position);
+//                if (mPreviousPage != position) {
+//                    //chiudo l'ActionBar contestuale del fragment precedente
+//                    ((AFragment) mTabPageAdapter.getItem(mPreviousPage)).finishActionMode();
+//                    //aggiorno i dati sulla page corrente causa cambio pagina (quindi se i dati ci sono non fa nulla)
+//                    ((AFragment) mTabPageAdapter.getItem(position)).onDataChanged(DataManager.CAUSE_PAGE_CHANGED);
+//                    mPreviousPage = position;
+//                } else {
+//                    //A0053 scroll top alla selezione della stessa tab
+//                    ((ScrollToTopListener) mTabPageAdapter.getItem(position)).scrollToTop();
+//                }
+//            }
+//        });
+//        mSlidingTabLayout.setViewPager(viewPager);
+
+        mSmartTabLayout = (SmartTabLayout) findViewById(R.id.smart_tabs);
+        mSmartTabLayout.setOnPageChangeListener(new ViewPager.SimpleOnPageChangeListener() {
             @Override
             public void onPageSelected(int position) {
                 Utils.d("slidingTabLayout OnPageChangeListener " + mPreviousPage + " -> " + position);
@@ -82,13 +105,23 @@ public class MainActivity extends ActionBarActivity implements ComicsObserver {
                     //aggiorno i dati sulla page corrente causa cambio pagina (quindi se i dati ci sono non fa nulla)
                     ((AFragment) mTabPageAdapter.getItem(position)).onDataChanged(DataManager.CAUSE_PAGE_CHANGED);
                     mPreviousPage = position;
-                } else {
+//                } else {
+//                    //A0053 scroll top alla selezione della stessa tab
+//                    ((ScrollToTopListener) mTabPageAdapter.getItem(position)).scrollToTop();
+                }
+            }
+        });
+        mSmartTabLayout.setOnTabClickListener(new SmartTabLayout.OnTabClickListener() {
+            @Override
+            public void onTabClicked(int position) {
+                Utils.d("slidingTabLayout OnTabClickListener " + mPreviousPage + " -> " + position);
+                if (mPreviousPage == position) {
                     //A0053 scroll top alla selezione della stessa tab
                     ((ScrollToTopListener) mTabPageAdapter.getItem(position)).scrollToTop();
                 }
             }
         });
-        slidingTabLayout.setViewPager(viewPager);
+        mSmartTabLayout.setViewPager(viewPager);
     }
 
     //spostato in DataManager
@@ -159,6 +192,10 @@ public class MainActivity extends ActionBarActivity implements ComicsObserver {
             Intent intent = new Intent(this, DataOptionsActivity.class);
             startActivity(intent);
             return true;
+        } else if (id == R.id.action_comics_sync) { //A0068
+            // TODO mostrare dialog per lettura codice sync
+            DataManager.getDataManager().enableRemoteSync("0000");
+            return true;
         }
 
         return super.onOptionsItemSelected(item);
@@ -168,27 +205,40 @@ public class MainActivity extends ActionBarActivity implements ComicsObserver {
     public void onChanged(int cause) {
         switch (cause) {
             case DataManager.CAUSE_RELEASES_MODE_CHANGED:
-                ReleaseListFragment fragment = (ReleaseListFragment)mTabPageAdapter.getItem(1);
-                SlidingTabLayout slidingTabLayout = (SlidingTabLayout) findViewById(R.id.sliding_tabs);
+                final ReleaseListFragment fragment = (ReleaseListFragment)mTabPageAdapter.getItem(1);
+//                SlidingTabLayout slidingTabLayout = (SlidingTabLayout) findViewById(R.id.sliding_tabs);
                 int groupMode = fragment.getGroupMode();
                 if (groupMode == 0) {
                     SharedPreferences settings = getSharedPreferences(MainActivity.PREFS_NAME, 0);
                     groupMode = settings.getInt(ReleaseListFragment.STATE_GROUP_MODE, ReleaseGroupHelper.MODE_CALENDAR);
                 }
+                final TextView tab = (TextView) mSmartTabLayout.getTabAt(1);
                 switch (groupMode) {
                     case ReleaseGroupHelper.MODE_LAW:
-                        slidingTabLayout.setPageTitle(1, getString(R.string.title_page_wishlist));
+//                        mSlidingTabLayout.setPageTitle(1, getString(R.string.title_page_wishlist));
+                        tab.setText(getString(R.string.title_page_wishlist));
                         break;
                     case ReleaseGroupHelper.MODE_CALENDAR:
-                        slidingTabLayout.setPageTitle(1, getString(R.string.title_page_calendar));
+//                        mSlidingTabLayout.setPageTitle(1, getString(R.string.title_page_calendar));
+                        tab.setText(getString(R.string.title_page_calendar));
                         break;
                     case ReleaseGroupHelper.MODE_SHOPPING:
-                        slidingTabLayout.setPageTitle(1, getString(R.string.title_page_shopping));
+//                        mSlidingTabLayout.setPageTitle(1, getString(R.string.title_page_shopping));
+                        tab.setText(getString(R.string.title_page_shopping));
                         break;
                     default:
-                        slidingTabLayout.setPageTitle(1, getString(R.string.title_page_releases));
+//                        mSlidingTabLayout.setPageTitle(1, getString(R.string.title_page_releases));
+                        tab.setText(getString(R.string.title_page_releases));
                         break;
                 }
+                break;
+            case DataManager.CAUSE_SYNC_OK:
+                // TODO
+                Toast.makeText(this, "sync ok", Toast.LENGTH_SHORT).show();
+                break;
+            case DataManager.CAUSE_SYNC_REFUSED:
+                // TODO
+                Toast.makeText(this, "sync refused", Toast.LENGTH_SHORT).show();
                 break;
             case DataManager.CAUSE_COMICS_ADDED:
             case DataManager.CAUSE_COMICS_CHANGED:

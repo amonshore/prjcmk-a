@@ -4,6 +4,9 @@ Autore: narsenico
 ## v1.0.5 (23)
 - aggiunta periodicità fumetti quindicinale
 
+## v1.0.4 (23)
+- integrazione con Amazon
+
 ## v1.0.4 (22)
 - gestione permessi Android M
 - corretto bug che non permetteva il caricamento delle notifiche dopo un reboot

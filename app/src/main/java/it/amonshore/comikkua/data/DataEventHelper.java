@@ -37,7 +37,7 @@ class DataEventHelper extends AIncrementalStart {
      */
     public void send(int action, long comicsId, int releaseNumber) {
         if (mEventBus != null) {
-            DataEvent event = new DataEvent();
+            final DataEvent event = new DataEvent();
             event.Action = action;
             event.ComicsId = comicsId;
             event.ReleaseNumber = releaseNumber;
@@ -48,10 +48,7 @@ class DataEventHelper extends AIncrementalStart {
     @Override
     protected void safeStart() {
         if (mEventBus == null) {
-
             final DataManager dataManager = DataManager.getDataManager();
-//        final Queue<DataEvent> pEventQueue = new ConcurrentLinkedQueue<>();
-
             mEventBus = new RxBus<>();
             mEventBus.toObserverable()
                     .observeOn(Schedulers.io()) //gli eventi verranno consumati in un scheduler specifico per I/O
@@ -63,12 +60,6 @@ class DataEventHelper extends AIncrementalStart {
                             return stream.buffer(stream.debounce(200, TimeUnit.MILLISECONDS));
                         }
                     })
-//                .doOnNext(new Action1<List<DataEvent>>() {
-//                    @Override
-//                    public void call(List<DataEvent> dataEvents) {
-//                        pEventQueue.addAll(dataEvents);
-//                    }
-//                })
                     .subscribe(new Subscriber<List<DataEvent>>() {
                         @Override
                         public void onCompleted() {
@@ -77,7 +68,7 @@ class DataEventHelper extends AIncrementalStart {
 
                         @Override
                         public void onError(Throwable e) {
-                            Utils.e("RX REMINDER error", e);
+                            Utils.e("RX DATA error", e);
                         }
 
                         @Override

@@ -4,6 +4,10 @@
     tools:context="it.amonshore.comikkua.ui.MainActivity">
     <!--<item android:id="@+id/action_share_data" android:title="@string/action_share_data"-->
         <!--android:orderInCategory="80" app:showAsAction="never" />-->
+    <item android:id="@+id/action_comics_sync"
+        android:title="@string/action_comics_sync"
+        android:icon="@drawable/ic_star_outline"
+        android:orderInCategory="30" app:showAsAction="ifRoom" />
     <item android:id="@+id/action_settings" android:title="@string/action_settings"
         android:orderInCategory="90" app:showAsAction="never" />
     <item android:id="@+id/action_options" android:title="@string/action_data_options"
