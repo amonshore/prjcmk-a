@@ -17,8 +17,11 @@ import android.widget.Toast;
 
 import com.google.zxing.Result;
 
+import java.util.regex.Pattern;
+
 import it.amonshore.comikkua.R;
 import it.amonshore.comikkua.RequestCodes;
+import it.amonshore.comikkua.data.DataManager;
 import me.dm7.barcodescanner.zxing.ZXingScannerView;
 
 /**
@@ -27,6 +30,8 @@ import me.dm7.barcodescanner.zxing.ZXingScannerView;
 public class SyncScannerActivity extends AppCompatActivity implements ZXingScannerView.ResultHandler {
 
     private ZXingScannerView mScannerView;
+    //regex per validazione sid
+    private Pattern mRgIsSid;
 
     @Override
     protected void onCreate(@Nullable Bundle savedInstanceState) {
@@ -40,6 +45,8 @@ public class SyncScannerActivity extends AppCompatActivity implements ZXingScann
         final ViewGroup contentFrame = (ViewGroup) findViewById(R.id.content_frame);
         mScannerView = new ZXingScannerView(this);
         contentFrame.addView(mScannerView);
+        //
+        mRgIsSid = Pattern.compile("^\\-?\\d+$");
         //verifico che l'app abbia i permessi per la scrittura su disco (API >= 23)
         if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.M &&
                 ContextCompat.checkSelfPermission(this,
@@ -115,21 +122,24 @@ public class SyncScannerActivity extends AppCompatActivity implements ZXingScann
 
     @Override
     public void handleResult(Result result) {
-        //TODO se viene letto un url valido è inutile ripristinare la camera
+        //se viene letto un sid valido è inutile ripristinare la camera
+        if (mRgIsSid.matcher(result.getText()).matches()) {
+            DataManager.getDataManager().initRemoteSync(result.getText());
+            finish();
+        } else {
+            Toast.makeText(this, R.string.syncscanner_notvalidcode, Toast.LENGTH_LONG).show();
 
-        Toast.makeText(this, "Contents = " + result.getText() +
-                ", Format = " + result.getBarcodeFormat().toString(), Toast.LENGTH_SHORT).show();
-
-        // Note:
-        // * Wait 2 seconds to resume the preview.
-        // * On older devices continuously stopping and resuming camera preview can result in freezing the app.
-        // * I don't know why this is the case but I don't have the time to figure out.
-        Handler handler = new Handler();
-        handler.postDelayed(new Runnable() {
-            @Override
-            public void run() {
-                mScannerView.resumeCameraPreview(SyncScannerActivity.this);
-            }
-        }, 2000);
+            // Note:
+            // * Wait 2 seconds to resume the preview.
+            // * On older devices continuously stopping and resuming camera preview can result in freezing the app.
+            // * I don't know why this is the case but I don't have the time to figure out.
+            Handler handler = new Handler();
+            handler.postDelayed(new Runnable() {
+                @Override
+                public void run() {
+                    mScannerView.resumeCameraPreview(SyncScannerActivity.this);
+                    }
+            }, 2000);
+        }
     }
 }

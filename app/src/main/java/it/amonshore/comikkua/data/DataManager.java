@@ -12,7 +12,9 @@ import com.evernote.android.job.JobManager;
 
 import java.io.File;
 import java.io.IOException;
+import java.util.Collections;
 import java.util.HashSet;
+import java.util.Iterator;
 import java.util.Set;
 import java.util.TimeZone;
 import java.util.TreeMap;
@@ -54,10 +56,11 @@ public class DataManager extends Observable<ComicsObserver> {
     public static final int CAUSE_RELEASES_MODE_CHANGED = 1 << 11;
     public static final int CAUSE_CREATED = 1 << 12; // 4096
     public static final int CAUSE_SYNC = 1 << 13;
-    public static final int CAUSE_SYNC_STARTED = CAUSE_SYNC | 1 << 14;
-    public static final int CAUSE_SYNC_REFUSED = CAUSE_SYNC | 1 << 15;
-    public static final int CAUSE_SYNC_STOPPED = CAUSE_SYNC | 1 << 16;
-    public static final int CAUSE_SYNC_ERROR = CAUSE_SYNC | 1 << 17;
+    public static final int CAUSE_SYNC_READY = CAUSE_SYNC | 1 << 14;
+    public static final int CAUSE_SYNC_STARTED = CAUSE_SYNC | 1 << 15;
+    public static final int CAUSE_SYNC_REFUSED = CAUSE_SYNC | 1 << 16;
+    public static final int CAUSE_SYNC_STOPPED = CAUSE_SYNC | 1 << 17;
+    public static final int CAUSE_SYNC_ERROR = CAUSE_SYNC | 1 << 18;
 
     public static final long NO_COMICS = -1;
     public static final int NO_RELEASE = -1;
@@ -238,6 +241,14 @@ public class DataManager extends Observable<ComicsObserver> {
             }
         }
         return null;
+    }
+
+    /**
+     *
+     * @return la lista di comics non modificabile
+     */
+    public Iterable<Comics> getRawComics() {
+        return Collections.unmodifiableCollection(mComicsCache.values());
     }
 
     /**
@@ -572,19 +583,23 @@ public class DataManager extends Observable<ComicsObserver> {
 
     /**
      * Attiva la sincronizzazione remota.
-     * Se la presentazione va a buon fine verrà inviata la notifica CAUSE_SYNC_STARTED.
+     * Se la presentazione va a buon fine verrà inviata la notifica CAUSE_SYNC_READY,
+     * seguita da CAUSE_SYNC_START a sincronizzazione attiva.
      * In caso contrario CAUSE_SYNC_REFUSED.
      *
      * @param syncId    codice di sincronizzazione
      * @return this
      */
-    public DataManager enableRemoteSync(String syncId) {
+    public DataManager initRemoteSync(String syncId) {
         mIsSyncEnabled = false; //riporto a false, sarà messo a true solo a sync avviata con successo
         mSyncEventHelper.applySyncId(syncId, new SyncEventHelper.SyncListener() {
             @Override
             public void onResponse(int response) {
-                if (response == SyncEventHelper.SYNC_STARTED) {
+                if (response == SyncEventHelper.SYNC_READY) {
+                    notifyChanged(CAUSE_SYNC_READY);
                     mIsSyncEnabled = true;
+                    mSyncEventHelper.start();
+                } else if (response == SyncEventHelper.SYNC_STARTED) {
                     notifyChanged(CAUSE_SYNC_STARTED);
                 } else if (response == SyncEventHelper.SYNC_REFUSED) {
                     mIsSyncEnabled = false;
@@ -594,14 +609,14 @@ public class DataManager extends Observable<ComicsObserver> {
                     // TODO dati ricevuti, aggionrare i dati locali
                 } else if (response == SyncEventHelper.SYNC_SENT) {
                     // TODO dati inviati
-                } else if (response == SyncEventHelper.SYNC_TIMEOUT) {
+                } else if (response == SyncEventHelper.SYNC_EXPIRED) {
                     mIsSyncEnabled = false;
-                    disableRmoteSync();
+                    mSyncEventHelper.stop();
                     // segnalo che la sincronizzazione non è più attiva
                     notifyChanged(CAUSE_SYNC_STOPPED);
                 } else {
                     mIsSyncEnabled = false;
-                    disableRmoteSync();
+                    mSyncEventHelper.stop();
                     // segnalo che la sincronizzazione non è più attiva (a causa di un errore)
                     notifyChanged(CAUSE_SYNC_ERROR);
                 }
@@ -612,19 +627,6 @@ public class DataManager extends Observable<ComicsObserver> {
                 // TODO ho ricevuto nuovi dati... che me ne faccio?
             }
         });
-
-        return this;
-    }
-
-    /**
-     * Disattiva la sincronizzazione remota.
-     *
-     * @return this
-     */
-    public DataManager disableRmoteSync() {
-        // TODO disabilitare la sincronizzazione remota
-        mIsSyncEnabled = false;
-        notifyChanged(CAUSE_SYNC_STOPPED);
 
         return this;
     }
@@ -651,8 +653,6 @@ public class DataManager extends Observable<ComicsObserver> {
         //volta
         mDataEventHelper.start();
         mReminderEventHelper.start();
-        //A0068
-        mSyncEventHelper.start();
 
         return this;
     }

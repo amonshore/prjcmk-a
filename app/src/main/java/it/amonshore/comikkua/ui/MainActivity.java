@@ -1,5 +1,6 @@
 package it.amonshore.comikkua.ui;
 
+import android.app.AlertDialog;
 import android.content.Intent;
 import android.content.SharedPreferences;
 import android.os.Handler;
@@ -194,14 +195,20 @@ public class MainActivity extends AppCompatActivity implements ComicsObserver {
             startActivity(intent);
             return true;
         } else if (id == R.id.action_comics_sync) { //A0068
-            // TODO mostrare dialog per lettura codice sync
-            //DataManager.getDataManager().enableRemoteSync("0000");
             Intent intent = new Intent(this, SyncScannerActivity.class);
             startActivity(intent);
             return true;
         }
 
         return super.onOptionsItemSelected(item);
+    }
+
+    private AlertDialog mAlertDialog;
+    private void dismissDialog() {
+        if (mAlertDialog != null) {
+            mAlertDialog.dismiss();
+            mAlertDialog = null;
+        }
     }
 
     @Override
@@ -235,16 +242,29 @@ public class MainActivity extends AppCompatActivity implements ComicsObserver {
                         break;
                 }
                 break;
+            case DataManager.CAUSE_SYNC_READY:
+                // TODO bloccare interfaccia utente fino a CAUSE_SYNC_STARTED o errore
+                //  (in locale è troppo veloce, non si vede neanche)
+                // TODO non va bene un alert perché se cambia l'orientamento non viene ripristinato!
+                final AlertDialog.Builder builder = new AlertDialog.Builder(this)
+                        .setTitle("SYNC READY")
+                        .setMessage("Waiting...");
+                mAlertDialog = builder.show();
+                //Toast.makeText(this, "sync ready", Toast.LENGTH_SHORT).show();
+                break;
             case DataManager.CAUSE_SYNC_STARTED:
-                // TODO
+                // TODO nascondere voce menu per sincronizzazione
+                dismissDialog();
                 Toast.makeText(this, "sync started", Toast.LENGTH_SHORT).show();
                 break;
             case DataManager.CAUSE_SYNC_REFUSED:
                 // TODO
+                dismissDialog();
                 Toast.makeText(this, "sync refused", Toast.LENGTH_SHORT).show();
                 break;
             case DataManager.CAUSE_SYNC_ERROR:
                 // TODO
+                dismissDialog();
                 Toast.makeText(this, "sync error", Toast.LENGTH_SHORT).show();
                 break;
             case DataManager.CAUSE_SYNC_STOPPED:

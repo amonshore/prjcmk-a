@@ -147,4 +147,5 @@
     <string name="syncscanner_permissions_explanation">Non sarai in grado di scannerizzare il codice di sincronizzazione senza autorizzare l\'accesso alla fotocamera. Vuoi modificare le impostazioni?</string>
     <string name="title_activity_synccode_scanner">Scannerizza codice</string>
     <string name="syncscanner_help">Vai su www.amonshore.it/comikku dal tuo computer e scannerizza il codice QR</string>
+    <string name="syncscanner_notvalidcode">Impossibile scannerizzare il codice. Assicurarsi di essere su www.amonshore.it/comikku e scannerizzarlo di nuovo.</string>
 </resources>

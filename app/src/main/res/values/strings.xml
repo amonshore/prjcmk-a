@@ -207,5 +207,6 @@
     <string name="syncscanner_permissions_need_title">Need access to camera</string>
     <string name="syncscanner_permissions_need_message">You can always change your permissions by going to Settings / Apps / Comikku / Persmissions</string>
     <string name="syncscanner_help">Go to www.amonshore.it/comikku on your computer and scan the QR Code</string>
+    <string name="syncscanner_notvalidcode">Can not scan the code. Be sure to be on www.amonshore.it/comikku and scan it again.</string>
 
 </resources>
