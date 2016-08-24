@@ -1,13 +1,9 @@
 package it.amonshore.comikkua.data;
 
 import android.content.Context;
-import android.os.Build;
-import android.util.JsonWriter;
 
-import com.android.volley.DefaultRetryPolicy;
 import com.android.volley.Request;
 import com.android.volley.Response;
-import com.android.volley.RetryPolicy;
 import com.android.volley.VolleyError;
 import com.android.volley.toolbox.JsonObjectRequest;
 
@@ -15,8 +11,6 @@ import org.json.JSONException;
 import org.json.JSONObject;
 
 import java.io.IOException;
-import java.io.StringWriter;
-import java.util.List;
 import java.util.concurrent.TimeUnit;
 
 import it.amonshore.comikkua.AIncrementalStart;
@@ -27,8 +21,7 @@ import it.amonshore.comikkua.VolleyNoRetryPolicy;
 import rx.Observable;
 import rx.Observer;
 import rx.Subscriber;
-import rx.functions.Func1;
-import rx.schedulers.Schedulers;
+import rx.functions.Action1;
 import rx.subjects.PublishSubject;
 
 /**
@@ -44,15 +37,13 @@ class SyncEventHelper extends AIncrementalStart {
 
     public final static int SYNC_READY = 0;
     public final static int SYNC_STARTED = 10;
-    public final static int SYNC_RECEIVED = 20;
     public final static int SYNC_SENT = 30;
     public final static int SYNC_REFUSED = 101;
     public final static int SYNC_ERR = 102;
     public final static int SYNC_EXPIRED = 103;
-    //TODO parametrizzare URL?
-    private final static String URL = "http://192.168.0.3:3000";
     //TODO parametrizzare il timeout ricevendolo insieme al syncid?
-    private final static int NODATA_TIMEOUT = 30_000;
+    private final static long NODATA_TIMEOUT = 30_000L;
+    private final static long NODATA_TIMEOUT_NANO = NODATA_TIMEOUT * 1_000_000L;
 
     public interface SyncListener {
 
@@ -74,6 +65,9 @@ class SyncEventHelper extends AIncrementalStart {
     private Observer<Long> mRemoteCheckStop;
     private Context mContext;
     private String mSyncId;
+    private String mSyncUrl;
+    private int mSyncTime;
+    private long mLastDataChanged;
     private SyncListener mSyncListener;
 
     public SyncEventHelper(Context context) {
@@ -91,13 +85,14 @@ class SyncEventHelper extends AIncrementalStart {
      * - SYNC_ERR: si è verifcato un errore durante la sincronizzazione
      * - SYNC_EXPIRED: il codice di sincronizzazione non è più valido
      *
+     * @param syncUrl   url da contattare per la sincronizzazione
      * @param syncId    codice di sincronizzazione da usare in tutte le richieste al server
      * @param listener  ascoltatore per ricevere eventi dal processo di sincronizzazione
      */
-    public void applySyncId(final String syncId, SyncListener listener) {
-        mSyncId = syncId;
+    public void applySyncId(final String syncUrl, final String syncId, SyncListener listener) {
         mSyncListener = listener;
-        final String url = URL + "/sync/" + syncId;
+        //
+        final String url = syncUrl + "/sync/" + syncId;
         final JsonObjectRequest req = new JsonObjectRequest(Request.Method.POST, url, null,
                 new Response.Listener<JSONObject>() {
                     @Override
@@ -106,8 +101,10 @@ class SyncEventHelper extends AIncrementalStart {
                             Utils.d(SyncEventHelper.class, response.toString());
                             if (syncId.equals(response.getString("sid"))) {
                                 mSyncId = syncId;
+                                mSyncUrl = syncUrl;
                                 mSyncListener.onResponse(SYNC_READY);
                             } else {
+                                Utils.e(SyncEventHelper.class, "applySincId error: wrong sid received");
                                 mSyncListener.onResponse(SYNC_REFUSED);
                             }
                         } catch (JSONException jsonex) {
@@ -118,17 +115,21 @@ class SyncEventHelper extends AIncrementalStart {
                 }, new Response.ErrorListener() {
             @Override
             public void onErrorResponse(VolleyError error) {
-                switch (error.networkResponse.statusCode) {
-                    case 403:
-                        mSyncListener.onResponse(SYNC_EXPIRED);
-                        break;
-                    case 404:
-                        mSyncListener.onResponse(SYNC_REFUSED);
-                        break;
-                    default:
-                        Utils.e(SyncEventHelper.class, "applySincId error", error);
-                        mSyncListener.onResponse(SYNC_ERR);
-                        break;
+                Utils.e(SyncEventHelper.class, "applySincId error", error);
+                if (error.networkResponse != null) {
+                    switch (error.networkResponse.statusCode) {
+                        case 403:
+                            mSyncListener.onResponse(SYNC_EXPIRED);
+                            break;
+                        case 404:
+                            mSyncListener.onResponse(SYNC_REFUSED);
+                            break;
+                        default:
+                            mSyncListener.onResponse(SYNC_ERR);
+                            break;
+                    }
+                } else {
+                    mSyncListener.onResponse(SYNC_ERR);
                 }
             }
         });
@@ -140,117 +141,58 @@ class SyncEventHelper extends AIncrementalStart {
 
     /**
      * Chiama periodicamente il server in attesa di nuovi dati.
-     *
-     * @return  se viene emesso un item da questo Observable il controllo remoto viene terminato
+     * Se viene emesso un item da mRemoteCheckStop il controllo remoto viene terminato.
      */
-    private Observer<Long> checkRemote() {
-        //TODO: usare url per check nuovi dati
-        final String url = URL + "/v1/comics";
-        final JsonObjectRequest req = new JsonObjectRequest(Request.Method.GET, url, null,
-                new Response.Listener<JSONObject>() {
-                    @Override
-                    public void onResponse(JSONObject response) {
-                        Utils.d(SyncEventHelper.class, "SYNC Data received");
-                        //mSyncListener.onResponse(SYNC_RECEIVED);
-                        // TODO se non ricevo dati per più di n volte segnalare timeout
-                        //mSyncListener.onResponse(SYNC_EXPIRED);
+    private void startCheckRemote() {
+        final Response.Listener<JSONObject> responseListener = new Response.Listener<JSONObject>() {
+            @Override
+            public void onResponse(JSONObject response) {
+                Utils.d(SyncEventHelper.class, response.toString());
+                try {
+                    // resp: { "sid": <sid>, "data": [] }
+                    if (response.getJSONArray("data").length() == 0) {
+                        // se non ho ricevuto dati per troppo tempo invio il segnale di sync scaduta
+                        if (System.nanoTime() - mLastDataChanged > NODATA_TIMEOUT_NANO) {
+                            Utils.d(SyncEventHelper.class, "SYNC EXPIRED");
+                            mSyncListener.onResponse(SYNC_EXPIRED);
+                        }
+                    } else {
+                        //TODO: nuovi dati ricevuti
+                        //mLastDataChanged = System.nanoTime();
+                        //mSyncListener.onDataReceived(...);
                     }
-                }, new Response.ErrorListener() {
+                } catch (JSONException jsonex) {
+                    Utils.e(SyncEventHelper.class, "SYNC ERR (time " + mSyncTime + ")", jsonex);
+                    mSyncListener.onResponse(SYNC_ERR);
+                }
+            }
+        };
+        final Response.ErrorListener errorListener = new Response.ErrorListener() {
             @Override
             public void onErrorResponse(VolleyError error) {
-                // TODO intercettare lo stato HTTP per sapere cosa rispondere (rifiuto syncid o errore)
-                Utils.e(SyncEventHelper.class, "SYNC ERR", error);
+                Utils.e(SyncEventHelper.class, "SYNC ERR (time " + mSyncTime + ")", error);
                 mSyncListener.onResponse(SYNC_ERR);
             }
-        });
-
+        };
         final PublishSubject<Long> stop = PublishSubject.create();
-
         Observable
                 .interval(2, 5, TimeUnit.SECONDS)
                 .takeUntil(stop)
-                .subscribe(new Subscriber<Long>() {
+                .subscribe(new Action1<Long>() {
                     @Override
-                    public void onCompleted() {
-                        Utils.d(SyncEventHelper.class, "SYNC check remote complete");
-                    }
-
-                    @Override
-                    public void onError(Throwable e) {
-                        Utils.d(SyncEventHelper.class, "SYNC check remote error");
-                    }
-
-                    @Override
-                    public void onNext(Long aLong) {
-                        Utils.d(SyncEventHelper.class, "SYNC check remote " + aLong);
+                    public void call(Long aLong) {
+                        //Utils.d(SyncEventHelper.class, "SYNC check remote " + aLong);
+                        final String url = mSyncUrl + "/sync/" + mSyncId + "/" + mSyncTime;
+                        final JsonObjectRequest req = new JsonObjectRequest(Request.Method.GET, url, null,
+                                responseListener, errorListener);
                         VolleyHelper.getInstance(mContext).addToRequestQueue(req);
                     }
                 });
 
-        return stop;
+        mRemoteCheckStop = stop;
     }
 
-    /**
-     * Invia una azione che verrà gestita insieme ad altre sucessivamente.
-     *
-     * @param action    azione da eseguire sui dati (ACTION_ADD, ACTION_UPD, ACTION_DEL, ACTION_CLEAR)
-     * @param comicsId  id del comics su cui operare l'azione
-     * @param releaseNumber numero della release su cui operare l'azione (NO_RELEASE per nessuna)
-     */
-    public void send(int action, long comicsId, int releaseNumber) {
-        if (mEventBus != null) {
-            final DataEvent event = new DataEvent();
-            event.Action = action;
-            event.ComicsId = comicsId;
-            event.ReleaseNumber = releaseNumber;
-            mEventBus.send(event);
-        }
-    }
-
-    @Override
-    protected void safeStart() {
-        //TODO verificare che sia stato presentato con successo il sync id, in caso contrario SYNC_ERR
-
-        // converto tutti i dati in JSON e li invio al server, se tutto va bene invio SYNC_STARTED
-        final DataManager dataManager = DataManager.getDataManager();
-        final JsonHelper jsonHelper = new JsonHelper();
-        final JSONObject jsonObject = new JSONObject();
-        try {
-            jsonObject
-                    .put("sid", mSyncId)
-                    .put("utctime", System.currentTimeMillis()) //UTC
-                    .put("version", BuildConfig.VERSION_CODE)
-                    .put("debug", BuildConfig.DEBUG)
-                    .put("comics", jsonHelper.comics2json(dataManager.getRawComics(), true));
-            // invio i dati al tempo 0
-            final String url = URL + "/sync/" + mSyncId + "/0";
-            final JsonObjectRequest req = new JsonObjectRequest(Request.Method.POST, url, jsonObject,
-                    new Response.Listener<JSONObject>() {
-                        @Override
-                        public void onResponse(JSONObject response) {
-                            //TODO se la risposta è corretta posso attivare checkRemote() e mEventBus
-                            Utils.d(SyncEventHelper.class, response.toString());
-                            //TODO mSyncListener.onResponse(SYNC_STARTED);
-                            mSyncListener.onResponse(SYNC_ERR);
-                        }
-                    }, new Response.ErrorListener() {
-                        @Override
-                        public void onErrorResponse(VolleyError error) {
-                            Utils.e(SyncEventHelper.class, "SYNC ERR (time 0)", error);
-                            mSyncListener.onResponse(SYNC_ERR);
-                        }
-                    });
-            VolleyHelper.getInstance(mContext).addToRequestQueue(req);
-        } catch (JSONException|IOException ex) {
-            Utils.e(SyncEventHelper.class, "SYNC ERR (time 0)", ex);
-            mSyncListener.onResponse(SYNC_ERR);
-        }
-
-        //TODO
-//        // chiamo periodicamente il server per vedere se ci sono novità
-//        if (mRemoteCheckStop == null) {
-//            mRemoteCheckStop = checkRemote();
-//        }
+    private void startCheckLocal() {
 //        //  il server potrebbe anche rispondere con un errore di timeout sincronizzazione (non ci sono stati scambi di dati per troppo tempo)
 //        if (mEventBus == null) {
 //            mEventBus = new RxBus<>();
@@ -284,7 +226,7 @@ class SyncEventHelper extends AIncrementalStart {
 //
 //                            if (dataEvents.size() > 0) {
 //
-//                                final String url = URL + "/v1/hello";
+//                                final String url = mSyncUrl + "/v1/hello";
 //                                final JsonObjectRequest req = new JsonObjectRequest(Request.Method.GET, url, null,
 //                                        new Response.Listener<JSONObject>() {
 //                                            @Override
@@ -348,6 +290,73 @@ class SyncEventHelper extends AIncrementalStart {
 //                    });
 //
 //        }
+    }
+
+    /**
+     * Invia una azione che verrà gestita insieme ad altre sucessivamente.
+     *
+     * @param action    azione da eseguire sui dati (ACTION_ADD, ACTION_UPD, ACTION_DEL, ACTION_CLEAR)
+     * @param comicsId  id del comics su cui operare l'azione
+     * @param releaseNumber numero della release su cui operare l'azione (NO_RELEASE per nessuna)
+     */
+    public void send(int action, long comicsId, int releaseNumber) {
+        if (mEventBus != null) {
+            final DataEvent event = new DataEvent();
+            event.Action = action;
+            event.ComicsId = comicsId;
+            event.ReleaseNumber = releaseNumber;
+            mEventBus.send(event);
+        }
+    }
+
+    @Override
+    protected void safeStart() {
+        // converto tutti i dati in JSON e li invio al server, se tutto va bene invio SYNC_STARTED
+        final DataManager dataManager = DataManager.getDataManager();
+        final JsonHelper jsonHelper = new JsonHelper();
+        final JSONObject jsonObject = new JSONObject();
+        try {
+            jsonObject
+                    .put("sid", mSyncId)
+                    .put("utctime", System.currentTimeMillis()) //UTC
+                    .put("version", BuildConfig.VERSION_CODE)
+                    .put("debug", BuildConfig.DEBUG)
+                    .put("comics", jsonHelper.comics2json(dataManager.getRawComics(), true));
+            // invio i dati al tempo 0
+            final String url = mSyncUrl + "/sync/" + mSyncId + "/0";
+            final JsonObjectRequest req = new JsonObjectRequest(Request.Method.POST, url, jsonObject,
+                    new Response.Listener<JSONObject>() {
+                        @Override
+                        public void onResponse(JSONObject response) {
+                            try {
+                                Utils.d(SyncEventHelper.class, response.toString());
+                                if (mSyncId.equals(response.getString("sid"))) {
+                                    mSyncTime = 0;
+                                    mLastDataChanged = System.nanoTime();
+                                    startCheckLocal();
+                                    startCheckRemote();
+                                    mSyncListener.onResponse(SYNC_STARTED);
+                                } else {
+                                    Utils.e(SyncEventHelper.class, "SYNC ERR (time 0): wrong sid received");
+                                    mSyncListener.onResponse(SYNC_ERR);
+                                }
+                            } catch (JSONException jsonex) {
+                                Utils.e(SyncEventHelper.class, "SYNC ERR (time 0)", jsonex);
+                                mSyncListener.onResponse(SYNC_ERR);
+                            }
+                        }
+                    }, new Response.ErrorListener() {
+                        @Override
+                        public void onErrorResponse(VolleyError error) {
+                            Utils.e(SyncEventHelper.class, "SYNC ERR (time 0)", error);
+                            mSyncListener.onResponse(SYNC_ERR);
+                        }
+                    });
+            VolleyHelper.getInstance(mContext).addToRequestQueue(req);
+        } catch (JSONException|IOException ex) {
+            Utils.e(SyncEventHelper.class, "SYNC ERR (time 0)", ex);
+            mSyncListener.onResponse(SYNC_ERR);
+        }
     }
 
     @Override

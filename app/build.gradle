@@ -12,7 +12,7 @@ android {
         applicationId "it.amonshore.comikkua"
         minSdkVersion 16
         targetSdkVersion 23
-        versionCode 23
+        versionCode 24
         versionName '1.0.5'
         renderscriptTargetApi 23
         renderscriptSupportModeEnabled true

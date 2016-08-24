@@ -148,4 +148,5 @@
     <string name="title_activity_synccode_scanner">Scannerizza codice</string>
     <string name="syncscanner_help">Vai su www.amonshore.it/comikku dal tuo computer e scannerizza il codice QR</string>
     <string name="syncscanner_notvalidcode">Impossibile scannerizzare il codice. Assicurarsi di essere su www.amonshore.it/comikku e scannerizzarlo di nuovo.</string>
+    <string name="action_comics_sync">Inizia sync</string>
 </resources>

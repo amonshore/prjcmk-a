@@ -72,6 +72,9 @@ public class DataManager extends Observable<ComicsObserver> {
     private static final String KEY_PREF_REMINDER = "pref_reminder";
     public static final String KEY_PREF_REMINDER_TIME = "pref_reminder_time";
 
+    private static final String SYNC_DEBUG_URL = "http://192.168.0.3:3000";
+    private static final String SYNC_PROD_URL = "http://212.94.138.208:3000";
+
     private static DataManager instance;
 
     /**
@@ -195,6 +198,10 @@ public class DataManager extends Observable<ComicsObserver> {
 
     public long getPreference(String key, long def) {
         return mPreferences.getLong(key, def);
+    }
+
+    public String getPreference(String key, String def) {
+        return mPreferences.getString(key, def);
     }
 
     public String getUserName() {
@@ -591,8 +598,12 @@ public class DataManager extends Observable<ComicsObserver> {
      * @return this
      */
     public DataManager initRemoteSync(String syncId) {
+        if (mIsSyncEnabled) {
+            mSyncEventHelper.stop();
+        }
         mIsSyncEnabled = false; //riporto a false, sarà messo a true solo a sync avviata con successo
-        mSyncEventHelper.applySyncId(syncId, new SyncEventHelper.SyncListener() {
+        mSyncEventHelper.applySyncId(getPreference("pref_sync_debugurl", false) ? SYNC_DEBUG_URL : SYNC_PROD_URL,
+                syncId, new SyncEventHelper.SyncListener() {
             @Override
             public void onResponse(int response) {
                 if (response == SyncEventHelper.SYNC_READY) {
@@ -605,8 +616,6 @@ public class DataManager extends Observable<ComicsObserver> {
                     mIsSyncEnabled = false;
                     // segnalo che il codice di sincronizzazione è stato rifiutato
                     notifyChanged(CAUSE_SYNC_REFUSED);
-                } else if (response == SyncEventHelper.SYNC_RECEIVED) {
-                    // TODO dati ricevuti, aggionrare i dati locali
                 } else if (response == SyncEventHelper.SYNC_SENT) {
                     // TODO dati inviati
                 } else if (response == SyncEventHelper.SYNC_EXPIRED) {
@@ -617,7 +626,7 @@ public class DataManager extends Observable<ComicsObserver> {
                 } else {
                     mIsSyncEnabled = false;
                     mSyncEventHelper.stop();
-                    // segnalo che la sincronizzazione non è più attiva (a causa di un errore)
+                    // segnalo che la sincronizzazione non è più attiva a causa di un errore
                     notifyChanged(CAUSE_SYNC_ERROR);
                 }
             }

@@ -266,6 +266,15 @@ public class Utils {
     }
 
     /**
+     * @param aClass
+     * @param msg
+     */
+    public static void e (Class aClass, String msg) {
+        if (BuildConfig.DEBUG)
+            Log.e(aClass.getName(), msg);
+    }
+
+    /**
      *
      * @param aClass
      * @param msg

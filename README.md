@@ -1,6 +1,9 @@
 # prjcmk-a
 Autore: narsenico
 
+## v1.0.5 (24)
+- sincronizzazione dati
+
 ## v1.0.5 (23)
 - aggiunta periodicità fumetti quindicinale
 

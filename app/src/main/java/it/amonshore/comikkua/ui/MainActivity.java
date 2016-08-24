@@ -269,7 +269,7 @@ public class MainActivity extends AppCompatActivity implements ComicsObserver {
                 break;
             case DataManager.CAUSE_SYNC_STOPPED:
                 // TODO
-                Toast.makeText(this, "sync stopped", Toast.LENGTH_SHORT).show();
+                Toast.makeText(this, "Synchronization no longer active", Toast.LENGTH_LONG).show();
                 break;
             case DataManager.CAUSE_COMICS_ADDED:
             case DataManager.CAUSE_COMICS_CHANGED:
