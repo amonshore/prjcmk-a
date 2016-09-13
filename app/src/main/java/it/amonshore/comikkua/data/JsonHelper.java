@@ -128,6 +128,25 @@ public class JsonHelper {
 
     /**
      *
+     * @param comics    comics
+     * @param includeReleases   se true verranno incluse le uscite (proprietà "releases")
+     * @return  una istanza di JSONObject
+     * @throws JSONException
+     * @throws IOException
+     */
+    public JSONObject comics2json(Comics comics, boolean includeReleases) throws JSONException, IOException {
+        final StringWriter stringWriter = new StringWriter();
+        final JsonWriter writer = new JsonWriter(stringWriter);
+        try {
+            writeJson(writer, comics, includeReleases);
+            return (JSONObject) new JSONTokener(stringWriter.toString()).nextValue();
+        } finally {
+            try { writer.close(); } catch (IOException ioex) { }
+        }
+    }
+
+    /**
+     *
      * @param comicsIterable    lista di comics
      * @param includeReleases   se true verranno incluse le uscite (proprietà "releases")
      * @return  una istanza di JSONArray

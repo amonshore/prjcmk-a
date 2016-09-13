@@ -25,6 +25,11 @@ android {
     }
     productFlavors {
     }
+
+    packagingOptions {
+        exclude 'META-INF/ASL2.0'
+    }
+
 }
 
 repositories {
@@ -52,4 +57,7 @@ dependencies {
     compile 'com.ogaclejapan.smarttablayout:library:1.6.1'
     compile 'com.android.volley:volley:1.0.0'
     compile 'me.dm7.barcodescanner:zxing:1.9'
+    compile files('libs/autobahn-0.5.0.jar')
+    compile files('libs/jackson-core-asl-1.9.7.jar')
+    compile files('libs/jackson-mapper-asl-1.9.7.jar')
 }

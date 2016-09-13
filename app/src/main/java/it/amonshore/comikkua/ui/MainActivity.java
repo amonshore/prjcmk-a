@@ -212,7 +212,17 @@ public class MainActivity extends AppCompatActivity implements ComicsObserver {
     }
 
     @Override
-    public void onChanged(int cause) {
+    public void onChanged(final int cause) {
+        if (!Utils.isMainThread()) {
+            this.runOnUiThread(new Runnable() {
+                @Override
+                public void run() {
+                    onChanged(cause);
+                }
+            });
+            return;
+        }
+
         switch (cause) {
             case DataManager.CAUSE_RELEASES_MODE_CHANGED:
                 final ReleaseListFragment fragment = (ReleaseListFragment)mTabPageAdapter.getItem(1);

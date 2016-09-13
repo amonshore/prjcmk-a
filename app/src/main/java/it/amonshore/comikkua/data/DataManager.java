@@ -14,7 +14,6 @@ import java.io.File;
 import java.io.IOException;
 import java.util.Collections;
 import java.util.HashSet;
-import java.util.Iterator;
 import java.util.Set;
 import java.util.TimeZone;
 import java.util.TreeMap;
@@ -72,8 +71,8 @@ public class DataManager extends Observable<ComicsObserver> {
     private static final String KEY_PREF_REMINDER = "pref_reminder";
     public static final String KEY_PREF_REMINDER_TIME = "pref_reminder_time";
 
-    private static final String SYNC_DEBUG_URL = "http://192.168.0.3:3000";
-    private static final String SYNC_PROD_URL = "http://212.94.138.208:3000";
+    private static final String SYNC_DEBUG_HOST = "192.168.0.3:3000";
+    private static final String SYNC_PROD_HOST = "212.94.138.208:3000";
 
     private static DataManager instance;
 
@@ -602,7 +601,7 @@ public class DataManager extends Observable<ComicsObserver> {
             mSyncEventHelper.stop();
         }
         mIsSyncEnabled = false; //riporto a false, sarà messo a true solo a sync avviata con successo
-        mSyncEventHelper.applySyncId(getPreference("pref_sync_debugurl", false) ? SYNC_DEBUG_URL : SYNC_PROD_URL,
+        mSyncEventHelper.applySyncId(getPreference("pref_sync_debugurl", false) ? SYNC_DEBUG_HOST : SYNC_PROD_HOST,
                 syncId, new SyncEventHelper.SyncListener() {
             @Override
             public void onResponse(int response) {
@@ -622,7 +621,7 @@ public class DataManager extends Observable<ComicsObserver> {
                     mIsSyncEnabled = false;
                     mSyncEventHelper.stop();
                     // segnalo che la sincronizzazione non è più attiva
-                    notifyChanged(CAUSE_SYNC_STOPPED);
+                        notifyChanged(CAUSE_SYNC_STOPPED);
                 } else {
                     mIsSyncEnabled = false;
                     mSyncEventHelper.stop();
