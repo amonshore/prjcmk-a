@@ -71,7 +71,7 @@ public class DataManager extends Observable<ComicsObserver> {
     private static final String KEY_PREF_REMINDER = "pref_reminder";
     public static final String KEY_PREF_REMINDER_TIME = "pref_reminder_time";
 
-    private static final String SYNC_DEBUG_HOST = "192.168.0.3:3000";
+    private static final String SYNC_DEBUG_HOST = "192.168.0.4:3000";
     private static final String SYNC_PROD_HOST = "212.94.138.208:3000";
 
     private static DataManager instance;

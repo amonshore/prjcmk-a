@@ -166,6 +166,42 @@ public class JsonHelper {
 
     /**
      *
+     * @param release   release
+     * @return  una istanza di JSONObject
+     * @throws JSONException
+     * @throws IOException
+     */
+    public JSONObject release2json(Release release) throws JSONException, IOException {
+        final StringWriter stringWriter = new StringWriter();
+        final JsonWriter writer = new JsonWriter(stringWriter);
+        try {
+            writeJson(writer, release);
+            return (JSONObject) new JSONTokener(stringWriter.toString()).nextValue();
+        } finally {
+            try { writer.close(); } catch (IOException ioex) { }
+        }
+    }
+
+    /**
+     *
+     * @param releaseIterable   una lista di release
+     * @return  una istanza di JSONArray
+     * @throws JSONException
+     * @throws IOException
+     */
+    public JSONArray releases2json(Iterable<Release> releaseIterable) throws JSONException, IOException {
+        final StringWriter stringWriter = new StringWriter();
+        final JsonWriter writer = new JsonWriter(stringWriter);
+        try {
+            writeJson(writer, releaseIterable);
+            return (JSONArray) new JSONTokener(stringWriter.toString()).nextValue();
+        } finally {
+            try { writer.close(); } catch (IOException ioex) { }
+        }
+    }
+
+    /**
+     *
      * @param writer    writer
      * @param comicsIterable    lista di comics
      * @param includeReleases   se true verranno incluse le uscite (proprietà "releases")
@@ -208,8 +244,17 @@ public class JsonHelper {
         writer.endObject();
     }
 
-    private void writeJson(JsonWriter writer, Release release) throws IOException {
+    public void writeJson(JsonWriter writer, Iterable<Release> releaseIterable) throws IOException {
+        writer.beginArray();
+        for (Release release : releaseIterable) {
+            writeJson(writer, release);
+        }
+        writer.endArray();
+    }
+
+    public void writeJson(JsonWriter writer, Release release) throws IOException {
         writer.beginObject();
+        writer.name(FIELD_ID).value(release.getComicsId());
         writer.name(FIELD_NUMBER).value(release.getNumber());
         writer.name(FIELD_DATE);
         if (release.getDate() == null) {

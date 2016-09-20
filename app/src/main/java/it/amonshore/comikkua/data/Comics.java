@@ -4,7 +4,9 @@ import android.text.TextUtils;
 
 import java.util.ArrayList;
 import java.util.Calendar;
+import java.util.Collections;
 import java.util.GregorianCalendar;
+import java.util.List;
 
 /**
  * Created by Narsenico on 07/05/2015.
@@ -211,6 +213,14 @@ public class Comics {
 
     /**
      *
+     * @return  le release sottoforma di lista non modificabile
+     */
+    public List<Release> getReleaseList() {
+        return Collections.unmodifiableList(releases);
+    }
+
+    /**
+     *
      * @param number    il numero della release
      * @return  release
      */
@@ -219,6 +229,14 @@ public class Comics {
             if (release.getNumber() == number) return release;
         }
         return  null;
+    }
+
+    /**
+     *
+     * @return  quante release possiede il fumetto
+     */
+    public int getReleaseCount() {
+        return releases.size();
     }
 
     /**
