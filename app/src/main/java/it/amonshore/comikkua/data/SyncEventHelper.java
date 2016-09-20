@@ -18,9 +18,9 @@ import rx.schedulers.Schedulers;
 
 /**
  * Created by narsenico on 07/06/16.
- * <p/>
+ * <p>
  * A0068 Gestore eventi per la sincronizzazione remota dei dati.
- * <p/>
+ * <p>
  * - presentazione syncid (applySyncId) -> SYNC_READY
  * -
  */
@@ -38,6 +38,7 @@ class SyncEventHelper extends AIncrementalStart {
     private final static String MESSAGE_SYNC_TIMEOUT = "sync timeout";
     private final static String MESSAGE_PUT_COMICS = "put comics";
     private final static String MESSAGE_REMOVE_COMICS = "remove comics";
+    private final static String MESSAGE_CLEAR_COMICS = "clear comics";
     private final static String MESSAGE_PUT_RELEASES = "put releases";
     private final static String MESSAGE_REMOVE_RELEASES = "remove releases";
     private final static String MESSAGE_STOP_SYNC = "stop sync";
@@ -70,6 +71,10 @@ class SyncEventHelper extends AIncrementalStart {
 
     public SyncEventHelper(Context context) {
         mContext = context;
+    }
+
+    private void sendMessage(String message) throws JSONException {
+        sendMessage(message, null);
     }
 
     private void sendMessage(String message, Object data) throws JSONException {
@@ -210,66 +215,40 @@ class SyncEventHelper extends AIncrementalStart {
                             Utils.d("RX SYNC " + dataEvent + " " + Utils.isMainThread());
 
                             try {
-                                switch (dataEvent.Action) {
-                                    case DataManager.ACTION_CLEAR:
-                                        sendMessage(MESSAGE_REMOVE_COMICS, "*");
-                                        break;
-                                    case DataManager.ACTION_ADD:
-                                    case DataManager.ACTION_UPD:
-                                        if (dataEvent.ReleaseNumber == DataManager.NO_RELEASE) {
-                                            final JSONObject jsData = mJsonHelper.comics2json(dataManager.getComics(dataEvent.ComicsId), false);
-                                            sendMessage(MESSAGE_PUT_COMICS, jsData);
-                                        } else {
-
+                                if (dataEvent.Action == DataManager.ACTION_CLEAR) {
+                                    sendMessage(MESSAGE_CLEAR_COMICS);
+                                } else if (dataEvent.Action == DataManager.ACTION_ADD) {
+                                    final Comics comics = dataManager.getComics(dataEvent.ComicsId);
+                                    if (dataEvent.ReleaseNumber == DataManager.NO_RELEASE) {
+                                        sendMessage(MESSAGE_PUT_COMICS, mJsonHelper.comics2json(comics, false));
+                                        // se il comics possiede già delle release le invio
+                                        // (ad esempio capita quando ripristino il fumetto dopo una cancellazione oppure al ripristino da file)
+                                        if (comics.getReleaseCount() > 0) {
+                                            sendMessage(MESSAGE_PUT_RELEASES, mJsonHelper.releases2json(comics.getReleaseList()));
                                         }
-                                        break;
-                                    case DataManager.ACTION_DEL:
-                                        if (dataEvent.ReleaseNumber == DataManager.NO_RELEASE) {
-                                            sendMessage(MESSAGE_REMOVE_COMICS, dataEvent.ComicsId);
-                                        } else {
-
-                                        }
-                                        break;
+                                    } else {
+                                        sendMessage(MESSAGE_PUT_RELEASES, mJsonHelper.release2json(comics.getRelease(dataEvent.ReleaseNumber)));
+                                    }
+                                } else if (dataEvent.Action == DataManager.ACTION_UPD) {
+                                    final Comics comics = dataManager.getComics(dataEvent.ComicsId);
+                                    if (dataEvent.ReleaseNumber == DataManager.NO_RELEASE) {
+                                        sendMessage(MESSAGE_PUT_COMICS, mJsonHelper.comics2json(comics, false));
+                                    } else {
+                                        sendMessage(MESSAGE_PUT_RELEASES, mJsonHelper.release2json(comics.getRelease(dataEvent.ReleaseNumber)));
+                                    }
+                                } else if (dataEvent.Action == DataManager.ACTION_DEL) {
+                                    if (dataEvent.ReleaseNumber == DataManager.NO_RELEASE) {
+                                        sendMessage(MESSAGE_REMOVE_COMICS, dataEvent.ComicsId);
+                                    } else {
+                                        final JSONObject relId = new JSONObject();
+                                        relId.put("cid", dataEvent.ComicsId);
+                                        relId.put("number", dataEvent.ReleaseNumber);
+                                        sendMessage(MESSAGE_REMOVE_RELEASES, relId);
+                                    }
                                 }
 
                                 // richiedo il prossimo
                                 request(1);
-//                            if (dataEvents.size() > 0) {
-////                                final String userName = dataManager.getUserName();
-////                                SQLiteDatabase database = null;
-////                                try {
-////                                    database = mDBHelper.getWritableDatabase();
-//                                    for (DataEvent event : dataEvents) {
-////                                    Utils.d(String.format("RX DATA act %s cid %s rid %s", event.Action, event.ComicsId, event.ReleaseNumber));
-//                                        switch (event.Action) {
-//                                            case DataManager.ACTION_CLEAR:
-//                                                clear(database, userName);
-//                                                break;
-//                                            case DataManager.ACTION_ADD:
-//                                                if (event.ReleaseNumber == DataManager.NO_RELEASE) {
-//                                                    writeComics(database, userName, dataManager.getComics(event.ComicsId), true);
-//                                                } else {
-//                                                    writeRelease(database, userName, dataManager.getComics(event.ComicsId)
-//                                                            .getRelease(event.ReleaseNumber), true);
-//                                                }
-//                                                break;
-//                                            case DataManager.ACTION_UPD:
-//                                                if (event.ReleaseNumber == DataManager.NO_RELEASE) {
-//                                                    writeComics(database, userName, dataManager.getComics(event.ComicsId), false);
-//                                                } else {
-//                                                    writeRelease(database, userName, dataManager.getComics(event.ComicsId)
-//                                                            .getRelease(event.ReleaseNumber), false);
-//                                                }
-//                                                break;
-//                                            case DataManager.ACTION_DEL:
-//                                                if (event.ReleaseNumber == DataManager.NO_RELEASE) {
-//                                                    deleteComics(database, userName, event.ComicsId);
-//                                                } else {
-//                                                    deleteRelease(database, userName, event.ComicsId, event.ReleaseNumber);
-//                                                }
-//                                                break;
-//                                        }
-//                                    }
                             } catch (Exception ex) {
                                 Utils.e(this.getClass(), "Write data", ex);
                                 mSyncListener.onResponse(SYNC_ERR);
