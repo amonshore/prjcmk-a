@@ -1,6 +1,5 @@
 package it.amonshore.comikkua.data;
 
-import android.content.Context;
 import android.os.Build;
 
 import org.json.JSONException;
@@ -18,20 +17,18 @@ import rx.schedulers.Schedulers;
 
 /**
  * Created by narsenico on 07/06/16.
- * <p>
+ *
  * A0068 Gestore eventi per la sincronizzazione remota dei dati.
- * <p>
  * - presentazione syncid (applySyncId) -> SYNC_READY
- * -
  */
 class SyncEventHelper extends AIncrementalStart {
 
-    public final static int SYNC_READY = 0;
-    public final static int SYNC_STARTED = 10;
-    public final static int SYNC_SENT = 30;
-    public final static int SYNC_REFUSED = 101;
-    public final static int SYNC_ERR = 102;
-    public final static int SYNC_EXPIRED = 103;
+    final static int SYNC_READY = 0;
+    final static int SYNC_STARTED = 10;
+    final static int SYNC_SENT = 30;
+    final static int SYNC_REFUSED = 101;
+    final static int SYNC_ERR = 102;
+    final static int SYNC_EXPIRED = 103;
 
     private final static String MESSAGE_HELLO = "hello";
     private final static String MESSAGE_SYNC_START = "sync start";
@@ -43,7 +40,7 @@ class SyncEventHelper extends AIncrementalStart {
     private final static String MESSAGE_REMOVE_RELEASES = "remove releases";
     private final static String MESSAGE_STOP_SYNC = "stop sync";
 
-    public interface SyncListener {
+    interface SyncListener {
 
         /**
          * @param response codice di risposta ricevuto dal server
@@ -59,19 +56,10 @@ class SyncEventHelper extends AIncrementalStart {
     }
 
     private RxBus<DataEvent> mEventBus;
-    private Context mContext;
-    private String mSyncId;
-    private String mSyncHost;
     private WebSocketConnection mWebSocketClient;
-    private int mSyncTime;
-    private long mLastDataChanged;
     private SyncListener mSyncListener;
     private boolean mStopRequested;
     private JsonHelper mJsonHelper = new JsonHelper();
-
-    public SyncEventHelper(Context context) {
-        mContext = context;
-    }
 
     private void sendMessage(String message) throws JSONException {
         sendMessage(message, null);
@@ -100,15 +88,13 @@ class SyncEventHelper extends AIncrementalStart {
      * @param syncId   codice di sincronizzazione da usare in tutte le richieste al server
      * @param listener ascoltatore per ricevere eventi dal processo di sincronizzazione
      */
-    public void applySyncId(final String syncHost, final String syncId, SyncListener listener) {
+    void applySyncId(final String syncHost, final String syncId, SyncListener listener) {
         mSyncListener = listener;
-        mSyncId = syncId;
-        mSyncHost = syncHost;
         mStopRequested = false;
 
         try {
             final DataManager dataManager = DataManager.getDataManager();
-            final String url = "ws://" + mSyncHost + "/sync/wsh/" + mSyncId;
+            final String url = "ws://" + syncHost + "/sync/wsh/" + syncId;
             Utils.d(this.getClass(), "SYNC connect to " + url);
 
             mWebSocketClient = new WebSocketConnection();
@@ -175,7 +161,7 @@ class SyncEventHelper extends AIncrementalStart {
      * @param comicsId      id del comics su cui operare l'azione
      * @param releaseNumber numero della release su cui operare l'azione (NO_RELEASE per nessuna)
      */
-    public void send(int action, long comicsId, int releaseNumber) {
+    void send(int action, long comicsId, int releaseNumber) {
         if (mEventBus != null) {
             final DataEvent event = new DataEvent();
             event.Action = action;
@@ -241,7 +227,7 @@ class SyncEventHelper extends AIncrementalStart {
                                         sendMessage(MESSAGE_REMOVE_COMICS, dataEvent.ComicsId);
                                     } else {
                                         final JSONObject relId = new JSONObject();
-                                        relId.put("cid", dataEvent.ComicsId);
+                                        relId.put("id", dataEvent.ComicsId);
                                         relId.put("number", dataEvent.ReleaseNumber);
                                         sendMessage(MESSAGE_REMOVE_RELEASES, relId);
                                     }
@@ -276,9 +262,9 @@ class SyncEventHelper extends AIncrementalStart {
     }
 
     private final static class DataEvent {
-        public int Action;
-        public long ComicsId;
-        public int ReleaseNumber;
+        int Action;
+        long ComicsId;
+        int ReleaseNumber;
     }
 
 }

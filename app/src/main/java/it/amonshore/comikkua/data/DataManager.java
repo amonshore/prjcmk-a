@@ -152,7 +152,7 @@ public class DataManager extends Observable<ComicsObserver> {
         mDataEventHelper = new DataEventHelper(mContext);
         mReminderEventHelper = new ReminderEventHelper(mContext);
         //A0068 gestore eventi per la sincronizzazione remota dei dati
-        mSyncEventHelper = new SyncEventHelper(mContext);
+        mSyncEventHelper = new SyncEventHelper();
     }
 
     private SharedPreferences.OnSharedPreferenceChangeListener mSharedPreferenceChangeListener =

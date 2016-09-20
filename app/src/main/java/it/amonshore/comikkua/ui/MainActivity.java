@@ -54,9 +54,6 @@ public class MainActivity extends AppCompatActivity implements ComicsObserver {
         //impsota i valori di default, il parametro false assicura che questo venga fatto una sola volta
         //  indipendentemente da quante volte viene chiamato il metodo
         PreferenceManager.setDefaultValues(this, R.xml.preferences, false);
-//        //registro il listerner per il cambiamento dei settings
-//        SharedPreferences prefs = PreferenceManager.getDefaultSharedPreferences(this);
-//        prefs.registerOnSharedPreferenceChangeListener(this);
         //Toolbar
         final Toolbar toolbar = (Toolbar)findViewById(R.id.toolbar_actionbar);
         setSupportActionBar(toolbar);
@@ -65,36 +62,6 @@ public class MainActivity extends AppCompatActivity implements ComicsObserver {
         final ViewPager viewPager = (ViewPager)findViewById(R.id.pager);
         viewPager.setAdapter(mTabPageAdapter);
         mPreviousPage = 0;
-//        // Give the SlidingTabLayout the ViewPager
-//        mSlidingTabLayout = (SlidingTabLayout) findViewById(R.id.sliding_tabs);
-//        // Set custom tab layout
-//        mSlidingTabLayout.setCustomTabView(R.layout.activity_main_tab, 0);
-//        // Center the tabs in the layout
-//        mSlidingTabLayout.setDistributeEvenly(true);
-//        // Customize tab color
-//        mSlidingTabLayout.setCustomTabColorizer(new SlidingTabLayout.TabColorizer() {
-//            @Override
-//            public int getIndicatorColor(int position) {
-//                return getResources().getColor(R.color.comikku_selected_tab_color);
-//            }
-//        });
-//        mSlidingTabLayout.setOnPageChangeListener(new ViewPager.SimpleOnPageChangeListener() {
-//            @Override
-//            public void onPageSelected(int position) {
-//                Utils.d("slidingTabLayout OnPageChangeListener " + mPreviousPage + " -> " + position);
-//                if (mPreviousPage != position) {
-//                    //chiudo l'ActionBar contestuale del fragment precedente
-//                    ((AFragment) mTabPageAdapter.getItem(mPreviousPage)).finishActionMode();
-//                    //aggiorno i dati sulla page corrente causa cambio pagina (quindi se i dati ci sono non fa nulla)
-//                    ((AFragment) mTabPageAdapter.getItem(position)).onDataChanged(DataManager.CAUSE_PAGE_CHANGED);
-//                    mPreviousPage = position;
-//                } else {
-//                    //A0053 scroll top alla selezione della stessa tab
-//                    ((ScrollToTopListener) mTabPageAdapter.getItem(position)).scrollToTop();
-//                }
-//            }
-//        });
-//        mSlidingTabLayout.setViewPager(viewPager);
 
         mSmartTabLayout = (SmartTabLayout) findViewById(R.id.smart_tabs);
         mSmartTabLayout.setOnPageChangeListener(new ViewPager.SimpleOnPageChangeListener() {

@@ -11,13 +11,6 @@
         android:layout_width="match_parent"
         android:layout_height="wrap_content"/>
 
-    <!--<com.google.samples.apps.iosched.ui.widget.SlidingTabLayout-->
-        <!--android:id="@+id/sliding_tabs"-->
-        <!--android:layout_width="match_parent"-->
-        <!--android:layout_height="wrap_content"-->
-        <!--android:elevation="@dimen/header_elevation"-->
-        <!--android:background="?attr/colorPrimary" />-->
-
     <com.ogaclejapan.smarttablayout.SmartTabLayout
         android:id="@+id/smart_tabs"
         android:layout_width="match_parent"
