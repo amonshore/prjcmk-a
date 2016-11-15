@@ -1,5 +1,6 @@
 package it.amonshore.comikkua.data;
 
+import android.app.backup.BackupManager;
 import android.content.Context;
 import android.content.SharedPreferences;
 import android.database.Cursor;
@@ -119,6 +120,8 @@ public class DataManager extends Observable<ComicsObserver> {
     //A0033
     private ReminderEventHelper mReminderEventHelper;
     private boolean mIsReminderEnabled = false;
+    //A0072
+    private BackupManager mBackupManager;
 
     private DataManager(Context context, String userName) {
         mContext = context;
@@ -138,6 +141,8 @@ public class DataManager extends Observable<ComicsObserver> {
         //creo i gestori eventi sui dati e sui reminder
         mDataEventHelper = new DataEventHelper(mContext);
         mReminderEventHelper = new ReminderEventHelper(mContext);
+        //
+        mBackupManager = new BackupManager(context);
     }
 
     private SharedPreferences.OnSharedPreferenceChangeListener mSharedPreferenceChangeListener =
@@ -547,6 +552,9 @@ public class DataManager extends Observable<ComicsObserver> {
         //se è un evento di tipo data lo invio al gestore degli eventi
         if ((action & ACTION_DATA) == ACTION_DATA) {
             mDataEventHelper.send(action, comicsId, releaseNumber);
+            //A0072 notifico che i dati sono stati modificati
+            Utils.d(this.getClass(), "backup manager data changed");
+            mBackupManager.dataChanged();
         }
         //invio all'osservatore un nuovo evento da gestire indipendentemente dal tipo
         if (mIsReminderEnabled) {

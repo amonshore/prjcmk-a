@@ -11,6 +11,7 @@ import org.json.JSONObject;
 import org.json.JSONTokener;
 
 import java.io.BufferedReader;
+import java.io.ByteArrayOutputStream;
 import java.io.File;
 import java.io.FileInputStream;
 import java.io.FileOutputStream;
@@ -18,6 +19,8 @@ import java.io.FileReader;
 import java.io.IOException;
 import java.io.OutputStreamWriter;
 import java.nio.channels.FileChannel;
+import java.security.MessageDigest;
+import java.security.NoSuchAlgorithmException;
 import java.text.ParseException;
 import java.text.SimpleDateFormat;
 import java.util.ArrayList;
@@ -481,4 +484,58 @@ public class FileHelper {
         }
         return ext;
     }
+
+    public static byte[] readAllBytes(File file) throws IOException {
+        ByteArrayOutputStream baos = new ByteArrayOutputStream();
+        FileInputStream fis = null;
+
+        try {
+            fis = new FileInputStream(file);
+            int nn;
+            byte[] buff = new byte[4096];
+
+            while ((nn = fis.read(buff, 0, buff.length)) > 0) {
+                baos.write(buff, 0, nn);
+            }
+            return baos.toByteArray();
+        } finally {
+            if (baos != null) {
+                baos.close();
+            }
+            if (fis != null) {
+                fis.close();
+            }
+        }
+    }
+
+    public static byte[] createChecksum(File file) throws IOException, NoSuchAlgorithmException {
+        FileInputStream fis =  new FileInputStream(file);
+
+        byte[] buffer = new byte[1024];
+        MessageDigest complete = MessageDigest.getInstance("MD5");
+        int numRead;
+
+        do {
+            numRead = fis.read(buffer);
+            if (numRead > 0) {
+                complete.update(buffer, 0, numRead);
+            }
+        } while (numRead != -1);
+
+        fis.close();
+        return complete.digest();
+    }
+
+    // see this How-to for a faster way to convert
+    // a byte array to a HEX string
+    public static String getMD5Checksum(File file) throws IOException, NoSuchAlgorithmException {
+        byte[] b = createChecksum(file);
+        String result = "";
+
+        for (int i=0; i < b.length; i++) {
+            result += Integer.toString( ( b[i] & 0xff ) + 0x100, 16).substring( 1 );
+        }
+        return result;
+    }
+
 }
