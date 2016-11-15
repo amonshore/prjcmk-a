@@ -37,6 +37,7 @@ public class DataManager extends Observable<ComicsObserver> {
     public final static int ACTION_UPD = ACTION_DATA | 1 << 2;
     public final static int ACTION_DEL = ACTION_DATA | 1 << 3;
     public final static int ACTION_CLEAR = ACTION_DATA | 1 << 4;
+    public final static int ACTION_NO_SYNC = ACTION_DATA | 1 << 5;
     public final static int ACTION_REMINDER_CLEAR = ACTION_REMINDER | 1 << 11;
     public final static int ACTION_REMINDER_UPDATE = ACTION_REMINDER | 1 << 12;
 
@@ -57,7 +58,7 @@ public class DataManager extends Observable<ComicsObserver> {
     public static final int CAUSE_SYNC = 1 << 13;
     public static final int CAUSE_SYNC_READY = CAUSE_SYNC | 1 << 14;
     public static final int CAUSE_SYNC_STARTED = CAUSE_SYNC | 1 << 15;
-    public static final int CAUSE_SYNC_REFUSED = CAUSE_SYNC | 1 << 16;
+    public static final int CAUSE_SYNC_RECEIVED = CAUSE_SYNC | 1 << 16;
     public static final int CAUSE_SYNC_STOPPED = CAUSE_SYNC | 1 << 17;
     public static final int CAUSE_SYNC_ERROR = CAUSE_SYNC | 1 << 18;
 
@@ -535,6 +536,8 @@ public class DataManager extends Observable<ComicsObserver> {
     public void notifyChanged(int cause) {
         Utils.d(this.getClass(), "notifyChanged " + cause);
 
+        // TODO: non va bene! gli eventi vengono scatenati sincroni
+
         //see DataSetObservable.notifyChanged()
         synchronized(mObservers) {
             // since onChanged() is implemented by the app, it could do anything, including
@@ -575,7 +578,8 @@ public class DataManager extends Observable<ComicsObserver> {
         if ((action & ACTION_DATA) == ACTION_DATA) {
             mDataEventHelper.send(action, comicsId, releaseNumber);
             //A0068 se abilitato invio l'evento anche al gestore della sincronizzazione remota
-            if (mIsSyncEnabled) {
+            // TODO: gestire ACTION_NO_SYNC (se presente non segnalare a mSyncEventHelper)
+            if (mIsSyncEnabled && (action & ACTION_NO_SYNC) == 0) {
                 mSyncEventHelper.send(action, comicsId, releaseNumber);
             }
         }
@@ -589,8 +593,7 @@ public class DataManager extends Observable<ComicsObserver> {
 
     /**
      * Attiva la sincronizzazione remota.
-     * Se la presentazione va a buon fine verrà inviata la notifica CAUSE_SYNC_READY,
-     * seguita da CAUSE_SYNC_START a sincronizzazione attiva.
+     * Se la presentazione va a buon fine verrà inviata la notifica CAUSE_SYNC_READY.
      * In caso contrario CAUSE_SYNC_REFUSED.
      *
      * @param syncId    codice di sincronizzazione
@@ -606,33 +609,17 @@ public class DataManager extends Observable<ComicsObserver> {
             @Override
             public void onResponse(int response) {
                 if (response == SyncEventHelper.SYNC_READY) {
-                    notifyChanged(CAUSE_SYNC_READY);
                     mIsSyncEnabled = true;
                     mSyncEventHelper.start();
-                } else if (response == SyncEventHelper.SYNC_STARTED) {
-                    notifyChanged(CAUSE_SYNC_STARTED);
-                } else if (response == SyncEventHelper.SYNC_REFUSED) {
-                    mIsSyncEnabled = false;
-                    // segnalo che il codice di sincronizzazione è stato rifiutato
-                    notifyChanged(CAUSE_SYNC_REFUSED);
-                } else if (response == SyncEventHelper.SYNC_SENT) {
-                    // TODO dati inviati
                 } else if (response == SyncEventHelper.SYNC_EXPIRED) {
                     mIsSyncEnabled = false;
                     mSyncEventHelper.stop();
-                    // segnalo che la sincronizzazione non è più attiva
-                        notifyChanged(CAUSE_SYNC_STOPPED);
-                } else {
+                } else if (response == SyncEventHelper.SYNC_ERR) {
                     mIsSyncEnabled = false;
                     mSyncEventHelper.stop();
-                    // segnalo che la sincronizzazione non è più attiva a causa di un errore
-                    notifyChanged(CAUSE_SYNC_ERROR);
+                } else {
+                    Utils.w(this.getClass(), "SyncListener event not valid: " + response);
                 }
-            }
-
-            @Override
-            public void onDataReceived(Object data) {
-                // TODO ho ricevuto nuovi dati... che me ne faccio?
             }
         });
 
@@ -655,7 +642,7 @@ public class DataManager extends Observable<ComicsObserver> {
     /**
      * @return  this
      */
-    public DataManager startWriteHandler() {
+    public DataManager startEventHelpers() {
         //può capitare che una istanza della MainActivity venga creata quando ne esiste già una
         //quindi gli helper tengono conto di questo fatto e attivano i processi interni una sola
         //volta
@@ -668,7 +655,7 @@ public class DataManager extends Observable<ComicsObserver> {
     /**
      * @return  this
      */
-    public DataManager stopWriteHandler() {
+    public DataManager stopEventHelpers() {
         //perché vengano fermati i processi interni deve essere chiamato lo stop tante volte
         //quante volte è stato chiamato start
         mDataEventHelper.stop();
@@ -698,7 +685,7 @@ public class DataManager extends Observable<ComicsObserver> {
     private void dispose() {
         mPreferences.unregisterOnSharedPreferenceChangeListener(mSharedPreferenceChangeListener);
         unregisterAll();
-        stopWriteHandler();
+        stopEventHelpers();
     }
 
 }

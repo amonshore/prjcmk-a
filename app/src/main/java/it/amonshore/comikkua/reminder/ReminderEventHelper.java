@@ -51,14 +51,25 @@ public class ReminderEventHelper extends AIncrementalStart {
                     .observeOn(Schedulers.io()) //gli eventi verranno consumati in un scheduler specifico per I/O
                     .map(new Func1<Integer, Integer>() {
                         public Integer call(Integer action) {
-                            switch (action) {
-                                case DataManager.ACTION_REMINDER_CLEAR:
-                                case DataManager.ACTION_REMINDER_UPDATE:
-                                    return action;
-                                case DataManager.ACTION_CLEAR:
-                                    return DataManager.ACTION_REMINDER_CLEAR;
-                                default:
-                                    return DataManager.ACTION_REMINDER_UPDATE;
+//                            switch (action) {
+//                                case DataManager.ACTION_REMINDER_CLEAR:
+//                                case DataManager.ACTION_REMINDER_UPDATE:
+//                                    return action;
+//                                case DataManager.ACTION_CLEAR:
+//                                    return DataManager.ACTION_REMINDER_CLEAR;
+//                                default:
+//                                    return DataManager.ACTION_REMINDER_UPDATE;
+//                            }
+
+                            // TODO: da provare bene
+                            if ((action & DataManager.ACTION_REMINDER_CLEAR) == DataManager.ACTION_REMINDER_CLEAR) {
+                                return DataManager.ACTION_REMINDER_CLEAR;
+                            } else if ((action & DataManager.ACTION_REMINDER_UPDATE) == DataManager.ACTION_REMINDER_UPDATE) {
+                                return DataManager.ACTION_REMINDER_UPDATE;
+                            } else if ((action & DataManager.ACTION_CLEAR) == DataManager.ACTION_CLEAR) {
+                                return DataManager.ACTION_REMINDER_CLEAR;
+                            } else {
+                                return DataManager.ACTION_REMINDER_UPDATE;
                             }
                         }
                     })

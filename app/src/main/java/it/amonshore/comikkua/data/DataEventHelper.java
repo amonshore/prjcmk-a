@@ -80,34 +80,35 @@ class DataEventHelper extends AIncrementalStart {
                                 try {
                                     database = mDBHelper.getWritableDatabase();
                                     for (DataEvent event : dataEvents) {
-//                                    Utils.d(String.format("RX DATA act %s cid %s rid %s", event.Action, event.ComicsId, event.ReleaseNumber));
-                                        switch (event.Action) {
-                                            case DataManager.ACTION_CLEAR:
-                                                clear(database, userName);
-                                                break;
-                                            case DataManager.ACTION_ADD:
-                                                if (event.ReleaseNumber == DataManager.NO_RELEASE) {
-                                                    writeComics(database, userName, dataManager.getComics(event.ComicsId), true);
-                                                } else {
-                                                    writeRelease(database, userName, dataManager.getComics(event.ComicsId)
-                                                            .getRelease(event.ReleaseNumber), true);
-                                                }
-                                                break;
-                                            case DataManager.ACTION_UPD:
-                                                if (event.ReleaseNumber == DataManager.NO_RELEASE) {
-                                                    writeComics(database, userName, dataManager.getComics(event.ComicsId), false);
-                                                } else {
-                                                    writeRelease(database, userName, dataManager.getComics(event.ComicsId)
-                                                            .getRelease(event.ReleaseNumber), false);
-                                                }
-                                                break;
-                                            case DataManager.ACTION_DEL:
-                                                if (event.ReleaseNumber == DataManager.NO_RELEASE) {
-                                                    deleteComics(database, userName, event.ComicsId);
-                                                } else {
-                                                    deleteRelease(database, userName, event.ComicsId, event.ReleaseNumber);
-                                                }
-                                                break;
+                                        if ((event.Action & DataManager.ACTION_CLEAR) == DataManager.ACTION_CLEAR) {
+                                            clear(database, userName);
+
+                                        } else if ((event.Action & DataManager.ACTION_ADD) == DataManager.ACTION_ADD) {
+                                            if (event.ReleaseNumber == DataManager.NO_RELEASE) {
+                                                writeComics(database, userName, dataManager.getComics(event.ComicsId), true);
+                                            } else {
+                                                writeRelease(database, userName, dataManager.getComics(event.ComicsId)
+                                                        .getRelease(event.ReleaseNumber), true);
+                                            }
+
+                                        } else if ((event.Action & DataManager.ACTION_UPD) == DataManager.ACTION_UPD) {
+                                            if (event.ReleaseNumber == DataManager.NO_RELEASE) {
+                                                writeComics(database, userName, dataManager.getComics(event.ComicsId), false);
+                                            } else {
+                                                writeRelease(database, userName, dataManager.getComics(event.ComicsId)
+                                                        .getRelease(event.ReleaseNumber), false);
+                                            }
+
+                                        } else if ((event.Action & DataManager.ACTION_DEL) == DataManager.ACTION_DEL) {
+                                            if (event.ReleaseNumber == DataManager.NO_RELEASE) {
+                                                deleteComics(database, userName, event.ComicsId);
+                                            } else {
+                                                deleteRelease(database, userName, event.ComicsId, event.ReleaseNumber);
+                                            }
+
+                                        } else {
+                                            Utils.w(DataEventHelper.class, "action not valid: " + event.Action);
+
                                         }
                                     }
                                 } catch (Exception ex) {

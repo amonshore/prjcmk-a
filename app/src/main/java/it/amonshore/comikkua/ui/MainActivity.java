@@ -50,7 +50,7 @@ public class MainActivity extends AppCompatActivity implements ComicsObserver {
         mDataManager = DataManager.getDataManager();
         Utils.d(this.getClass(), "*********** MAIN onCreate -> register observer and start WH");
         mDataManager.registerObserver(this);
-        mDataManager.startWriteHandler();
+        mDataManager.startEventHelpers();
         //impsota i valori di default, il parametro false assicura che questo venga fatto una sola volta
         //  indipendentemente da quante volte viene chiamato il metodo
         PreferenceManager.setDefaultValues(this, R.xml.preferences, false);
@@ -131,7 +131,7 @@ public class MainActivity extends AppCompatActivity implements ComicsObserver {
 //        SharedPreferences prefs = PreferenceManager.getDefaultSharedPreferences(this);
 //        prefs.unregisterOnSharedPreferenceChangeListener(this);
         mDataManager.unregisterObserver(this);
-        mDataManager.stopWriteHandler();
+        mDataManager.stopEventHelpers();
     }
 
     @Override
@@ -193,7 +193,6 @@ public class MainActivity extends AppCompatActivity implements ComicsObserver {
         switch (cause) {
             case DataManager.CAUSE_RELEASES_MODE_CHANGED:
                 final ReleaseListFragment fragment = (ReleaseListFragment)mTabPageAdapter.getItem(1);
-//                SlidingTabLayout slidingTabLayout = (SlidingTabLayout) findViewById(R.id.sliding_tabs);
                 int groupMode = fragment.getGroupMode();
                 if (groupMode == 0) {
                     SharedPreferences settings = getSharedPreferences(MainActivity.PREFS_NAME, 0);
@@ -202,19 +201,15 @@ public class MainActivity extends AppCompatActivity implements ComicsObserver {
                 final TextView tab = (TextView) mSmartTabLayout.getTabAt(1);
                 switch (groupMode) {
                     case ReleaseGroupHelper.MODE_LAW:
-//                        mSlidingTabLayout.setPageTitle(1, getString(R.string.title_page_wishlist));
                         tab.setText(getString(R.string.title_page_wishlist));
                         break;
                     case ReleaseGroupHelper.MODE_CALENDAR:
-//                        mSlidingTabLayout.setPageTitle(1, getString(R.string.title_page_calendar));
                         tab.setText(getString(R.string.title_page_calendar));
                         break;
                     case ReleaseGroupHelper.MODE_SHOPPING:
-//                        mSlidingTabLayout.setPageTitle(1, getString(R.string.title_page_shopping));
                         tab.setText(getString(R.string.title_page_shopping));
                         break;
                     default:
-//                        mSlidingTabLayout.setPageTitle(1, getString(R.string.title_page_releases));
                         tab.setText(getString(R.string.title_page_releases));
                         break;
                 }
@@ -227,22 +222,20 @@ public class MainActivity extends AppCompatActivity implements ComicsObserver {
                         .setTitle("SYNC READY")
                         .setMessage("Waiting...");
                 mAlertDialog = builder.show();
-                //Toast.makeText(this, "sync ready", Toast.LENGTH_SHORT).show();
                 break;
             case DataManager.CAUSE_SYNC_STARTED:
-                // TODO nascondere voce menu per sincronizzazione
+                // TODO nascondere voce menu per sincronizzazione (oppure no! cosa succede se scateno un'altra sync?)
                 dismissDialog();
                 Toast.makeText(this, "sync started", Toast.LENGTH_SHORT).show();
-                break;
-            case DataManager.CAUSE_SYNC_REFUSED:
-                // TODO
-                dismissDialog();
-                Toast.makeText(this, "sync refused", Toast.LENGTH_SHORT).show();
                 break;
             case DataManager.CAUSE_SYNC_ERROR:
                 // TODO
                 dismissDialog();
                 Toast.makeText(this, "sync error", Toast.LENGTH_SHORT).show();
+                break;
+            case DataManager.CAUSE_SYNC_RECEIVED:
+                // TODO
+                Toast.makeText(this, "sync received", Toast.LENGTH_SHORT).show();
                 break;
             case DataManager.CAUSE_SYNC_STOPPED:
                 // TODO

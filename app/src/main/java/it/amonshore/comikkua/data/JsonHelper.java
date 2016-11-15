@@ -24,6 +24,7 @@ public class JsonHelper {
     private final static String FALSE = "F";
 
     private final static String FIELD_ID = "id";
+    private final static String FIELD_CID = "cid";
     private final static String FIELD_NAME = "name";
     private final static String FIELD_SERIES = "series";
     private final static String FIELD_PUBLISHER = "publisher";
@@ -56,7 +57,7 @@ public class JsonHelper {
      */
     public Comics json2comics(JSONObject obj) throws JSONException {
         //nella versione ionic l'id è una stringa, devo convertirla in long
-        Comics comics = new Comics(tryGetId(obj));
+        Comics comics = new Comics(tryGetIdOrCid(obj));
         comics.setName(obj.getString(FIELD_NAME));
         comics.setSeries(tryGetString(obj, FIELD_SERIES));
         comics.setPublisher(tryGetString(obj, FIELD_PUBLISHER));
@@ -92,6 +93,18 @@ public class JsonHelper {
             return obj.getLong(FIELD_ID);
         } catch (JSONException jsonex) {
             return (++mLastComicsId) * -1;
+        }
+    }
+
+    private long tryGetIdOrCid(JSONObject obj) {
+        try {
+            return obj.getLong(FIELD_ID);
+        } catch (JSONException jsonex) {
+            try {
+                return obj.getLong(FIELD_CID);
+            } catch (JSONException jsonex2) {
+                return (++mLastComicsId) * -1;
+            }
         }
     }
 

@@ -21,12 +21,12 @@ public class BootReceiver extends BroadcastReceiver {
             Utils.d(this.getClass(), "Boot completed: reloading reminders");
             DataManager
                     .getDataManager()
-                    // devo per forza richiamare startWriteHandler altrimenti updateData non va a buon fine
-                    .startWriteHandler()
+                    // devo per forza richiamare startEventHelpers altrimenti updateData non va a buon fine
+                    .startEventHelpers()
                     .updateData(DataManager.ACTION_REMINDER_UPDATE,
                             DataManager.NO_COMICS, DataManager.NO_RELEASE)
                     // e quindi lo chiudo altrimenti rimarrà sempre aperto
-                    .stopWriteHandler();
+                    .stopEventHelpers();
         }
     }
 }

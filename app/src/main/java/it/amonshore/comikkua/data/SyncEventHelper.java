@@ -2,6 +2,7 @@ package it.amonshore.comikkua.data;
 
 import android.os.Build;
 
+import org.json.JSONArray;
 import org.json.JSONException;
 import org.json.JSONObject;
 import org.json.JSONTokener;
@@ -24,9 +25,6 @@ import rx.schedulers.Schedulers;
 class SyncEventHelper extends AIncrementalStart {
 
     final static int SYNC_READY = 0;
-    final static int SYNC_STARTED = 10;
-    final static int SYNC_SENT = 30;
-    final static int SYNC_REFUSED = 101;
     final static int SYNC_ERR = 102;
     final static int SYNC_EXPIRED = 103;
 
@@ -40,6 +38,13 @@ class SyncEventHelper extends AIncrementalStart {
     private final static String MESSAGE_REMOVE_RELEASES = "remove releases";
     private final static String MESSAGE_STOP_SYNC = "stop sync";
 
+    private final static String MESSAGE_COMICS_UPDATED = "comics updated";
+    private final static String MESSAGE_COMICS_REMOVED = "comics removed";
+    private final static String MESSAGE_COMICS_CLEARED = "comics cleared";
+    private final static String MESSAGE_RELEASES_UPDATED = "releases updated";
+    private final static String MESSAGE_RELEASES_REMOVED = "releases removed";
+
+
     interface SyncListener {
 
         /**
@@ -47,12 +52,6 @@ class SyncEventHelper extends AIncrementalStart {
          */
         void onResponse(int response);
 
-        /**
-         * TODO quali dati ricevere?
-         *
-         * @param data dati ricevuti dal server
-         */
-        void onDataReceived(Object data);
     }
 
     private RxBus<DataEvent> mEventBus;
@@ -77,10 +76,7 @@ class SyncEventHelper extends AIncrementalStart {
      * Presenta il codice di sincronizzazione al server.
      * Tramite l'ascoltatore si potrà conoscere lo stato della sincronizzazione:
      * - SYNC_READY: codice sincronizzazione accettato (ma la sincronizzazione non è ancora attiva)
-     * - SYNC_STARTED: la sincronizzazione dei dati è attiva
      * - SYNC_RECEIVED: sono stati ricevuti dei nuovi dati dal server
-     * - SYNC_SENT: sono stati inviati con successo dei dati al server
-     * - SYNC_REFUSED: il codice di sincronizzazione non è stato accettato
      * - SYNC_ERR: si è verifcato un errore durante la sincronizzazione
      * - SYNC_EXPIRED: il codice di sincronizzazione non è più valido
      *
@@ -91,11 +87,11 @@ class SyncEventHelper extends AIncrementalStart {
     void applySyncId(final String syncHost, final String syncId, SyncListener listener) {
         mSyncListener = listener;
         mStopRequested = false;
+        final DataManager dataManager = DataManager.getDataManager();
+        final String url = "ws://" + syncHost + "/sync/wsh/" + syncId;
+        Utils.d(this.getClass(), "SYNC connect to " + url);
 
         try {
-            final DataManager dataManager = DataManager.getDataManager();
-            final String url = "ws://" + syncHost + "/sync/wsh/" + syncId;
-            Utils.d(this.getClass(), "SYNC connect to " + url);
 
             mWebSocketClient = new WebSocketConnection();
             mWebSocketClient.connect(url, new WebSocketHandler() {
@@ -112,9 +108,12 @@ class SyncEventHelper extends AIncrementalStart {
                                 .put("comics", mJsonHelper.comics2json(dataManager.getRawComics(), true));
                         sendMessage(MESSAGE_HELLO, jsData);
                         mSyncListener.onResponse(SYNC_READY);
+                        dataManager.notifyChanged(DataManager.CAUSE_SYNC_READY);
                     } catch (Exception ex2) {
                         Utils.e(SyncEventHelper.class, "SYNC ERR (ws)", ex2);
                         mSyncListener.onResponse(SYNC_ERR);
+                        // segnalo che la sincronizzazione non è più attiva a causa di un errore
+                        dataManager.notifyChanged(DataManager.CAUSE_SYNC_ERROR);
                     }
                 }
 
@@ -126,16 +125,42 @@ class SyncEventHelper extends AIncrementalStart {
                         final JSONObject msg = (JSONObject) tokener.nextValue();
                         final String message = msg.getString("message");
                         if (MESSAGE_SYNC_START.equals(message)) {
-                            mSyncListener.onResponse(SYNC_STARTED);
+                            dataManager.notifyChanged(DataManager.CAUSE_SYNC_STARTED);
+
                         } else if (MESSAGE_SYNC_TIMEOUT.equals(message)) {
                             mSyncListener.onResponse(SYNC_EXPIRED);
+                            // segnalo che la sincronizzazione non è più attiva
+                            dataManager.notifyChanged(DataManager.CAUSE_SYNC_STOPPED);
+
+                        } else if (MESSAGE_COMICS_UPDATED.equals(message)) {
+                            Utils.d(SyncEventHelper.class, message);
+                            // TODO: usando updateData si innesca un loop infinito perché viene segnalato un cambiamento anche a SyncEventHelper
+                            //  aggiungere ACTION_NO_SYNC o cmq un flag che impedisca la segnalazione a SyncEventHelper
+                            final JSONObject data = msg.getJSONObject("data");
+                            final Comics comics = mJsonHelper.json2comics(data);
+                            if (dataManager.put(comics)) {
+                                dataManager.updateData(DataManager.ACTION_NO_SYNC | DataManager.ACTION_ADD,
+                                        comics.getId(), DataManager.NO_RELEASE);
+                                dataManager.notifyChanged(DataManager.CAUSE_COMICS_ADDED);
+                            } else {
+                                dataManager.updateData(DataManager.ACTION_NO_SYNC | DataManager.ACTION_UPD,
+                                        comics.getId(), DataManager.NO_RELEASE);
+                                dataManager.notifyChanged(DataManager.CAUSE_COMICS_CHANGED);
+                            }
+                            dataManager.notifyChanged(DataManager.CAUSE_SYNC_RECEIVED);
+
                         } else {
                             mSyncListener.onResponse(SYNC_ERR);
+                            // segnalo che la sincronizzazione non è più attiva a causa di un errore
+                            dataManager.notifyChanged(DataManager.CAUSE_SYNC_ERROR);
+
                         }
                         // TODO: gestire gli altri messaggi
                     } catch (JSONException jsonex) {
                         Utils.e(SyncEventHelper.class, "SYNC ERR (ws)", jsonex);
                         mSyncListener.onResponse(SYNC_ERR);
+                        // segnalo che la sincronizzazione non è più attiva a causa di un errore
+                        dataManager.notifyChanged(DataManager.CAUSE_SYNC_ERROR);
                     }
                 }
 
@@ -145,12 +170,21 @@ class SyncEventHelper extends AIncrementalStart {
                     // scateno l'errore solo se si è trattata di una chiusura imprevista
                     if (!mStopRequested) {
                         mSyncListener.onResponse(SYNC_ERR);
+                        if (code == 3) {
+                            // segnalo che la sincronizzazione non è più attiva
+                            dataManager.notifyChanged(DataManager.CAUSE_SYNC_STOPPED);
+                        } else {
+                            // segnalo che la sincronizzazione non è più attiva a causa di un errore
+                            dataManager.notifyChanged(DataManager.CAUSE_SYNC_ERROR);
+                        }
                     }
                 }
             });
         } catch (Exception ex) {
             Utils.e(SyncEventHelper.class, "SYNC ERR (ws)", ex);
             mSyncListener.onResponse(SYNC_ERR);
+            // segnalo che la sincronizzazione non è più attiva a causa di un errore
+            dataManager.notifyChanged(DataManager.CAUSE_SYNC_ERROR);
         }
     }
 
@@ -238,8 +272,9 @@ class SyncEventHelper extends AIncrementalStart {
                             } catch (Exception ex) {
                                 Utils.e(this.getClass(), "Write data", ex);
                                 mSyncListener.onResponse(SYNC_ERR);
+                                // segnalo che la sincronizzazione non è più attiva a causa di un errore
+                                dataManager.notifyChanged(DataManager.CAUSE_SYNC_ERROR);
                             }
-//                            }
                         }
                     });
 
