@@ -2,7 +2,7 @@
 Autore: narsenico
 
 ## v1.0.6 (24)
-- A0072
+- backup/restore remoto
 
 ## v1.0.5 (23)
 - aggiunta periodicità fumetti quindicinale

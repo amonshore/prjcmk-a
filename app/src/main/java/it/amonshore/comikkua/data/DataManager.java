@@ -13,6 +13,7 @@ import com.evernote.android.job.JobManager;
 
 import java.io.File;
 import java.io.IOException;
+import java.util.Collections;
 import java.util.HashSet;
 import java.util.Set;
 import java.util.TimeZone;
@@ -233,6 +234,14 @@ public class DataManager extends Observable<ComicsObserver> {
             }
         }
         return null;
+    }
+
+    /**
+     *
+     * @return la lista di comics non modificabile
+     */
+    public Iterable<Comics> getRawComics() {
+        return Collections.unmodifiableCollection(mComicsCache.values());
     }
 
     /**
@@ -466,6 +475,21 @@ public class DataManager extends Observable<ComicsObserver> {
             } catch (IOException ioex) {
                 Utils.e(this.getClass(), "Error during data restore", ioex);
                 return false;
+            }
+        }
+    }
+
+    public void restoreFromRaw(Comics[] comics) {
+        synchronized (mSyncObj) {
+            mComicsCache.clear();
+            mPublishers.clear();
+            mBestReleases.clear();
+            updateData(ACTION_CLEAR, NO_COMICS, NO_RELEASE);
+            for (Comics cc : comics) {
+                put(cc);
+                mLastComicsId = Math.max(mLastComicsId, cc.getId());
+                updateBestRelease(cc.getId());
+                updateData(ACTION_ADD, cc.getId(), NO_RELEASE);
             }
         }
     }
